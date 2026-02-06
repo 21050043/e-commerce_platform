@@ -35,6 +35,23 @@ CREATE TABLE IF NOT EXISTS DanhMuc (
     HinhAnh VARCHAR(255)
 );
 
+-- Create table NguoiBan (Vendor)
+CREATE TABLE IF NOT EXISTS NguoiBan (
+    MaNguoiBan INT AUTO_INCREMENT PRIMARY KEY,
+    MaKhachHang INT NOT NULL,
+    LoaiHinh ENUM('CA_NHAN','DOANH_NGHIEP') NOT NULL,
+    TenCuaHang VARCHAR(150),
+    DiaChiKinhDoanh VARCHAR(255) NOT NULL,
+    EmailLienHe VARCHAR(150),
+    MaDanhMucChinh INT NOT NULL,
+    SoDienThoaiLienHe VARCHAR(15) NOT NULL,
+    TrangThai ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+    LyDoTuChoi VARCHAR(255),
+    NgayDuyet DATETIME NULL,
+    CONSTRAINT FK_NguoiBan_KhachHang FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang),
+    CONSTRAINT FK_NguoiBan_DanhMuc FOREIGN KEY (MaDanhMucChinh) REFERENCES DanhMuc(MaDanhMuc)
+);
+
 -- Create table SanPham
 CREATE TABLE IF NOT EXISTS SanPham (
     MaSanPham INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,23 +98,6 @@ CREATE TABLE IF NOT EXISTS ChiTietHoaDon (
     ThanhTien DECIMAL(18, 2) NOT NULL,
     CONSTRAINT FK_ChiTietHoaDon_HoaDon FOREIGN KEY (MaHoaDon) REFERENCES HoaDon(MaHoaDon),
     CONSTRAINT FK_ChiTietHoaDon_SanPham FOREIGN KEY (MaSanPham) REFERENCES SanPham(MaSanPham)
-);
-
--- Create table NguoiBan (Vendor)
-CREATE TABLE IF NOT EXISTS NguoiBan (
-    MaNguoiBan INT AUTO_INCREMENT PRIMARY KEY,
-    MaKhachHang INT NOT NULL,
-    LoaiHinh ENUM('CA_NHAN','DOANH_NGHIEP') NOT NULL,
-    TenCuaHang VARCHAR(150),
-    DiaChiKinhDoanh VARCHAR(255) NOT NULL,
-    EmailLienHe VARCHAR(150),
-    MaDanhMucChinh INT NOT NULL,
-    SoDienThoaiLienHe VARCHAR(15) NOT NULL,
-    TrangThai ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
-    LyDoTuChoi VARCHAR(255),
-    NgayDuyet DATETIME NULL,
-    CONSTRAINT FK_NguoiBan_KhachHang FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang),
-    CONSTRAINT FK_NguoiBan_DanhMuc FOREIGN KEY (MaDanhMucChinh) REFERENCES DanhMuc(MaDanhMuc)
 );
 
 -- Bridge table: NguoiBan <-> DanhMuc (many-to-many business categories)

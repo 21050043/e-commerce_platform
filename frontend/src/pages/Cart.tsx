@@ -37,7 +37,7 @@ const Cart = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4 text-center">Giỏ Hàng</h1>
@@ -55,19 +55,19 @@ const Cart = () => {
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
               <span className="ml-2">Đang tải giỏ hàng...</span>
             </div>
           ) : cart.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShoppingBag className="h-8 w-8 text-pink-500" />
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="h-8 w-8 text-primary-600" />
               </div>
               <h2 className="text-2xl font-semibold mb-2">Giỏ hàng trống</h2>
               <p className="text-gray-600 mb-6">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
               <Link
                 to="/categories"
-                className="bg-pink-500 text-white px-6 py-3 rounded-md hover:bg-pink-600 transition"
+                className="bg-primary-600 text-white px-6 py-3 rounded-md hover:bg-primary-700 transition"
               >
                 Tiếp tục mua sắm
               </Link>
@@ -93,14 +93,14 @@ const Cart = () => {
                           <td className="py-4 px-6">
                             <div className="flex items-center">
                               <img
-                                src={item.product.HinhAnh ? (item.product.HinhAnh.startsWith('http') 
-                                  ? item.product.HinhAnh 
-                                  : `http://localhost:5000${item.product.HinhAnh}`) 
+                                src={item.product.HinhAnh ? (item.product.HinhAnh.startsWith('http')
+                                  ? item.product.HinhAnh
+                                  : `http://localhost:5000${item.product.HinhAnh}`)
                                   : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80'}
                                 alt={item.product.TenSanPham}
                                 className="w-16 h-16 object-cover rounded"
                               />
-                              <Link to={`/products/${item.product.MaSanPham}`} className="ml-4 hover:text-pink-500">
+                              <Link to={`/products/${item.product.MaSanPham}`} className="ml-4 hover:text-primary-600">
                                 {item.product.TenSanPham}
                               </Link>
                             </div>
@@ -163,7 +163,7 @@ const Cart = () => {
                       clearAll();
                       addToast('Đã xóa toàn bộ giỏ hàng', 'success');
                     }}
-                    className="px-6 py-2 border border-pink-500 text-pink-500 rounded-md hover:bg-pink-500 hover:text-white transition"
+                    className="px-6 py-2 border border-primary-600 text-primary-600 rounded-md hover:bg-primary-600 hover:text-white transition"
                   >
                     Xóa giỏ hàng
                   </button>
@@ -185,13 +185,13 @@ const Cart = () => {
                     </div>
                     <div className="flex justify-between font-semibold border-t border-b py-4 my-2">
                       <span>Tổng cộng</span>
-                      <span className="text-pink-600">{formatPrice(totalPrice)}</span>
+                      <span className="text-primary-700">{formatPrice(totalPrice)}</span>
                     </div>
                   </div>
 
                   <button
                     onClick={proceedToCheckout}
-                    className="w-full bg-pink-500 text-white py-3 rounded-md mt-4 hover:bg-pink-600 transition flex items-center justify-center"
+                    className="w-full bg-primary-600 text-white py-3 rounded-md mt-4 hover:bg-primary-700 transition flex items-center justify-center"
                   >
                     Thanh toán <ArrowRight className="ml-2" size={18} />
                   </button>

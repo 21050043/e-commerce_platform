@@ -61,7 +61,7 @@ const VendorShop = () => {
     return (
       <MainLayout>
         <div className="flex justify-center items-center py-20">
-          <Loader className="animate-spin h-8 w-8 text-pink-500" />
+          <Loader className="animate-spin h-8 w-8 text-primary-600" />
           <span className="ml-2">Đang tải thông tin cửa hàng...</span>
         </div>
       </MainLayout>
@@ -87,11 +87,11 @@ const VendorShop = () => {
       <div className="bg-gray-100 py-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center text-sm">
-            <Link to="/" className="text-gray-600 hover:text-pink-500">
+            <Link to="/" className="text-gray-600 hover:text-primary-600">
               Trang Chủ
             </Link>
             <ChevronRight className="mx-2 h-4 w-4 text-gray-400" />
-            <span className="text-pink-500">Cửa hàng: {shopData.vendor.TenCuaHang}</span>
+            <span className="text-primary-600">Cửa hàng: {shopData.vendor.TenCuaHang}</span>
           </div>
         </div>
       </div>
@@ -99,11 +99,11 @@ const VendorShop = () => {
       {/* Vendor Header */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg p-8 border border-pink-100">
+          <div className="bg-gradient-to-r from-primary-50 to-primary-100/50 rounded-lg p-8 border border-primary-100">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               {/* Vendor Avatar/Icon */}
               <div className="flex-shrink-0">
-                <div className="w-20 h-20 bg-pink-500 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 bg-primary-600 rounded-full flex items-center justify-center">
                   <Store className="w-10 h-10 text-white" />
                 </div>
               </div>
@@ -118,11 +118,11 @@ const VendorShop = () => {
                 {/* Contact Info */}
                 <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                   <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2 text-pink-500" />
+                    <Phone className="w-4 h-4 mr-2 text-primary-600" />
                     <span>{shopData.vendor.SoDienThoaiLienHe}</span>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-pink-500" />
+                    <MapPin className="w-4 h-4 mr-2 text-primary-600" />
                     <span>{shopData.vendor.DiaChiKinhDoanh}</span>
                   </div>
                 </div>
@@ -132,7 +132,7 @@ const VendorShop = () => {
               <div className="flex-shrink-0">
                 <div className="bg-white rounded-lg p-4 shadow-sm border">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-pink-600">{shopData.stats.productCount}</div>
+                    <div className="text-2xl font-bold text-primary-600">{shopData.stats.productCount}</div>
                     <div className="text-sm text-gray-600">Sản phẩm</div>
                   </div>
                   <div className="mt-3 text-center">
@@ -187,7 +187,7 @@ const VendorShop = () => {
                     <h3 className="font-medium text-gray-800 mb-2 line-clamp-2">
                       {product.TenSanPham}
                     </h3>
-                    <p className="text-pink-600 font-bold text-lg">
+                    <p className="text-primary-700 font-bold text-lg">
                       {formatPrice(product.GiaSanPham)}
                     </p>
                     <div className="mt-2 text-sm text-gray-600">

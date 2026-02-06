@@ -12,7 +12,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,10 +36,10 @@ const Login = () => {
         SoDienThoai: phoneNumber,
         MatKhau: password
       });
-      
+
       // Thông báo đăng nhập thành công
       addToast('Đăng nhập thành công!', 'success');
-      
+
       // Chuyển hướng về trang trước đó hoặc trang mặc định dựa vào vai trò
       const from = location.state?.from;
       if (from) {
@@ -77,7 +77,7 @@ const Login = () => {
       <div className="bg-gray-100 min-h-screen py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-8 text-white text-center">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-8 text-white text-center">
               <h1 className="text-3xl font-bold mb-2">Đăng nhập</h1>
               <p>Đăng nhập để tiếp tục mua sắm</p>
             </div>
@@ -140,7 +140,7 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-2 px-4 rounded-lg hover:from-pink-600 hover:to-rose-600 transition flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-primary-600 to-primary-800 text-white py-2 px-4 rounded-lg hover:from-primary-700 hover:to-primary-900 transition flex items-center justify-center"
                   disabled={loading}
                 >
                   {loading ? (
@@ -157,7 +157,7 @@ const Login = () => {
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
                   Chưa có tài khoản?{' '}
-                  <Link to="/register" className="text-pink-500 hover:text-pink-700">
+                  <Link to="/register" className="text-primary-600 hover:text-primary-800">
                     Đăng ký ngay
                   </Link>
                 </p>

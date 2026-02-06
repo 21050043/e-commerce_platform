@@ -13,7 +13,7 @@ const NotFound = () => {
         </p>
         <Link
           to="/"
-          className="mt-8 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition-colors"
+          className="mt-8 flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md transition-colors"
         >
           <Home size={18} />
           <span>Quay về trang chủ</span>

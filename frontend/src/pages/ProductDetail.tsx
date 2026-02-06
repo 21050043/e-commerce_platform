@@ -105,7 +105,7 @@ const ProductDetail = () => {
     return (
       <MainLayout>
         <div className="flex justify-center items-center py-20">
-          <Loader className="animate-spin h-8 w-8 text-pink-500" />
+          <Loader className="animate-spin h-8 w-8 text-primary-600" />
           <span className="ml-2">Đang tải thông tin sản phẩm...</span>
         </div>
       </MainLayout>
@@ -131,22 +131,22 @@ const ProductDetail = () => {
       <div className="bg-gray-100 py-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center text-sm">
-            <Link to="/" className="text-gray-600 hover:text-pink-500">
+            <Link to="/" className="text-gray-600 hover:text-primary-600">
               Trang Chủ
             </Link>
             <ChevronRight className="mx-2 h-4 w-4 text-gray-400" />
-            <Link to="/categories" className="text-gray-600 hover:text-pink-500">
+            <Link to="/categories" className="text-gray-600 hover:text-primary-600">
               Danh Mục
             </Link>
             <ChevronRight className="mx-2 h-4 w-4 text-gray-400" />
             <Link
               to={`/categories/${product.DanhMuc.MaDanhMuc}`}
-              className="text-gray-600 hover:text-pink-500"
+              className="text-gray-600 hover:text-primary-600"
             >
               {product.DanhMuc.TenDanhMuc}
             </Link>
             <ChevronRight className="mx-2 h-4 w-4 text-gray-400" />
-            <span className="text-pink-500">{product.TenSanPham}</span>
+            <span className="text-primary-600">{product.TenSanPham}</span>
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ const ProductDetail = () => {
             <div className="md:w-1/2 px-4">
               <h1 className="text-3xl font-bold text-gray-800 mb-1">{product.TenSanPham}</h1>
               {product.NguoiBan && (
-                <div className="mb-3 p-3 rounded-lg border border-rose-100 bg-rose-50/50">
+                <div className="mb-3 p-3 rounded-lg border border-primary-100 bg-primary-50/50">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-sm text-gray-600">Người bán:</span>{' '}
@@ -183,14 +183,14 @@ const ProductDetail = () => {
                     </div>
                     <Link
                       to={`/vendor/${product.NguoiBan.MaNguoiBan}`}
-                      className="text-pink-500 hover:text-pink-700 text-sm font-medium underline"
+                      className="text-primary-600 hover:text-primary-800 text-sm font-medium underline"
                     >
                       Xem cửa hàng
                     </Link>
                   </div>
                 </div>
               )}
-              
+
               {/* Rating */}
               <div className="flex items-center mb-4">
                 <div className="flex items-center text-yellow-400 mr-2">
@@ -207,7 +207,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Price */}
-              <div className="text-2xl font-bold text-pink-600 mb-4">
+              <div className="text-2xl font-bold text-primary-600 mb-4">
                 {formatPrice(product.GiaSanPham)}
               </div>
 
@@ -230,7 +230,7 @@ const ProductDetail = () => {
                   <span className="font-semibold">Danh mục:</span>{' '}
                   <Link
                     to={`/categories/${product.DanhMuc.MaDanhMuc}`}
-                    className="text-pink-500 hover:text-pink-700"
+                    className="text-primary-600 hover:text-primary-800"
                   >
                     {product.DanhMuc.TenDanhMuc}
                   </Link>
@@ -255,7 +255,7 @@ const ProductDetail = () => {
                       max={product.SoLuong}
                       value={quantity}
                       onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-                      className="w-16 text-center py-2 border-t border-b focus:outline-none focus:border-pink-500"
+                      className="w-16 text-center py-2 border-t border-b focus:outline-none focus:border-primary-500"
                     />
                     <button
                       onClick={() => handleQuantityChange(quantity + 1)}
@@ -272,7 +272,7 @@ const ProductDetail = () => {
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <button
                   onClick={addToCart}
-                  className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-3 px-6 rounded-md flex items-center justify-center"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-md flex items-center justify-center"
                   disabled={product.SoLuong === 0}
                 >
                   <ShoppingCart className="mr-2" size={20} />
@@ -292,21 +292,19 @@ const ProductDetail = () => {
             <div className="flex border-b">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`py-4 px-6 font-medium text-sm focus:outline-none ${
-                  activeTab === 'description'
-                    ? 'text-pink-600 border-b-2 border-pink-500'
-                    : 'text-gray-500 hover:text-pink-500'
-                }`}
+                className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'description'
+                    ? 'text-primary-600 border-b-2 border-primary-500'
+                    : 'text-gray-500 hover:text-primary-500'
+                  }`}
               >
                 Mô tả sản phẩm
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`py-4 px-6 font-medium text-sm focus:outline-none ${
-                  activeTab === 'reviews'
-                    ? 'text-pink-600 border-b-2 border-pink-500'
-                    : 'text-gray-500 hover:text-pink-500'
-                }`}
+                className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'reviews'
+                    ? 'text-primary-600 border-b-2 border-primary-500'
+                    : 'text-gray-500 hover:text-primary-500'
+                  }`}
               >
                 Đánh giá ({reviewCount})
               </button>
@@ -361,9 +359,9 @@ const ProductDetail = () => {
                     </p>
                   </div>
                   <div className="flex justify-center mt-4">
-                    <Link 
+                    <Link
                       to={`/products/${productId}/reviews`}
-                      className="text-pink-500 hover:text-pink-700 font-medium"
+                      className="text-primary-600 hover:text-primary-800 font-medium"
                     >
                       Xem tất cả đánh giá
                     </Link>
@@ -398,7 +396,7 @@ const ProductDetail = () => {
                     <h3 className="font-medium text-gray-800 mb-2 line-clamp-2">
                       {relatedProduct.TenSanPham}
                     </h3>
-                    <p className="text-pink-600 font-bold">
+                    <p className="text-primary-600 font-bold">
                       {formatPrice(relatedProduct.GiaSanPham)}
                     </p>
                   </div>

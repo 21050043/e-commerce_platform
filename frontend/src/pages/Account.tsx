@@ -34,7 +34,7 @@ const Account = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'thongTin' | 'matKhau'>('thongTin');
-  
+
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -86,11 +86,11 @@ const Account = () => {
           setVendorStatus(null);
           setVendorProfile(null);
         }
-      } catch {}
+      } catch { }
       try {
         const cats = await getAllCategories();
         setCategories(cats);
-      } catch {}
+      } catch { }
     })();
   }, [isAuthenticated, user, navigate]);
 
@@ -152,13 +152,13 @@ const Account = () => {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.MatKhauMoi !== formData.XacNhanMatKhau) {
       setError('Xác nhận mật khẩu không khớp');
       addToast('Xác nhận mật khẩu không khớp', 'error');
       return;
     }
-    
+
     try {
       setError(null);
       setSuccessMessage(null);
@@ -243,7 +243,7 @@ const Account = () => {
     return (
       <MainLayout>
         <div className="flex justify-center items-center py-20">
-          <Loader className="animate-spin h-8 w-8 text-pink-500" />
+          <Loader className="animate-spin h-8 w-8 text-primary-600" />
           <span className="ml-2">Đang tải thông tin tài khoản...</span>
         </div>
       </MainLayout>
@@ -253,7 +253,7 @@ const Account = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4 text-center">Tài Khoản</h1>
@@ -274,32 +274,30 @@ const Account = () => {
             <div className="md:w-1/4">
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div className="flex items-center mb-6">
-                  <div className="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mr-4">
-                    <User className="h-8 w-8 text-pink-500" />
+                  <div className="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                    <User className="h-8 w-8 text-primary-600" />
                   </div>
                   <div>
                     <p className="font-semibold text-lg">{formData.TenKhachHang}</p>
                     <p className="text-gray-600">{formData.SoDienThoai}</p>
                   </div>
                 </div>
-                
+
                 <nav className="space-y-2">
-                  <button 
-                    className={`w-full text-left px-4 py-2 rounded-md transition ${
-                      activeTab === 'thongTin' 
-                        ? 'bg-pink-500 text-white' 
-                        : 'hover:bg-gray-100'
-                    }`}
+                  <button
+                    className={`w-full text-left px-4 py-2 rounded-md transition ${activeTab === 'thongTin'
+                      ? 'bg-primary-600 text-white'
+                      : 'hover:bg-gray-100'
+                      }`}
                     onClick={() => setActiveTab('thongTin')}
                   >
                     Thông tin tài khoản
                   </button>
-                  <button 
-                    className={`w-full text-left px-4 py-2 rounded-md transition ${
-                      activeTab === 'matKhau' 
-                        ? 'bg-pink-500 text-white' 
-                        : 'hover:bg-gray-100'
-                    }`}
+                  <button
+                    className={`w-full text-left px-4 py-2 rounded-md transition ${activeTab === 'matKhau'
+                      ? 'bg-primary-600 text-white'
+                      : 'hover:bg-gray-100'
+                      }`}
                     onClick={() => setActiveTab('matKhau')}
                   >
                     Đổi mật khẩu
@@ -331,7 +329,7 @@ const Account = () => {
                     <span>{error}</span>
                   </div>
                 )}
-                
+
                 {successMessage && (
                   <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     {successMessage}
@@ -354,13 +352,13 @@ const Account = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="mb-6 p-4 border rounded-lg bg-rose-50/50">
+                      <div className="mb-6 p-4 border rounded-lg bg-primary-50/50">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium text-gray-800">Bạn là người bán?</p>
                             <p className="text-sm text-gray-600">{vendorStatus === 'PENDING' ? 'Hồ sơ của bạn đang chờ phê duyệt. Vui lòng đợi email/SMS thông báo.' : 'Đăng ký trở thành vendor để quản lý sản phẩm của bạn.'}
                               {vendorStatus && (
-                                <span className="ml-2 px-2 py-0.5 rounded text-xs bg-rose-100 text-rose-700">
+                                <span className="ml-2 px-2 py-0.5 rounded text-xs bg-primary-100 text-primary-700">
                                   Trạng thái: {vendorStatus}
                                 </span>
                               )}
@@ -368,7 +366,7 @@ const Account = () => {
                           </div>
                           <button
                             onClick={openVendorModal}
-                            className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600"
+                            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
                             disabled={vendorStatus === 'PENDING'}
                           >
                             {vendorStatus === 'PENDING' ? 'Đang chờ duyệt' : 'Đăng ký vendor'}
@@ -376,7 +374,7 @@ const Account = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     <form onSubmit={handleUpdateProfile}>
                       <div className="space-y-4 mb-6">
                         <div>
@@ -388,11 +386,11 @@ const Account = () => {
                             name="TenKhachHang"
                             value={formData.TenKhachHang}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-gray-700 mb-2">
                             Số điện thoại
@@ -402,11 +400,11 @@ const Account = () => {
                             name="SoDienThoai"
                             value={formData.SoDienThoai}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-gray-700 mb-2">
                             Địa chỉ giao hàng
@@ -415,7 +413,7 @@ const Account = () => {
                             name="DiaChi"
                             value={formData.DiaChi}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             rows={3}
                             required
                           ></textarea>
@@ -431,22 +429,21 @@ const Account = () => {
                               name="DiaChiKinhDoanh"
                               value={formData.DiaChiKinhDoanh || ''}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                               rows={3}
                               required
                             ></textarea>
                           </div>
                         )}
                       </div>
-                      
+
                       <button
                         type="submit"
                         disabled={submitting}
-                        className={`flex items-center px-6 py-2 rounded-md text-white transition ${
-                          submitting 
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-pink-500 hover:bg-pink-600'
-                        }`}
+                        className={`flex items-center px-6 py-2 rounded-md text-white transition ${submitting
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-primary-600 hover:bg-primary-700'
+                          }`}
                       >
                         {submitting ? (
                           <>
@@ -468,7 +465,7 @@ const Account = () => {
                 {activeTab === 'matKhau' && (
                   <>
                     <h2 className="text-xl font-semibold mb-6">Đổi mật khẩu</h2>
-                    
+
                     <form onSubmit={handleUpdatePassword}>
                       <div className="space-y-4 mb-6">
                         <div>
@@ -480,11 +477,11 @@ const Account = () => {
                             name="MatKhauCu"
                             value={formData.MatKhauCu}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-gray-700 mb-2">
                             Mật khẩu mới
@@ -494,11 +491,11 @@ const Account = () => {
                             name="MatKhauMoi"
                             value={formData.MatKhauMoi}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-gray-700 mb-2">
                             Xác nhận mật khẩu mới
@@ -508,20 +505,19 @@ const Account = () => {
                             name="XacNhanMatKhau"
                             value={formData.XacNhanMatKhau}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                             required
                           />
                         </div>
                       </div>
-                      
+
                       <button
                         type="submit"
                         disabled={submitting}
-                        className={`flex items-center px-6 py-2 rounded-md text-white transition ${
-                          submitting 
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-pink-500 hover:bg-pink-600'
-                        }`}
+                        className={`flex items-center px-6 py-2 rounded-md text-white transition ${submitting
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-primary-600 hover:bg-primary-700'
+                          }`}
                       >
                         {submitting ? (
                           <>
@@ -547,7 +543,7 @@ const Account = () => {
       {showVendorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative">
-            <button onClick={closeVendorModal} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500">×</button>
+            <button onClick={closeVendorModal} className="absolute top-3 right-3 text-gray-400 hover:text-primary-600">×</button>
             <h3 className="text-xl font-semibold mb-4">Đăng ký người bán (Vendor)</h3>
             <form onSubmit={submitVendor} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -574,7 +570,7 @@ const Account = () => {
                   <label className="block text-sm text-gray-700 mb-1">Danh mục kinh doanh (chọn nhiều)</label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {categories.map(c => (
-                      <label key={c.MaDanhMuc} className={`flex items-center gap-2 border rounded px-3 py-2 cursor-pointer ${vendorForm.categories.includes(c.MaDanhMuc) ? 'bg-rose-50 border-rose-300' : ''}`}>
+                      <label key={c.MaDanhMuc} className={`flex items-center gap-2 border rounded px-3 py-2 cursor-pointer ${vendorForm.categories.includes(c.MaDanhMuc) ? 'bg-primary-50 border-primary-300' : ''}`}>
                         <input type="checkbox" checked={vendorForm.categories.includes(c.MaDanhMuc)} onChange={() => toggleCategory(c.MaDanhMuc)} />
                         <span className="text-sm">{c.TenDanhMuc}</span>
                       </label>
@@ -592,7 +588,7 @@ const Account = () => {
               </label>
               <div className="flex justify-end gap-2">
                 <button type="button" onClick={closeVendorModal} className="px-4 py-2 bg-gray-100 rounded-md">Hủy</button>
-                <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600">Gửi đăng ký</button>
+                <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">Gửi đăng ký</button>
               </div>
             </form>
           </div>

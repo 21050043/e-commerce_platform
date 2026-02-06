@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { ChevronRight, ChevronLeft, ChevronDown, Star, Filter, ShoppingCart, Search, Loader } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronDown, Star, ShoppingCart, Loader } from 'lucide-react';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
@@ -46,7 +46,6 @@ const ProductsByCategory = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const { addToast } = useToast();
   const { addItem } = useCart();
   const [selectedPriceRange, setSelectedPriceRange] = useState<{ label: string; min: number; max: number | null }>(priceRanges[0]);
@@ -87,21 +86,10 @@ const ProductsByCategory = () => {
     setSearchParams({ page: newPage.toString() });
   };
 
-  const applyFilters = () => {
-    setSearchParams({ page: '1' });
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/products/search?q=${encodeURIComponent(searchQuery)}`;
-    }
-  };
-
   const addToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Chuyển đổi Product thành ProductResponse để phù hợp với interface yêu cầu
     const productForCart: ProductResponse = {
       MaSanPham: product.MaSanPham,
@@ -112,7 +100,7 @@ const ProductsByCategory = () => {
       MaDanhMuc: product.DanhMuc.MaDanhMuc,
       DanhMuc: product.DanhMuc
     };
-    
+
     // Sử dụng hàm addItem từ CartContext
     addItem(productForCart, 1);
     addToast(`Đã thêm ${product.TenSanPham} vào giỏ hàng!`, 'success');
@@ -127,7 +115,7 @@ const ProductsByCategory = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4 text-center">
@@ -152,14 +140,14 @@ const ProductsByCategory = () => {
             <div className="md:w-1/4 lg:w-1/5">
               {/* Price Filter */}
               <div className="bg-white p-5 rounded-lg shadow mb-6">
-                <div 
+                <div
                   className="flex items-center justify-between cursor-pointer"
                   onClick={() => setShowFilters(!showFilters)}
                 >
                   <h3 className="font-semibold text-lg">Lọc theo giá</h3>
-                  <ChevronDown 
-                    className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`} 
-                    size={20} 
+                  <ChevronDown
+                    className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}
+                    size={20}
                   />
                 </div>
                 {showFilters && (
@@ -167,7 +155,7 @@ const ProductsByCategory = () => {
                     {priceRanges.map((range, idx) => (
                       <button
                         key={idx}
-                        className={`w-full text-left px-4 py-2 rounded transition font-medium border border-gray-200 hover:bg-pink-50 focus:outline-none ${selectedPriceRange.label === range.label ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-700'}`}
+                        className={`w-full text-left px-4 py-2 rounded transition font-medium border border-gray-200 hover:bg-primary-50 focus:outline-none ${selectedPriceRange.label === range.label ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-gray-700'}`}
                         onClick={() => setSelectedPriceRange(range)}
                       >
                         {range.label}
@@ -182,7 +170,7 @@ const ProductsByCategory = () => {
             <div className="md:w-3/4 lg:w-4/5">
               {loading ? (
                 <div className="flex justify-center items-center py-12">
-                  <Loader className="animate-spin h-8 w-8 text-pink-500" />
+                  <Loader className="animate-spin h-8 w-8 text-primary-600" />
                   <span className="ml-2">Đang tải sản phẩm...</span>
                 </div>
               ) : error ? (
@@ -221,16 +209,16 @@ const ProductsByCategory = () => {
                                 />
                               ))}
                             </div>
-                            <h3 className="font-semibold text-gray-800 mb-1 hover:text-pink-600 transition-colors">
+                            <h3 className="font-semibold text-gray-800 mb-1 hover:text-primary-600 transition-colors">
                               {product.TenSanPham}
                             </h3>
                             <p className="text-sm text-gray-500 mb-2">{product.DanhMuc?.TenDanhMuc}</p>
                             <div className="flex justify-between items-center">
-                              <span className="text-lg font-bold text-pink-600">
+                              <span className="text-lg font-bold text-primary-600">
                                 {formatPrice(product.GiaSanPham)}
                               </span>
-                              <button 
-                                className="bg-pink-500 hover:bg-pink-600 text-white text-sm px-3 py-1 rounded-full transition-colors"
+                              <button
+                                className="bg-primary-600 hover:bg-primary-700 text-white text-sm px-3 py-1 rounded-full transition-colors"
                                 onClick={(e) => addToCart(e, product)}
                               >
                                 <ShoppingCart size={16} />
@@ -249,11 +237,10 @@ const ProductsByCategory = () => {
                         <button
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1}
-                          className={`px-4 py-2 rounded-md ${
-                            currentPage === 1
-                              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                              : 'bg-white text-gray-700 hover:bg-pink-500 hover:text-white'
-                          }`}
+                          className={`px-4 py-2 rounded-md ${currentPage === 1
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-primary-600 hover:text-white'
+                            }`}
                         >
                           <ChevronLeft size={20} />
                         </button>
@@ -262,11 +249,10 @@ const ProductsByCategory = () => {
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-4 py-2 rounded-md ${
-                              currentPage === page
-                                ? 'bg-pink-500 text-white'
-                                : 'bg-white text-gray-700 hover:bg-pink-500 hover:text-white'
-                            }`}
+                            className={`px-4 py-2 rounded-md ${currentPage === page
+                              ? 'bg-primary-600 text-white'
+                              : 'bg-white text-gray-700 hover:bg-primary-600 hover:text-white'
+                              }`}
                           >
                             {page}
                           </button>
@@ -275,11 +261,10 @@ const ProductsByCategory = () => {
                         <button
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages}
-                          className={`px-4 py-2 rounded-md ${
-                            currentPage === totalPages
-                              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                              : 'bg-white text-gray-700 hover:bg-pink-500 hover:text-white'
-                          }`}
+                          className={`px-4 py-2 rounded-md ${currentPage === totalPages
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-primary-600 hover:text-white'
+                            }`}
                         >
                           <ChevronRight size={20} />
                         </button>

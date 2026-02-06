@@ -31,7 +31,7 @@ const SearchResults = () => {
 
   return (
     <MainLayout>
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-2 flex justify-center items-center gap-2">
             <Search size={32} />
@@ -44,7 +44,7 @@ const SearchResults = () => {
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <Loader className="animate-spin h-8 w-8 text-pink-500" />
+              <Loader className="animate-spin h-8 w-8 text-primary-600" />
               <span className="ml-2">Đang tìm kiếm sản phẩm...</span>
             </div>
           ) : error ? (
@@ -74,7 +74,7 @@ const SearchResults = () => {
                   </div>
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.TenSanPham}</h3>
-                    <p className="text-pink-600 font-bold text-lg">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.GiaSanPham)}</p>
+                    <p className="text-primary-700 font-bold text-lg">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.GiaSanPham)}</p>
                   </div>
                 </Link>
               ))}

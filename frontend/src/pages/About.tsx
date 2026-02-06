@@ -1,4 +1,3 @@
-import React from 'react';
 import MainLayout from '../layouts/MainLayout';
 import { MapPin, Phone, Mail, Clock, Truck, Award, ThumbsUp, Heart } from 'lucide-react';
 
@@ -6,7 +5,7 @@ const About = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section 
+      <section
         className="relative bg-cover bg-center h-80"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1458682625221-3a45f8a844c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80)' }}
       >
@@ -15,7 +14,7 @@ const About = () => {
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Về Chúng Tôi</h1>
             <p className="text-lg text-white max-w-2xl mx-auto">
-              Chuyên cung cấp các loại hoa tươi và quà tặng chất lượng với dịch vụ chuyên nghiệp
+              Chuyên cung cấp linh kiện điện tử, vi điều khiển và giải pháp công nghệ chuyên nghiệp
             </p>
           </div>
         </div>
@@ -26,9 +25,9 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="md:w-1/2">
-              <img 
-                src="https://images.squarespace-cdn.com/content/v1/5eac4ea3e88fff1b365dc45d/1599599381716-G6S1JK3EQVVQR1F4ZJ4S/AUGUST+pink+50x70.jpg?format=1000w" 
-                alt="Flower Shop Story" 
+              <img
+                src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                alt="Electronic Hub Story"
                 className="rounded-lg shadow-lg w-full"
               />
             </div>
@@ -37,23 +36,23 @@ const About = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Card 1 */}
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border border-gray-100 hover:shadow-lg transition">
-                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Phạm Nguyễn Chu Nguyên" className="w-20 h-20 rounded-full mb-3 border-4 border-pink-200 object-cover" />
+                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Phạm Nguyễn Chu Nguyên" className="w-20 h-20 rounded-full mb-3 border-4 border-primary-100 object-cover" />
                   <div className="font-semibold text-lg text-gray-800">Phạm Nguyễn Chu Nguyên</div>
-                  <div className="text-pink-600 font-medium text-sm mb-1">MSSV: 21050043</div>
+                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: 21050043</div>
                   <div className="text-gray-500 text-xs">Trách nhiệm: &amp;</div>
                 </div>
                 {/* Card 2 */}
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border border-gray-100 hover:shadow-lg transition">
-                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Vy Ngọc Nhân" className="w-20 h-20 rounded-full mb-3 border-4 border-pink-200 object-cover" />
+                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Vy Ngọc Nhân" className="w-20 h-20 rounded-full mb-3 border-4 border-primary-100 object-cover" />
                   <div className="font-semibold text-lg text-gray-800">Vy Ngọc Nhân</div>
-                  <div className="text-pink-600 font-medium text-sm mb-1">MSSV: 22050030</div>
+                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: 22050030</div>
                   <div className="text-gray-500 text-xs">Trách nhiệm: &amp; </div>
                 </div>
                 {/* Card 3 */}
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border border-gray-100 hover:shadow-lg transition">
-                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Đặng Văn Nhật Thanh" className="w-20 h-20 rounded-full mb-3 border-4 border-pink-200 object-cover" />
+                  <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Đặng Văn Nhật Thanh" className="w-20 h-20 rounded-full mb-3 border-4 border-primary-100 object-cover" />
                   <div className="font-semibold text-lg text-gray-800">Đặng Văn Nhật Thanh</div>
-                  <div className="text-pink-600 font-medium text-sm mb-1">MSSV: 23050029</div>
+                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: 23050029</div>
                   <div className="text-gray-500 text-xs">Trách nhiệm: &amp; </div>
                 </div>
               </div>
@@ -68,28 +67,28 @@ const About = () => {
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Giá Trị Cốt Lõi</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="h-8 w-8 text-pink-500" />
+              <div className="bg-primary-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-primary-500" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Đam Mê</h3>
               <p className="text-gray-600">
-                Nhóm sinh viên chúng em thực hiện dự án với sự đam mê đối với Ngành Công Nghệ Thông Tin.
+                Nhóm sinh viên chúng em thực hiện dự án với niềm đam mê công nghệ và mong muốn đóng góp cho cộng đồng kỹ thuật.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="h-8 w-8 text-pink-500" />
+              <div className="bg-primary-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="h-8 w-8 text-primary-500" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Chất Lượng</h3>
               <p className="text-gray-600">
-                Nhóm sinh viên chúng em  cam kết chỉ sử dụng những bông hoa tươi nhất và vật liệu chất lượng cao.
+                Chúng em cam kết cung cấp linh kiện chính hãng, thông số chính xác và độ bền cao.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ThumbsUp className="h-8 w-8 text-pink-500" />
+              <div className="bg-primary-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ThumbsUp className="h-8 w-8 text-primary-500" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Sự Hài Lòng</h3>
               <p className="text-gray-600">
@@ -98,8 +97,8 @@ const About = () => {
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Truck className="h-8 w-8 text-pink-500" />
+              <div className="bg-primary-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Truck className="h-8 w-8 text-primary-500" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Dịch Vụ</h3>
               <p className="text-gray-600">
@@ -119,19 +118,19 @@ const About = () => {
               <h3 className="text-xl font-semibold mb-4">Thông Tin Liên Hệ</h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <MapPin className="h-6 w-6 text-pink-500 mr-3 flex-shrink-0 mt-1" />
+                  <MapPin className="h-6 w-6 text-primary-500 mr-3 flex-shrink-0 mt-1" />
                   <span>Trường đại học Bình Dương, TP. Thủ dầu Một, Bình Dương</span>
                 </li>
                 <li className="flex items-center">
-                  <Phone className="h-6 w-6 text-pink-500 mr-3 flex-shrink-0" />
+                  <Phone className="h-6 w-6 text-primary-500 mr-3 flex-shrink-0" />
                   <span>0938 320 498</span>
                 </li>
                 <li className="flex items-center">
-                  <Mail className="h-6 w-6 text-pink-500 mr-3 flex-shrink-0" />
+                  <Mail className="h-6 w-6 text-primary-500 mr-3 flex-shrink-0" />
                   <span>21050043@student.bdu.edu.vn</span>
                 </li>
                 <li className="flex items-center">
-                  <Clock className="h-6 w-6 text-pink-500 mr-3 flex-shrink-0" />
+                  <Clock className="h-6 w-6 text-primary-500 mr-3 flex-shrink-0" />
                   <div>
                     <p>Thứ Hai - Thứ Bảy: 8:00 - 20:00</p>
                     <p>Chủ Nhật: 9:00 - 18:00</p>
@@ -149,12 +148,12 @@ const About = () => {
                   </a>
                   <a href="https://zalo.me/0938320498" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition flex flex-col items-center" title="Zalo">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 48 48" fill="currentColor">
-                      <rect width="48" height="48" rx="12" fill="#008ee6"/>
+                      <rect width="48" height="48" rx="12" fill="#008ee6" />
                       <text x="24" y="30" textAnchor="middle" fontSize="18" fill="white" fontFamily="Arial, Helvetica, sans-serif">Zalo</text>
                     </svg>
                     <span className="text-xs mt-1 text-gray-700 font-medium">0938 320 498</span>
                   </a>
-                  <a href="mailto:21050043@student.bdu.edu.vn" className="text-rose-500 hover:text-rose-700 transition" title="Email">
+                  <a href="mailto:21050043@student.bdu.edu.vn" className="text-primary-500 hover:text-primary-700 transition" title="Email">
                     <Mail className="h-8 w-8" />
                   </a>
                 </div>
@@ -170,7 +169,7 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-center">
             <div className="bg-white bg-opacity-80 rounded-lg shadow p-4 text-center text-sm text-gray-500 border border-gray-200 max-w-xl w-full">
-              <span className="font-medium text-gray-700">Bản quyền hình ảnh:</span> Một số hình ảnh sử dụng trong website được lấy từ nguồn <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline font-semibold">www.pexels.com</a> theo giấy phép miễn phí bản quyền.
+              <span className="font-medium text-gray-700">Bản quyền hình ảnh:</span> Một số hình ảnh sử dụng trong website được lấy từ nguồn <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline font-semibold">www.pexels.com</a> theo giấy phép miễn phí bản quyền.
             </div>
           </div>
         </div>

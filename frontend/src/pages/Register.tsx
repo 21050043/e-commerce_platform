@@ -16,8 +16,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  
+
   const { register } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -53,8 +52,8 @@ const Register = () => {
         MatKhau: form.MatKhau,
         DiaChi: form.DiaChi
       });
-      setSuccess('Đăng ký thành công!');
-      setForm({ TenKhachHang: '', SoDienThoai: '', MatKhau: '', MatKhauNhapLai: '', DiaChi: '' });
+      addToast('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success');
+      navigate('/login');
     } catch (err: any) {
       if (err.response?.data?.message?.includes('Số điện thoại đã được sử dụng')) {
         setError('Số điện thoại đã được sử dụng. Vui lòng nhập số khác.');
@@ -71,7 +70,7 @@ const Register = () => {
       <div className="bg-gray-100 min-h-screen py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-8 text-white text-center">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-8 text-white text-center">
               <h1 className="text-3xl font-bold mb-2">Đăng ký</h1>
               <p>Tạo tài khoản để mua sắm dễ dàng hơn</p>
             </div>
@@ -190,7 +189,7 @@ const Register = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-2 px-4 rounded-lg hover:from-pink-600 hover:to-rose-600 transition flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-primary-600 to-primary-800 text-white py-2 px-4 rounded-lg hover:from-primary-700 hover:to-primary-900 transition flex items-center justify-center"
                   disabled={loading}
                 >
                   {loading ? (
@@ -207,7 +206,7 @@ const Register = () => {
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
                   Đã có tài khoản?{' '}
-                  <Link to="/login" className="text-pink-500 hover:text-pink-700">
+                  <Link to="/login" className="text-primary-600 hover:text-primary-800">
                     Đăng nhập ngay
                   </Link>
                 </p>

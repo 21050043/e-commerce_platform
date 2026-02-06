@@ -35,7 +35,7 @@ const Orders = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
-  
+
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
@@ -51,10 +51,10 @@ const Orders = () => {
         try {
           setLoading(true);
           setError(null);
-          
+
           console.log('Đang tải đơn hàng của khách hàng/người bán');
           const response = await api.get(API_ENDPOINTS.ORDER.GET_MY_ORDERS);
-          
+
           // Kiểm tra dữ liệu trả về
           if (Array.isArray(response.data)) {
             console.log(`Đã tải ${response.data.length} đơn hàng`);
@@ -92,7 +92,7 @@ const Orders = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4 text-center">Đơn Hàng Của Bạn</h1>
@@ -110,7 +110,7 @@ const Orders = () => {
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <Loader className="animate-spin h-8 w-8 text-pink-500" />
+              <Loader className="animate-spin h-8 w-8 text-primary-600" />
               <span className="ml-2">Đang tải đơn hàng...</span>
             </div>
           ) : error ? (
@@ -120,14 +120,14 @@ const Orders = () => {
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="h-8 w-8 text-pink-500" />
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="h-8 w-8 text-primary-600" />
               </div>
               <h2 className="text-2xl font-semibold mb-2">Bạn chưa có đơn hàng nào</h2>
               <p className="text-gray-600 mb-6">Hãy mua sắm và đặt hàng ngay để xem lịch sử đơn hàng tại đây.</p>
               <Link
                 to="/categories"
-                className="bg-pink-500 text-white px-6 py-3 rounded-md hover:bg-pink-600 transition"
+                className="bg-primary-600 text-white px-6 py-3 rounded-md hover:bg-primary-700 transition"
               >
                 Mua sắm ngay
               </Link>
@@ -166,8 +166,8 @@ const Orders = () => {
                           onClick={() => toggleOrderDetails(order.MaHoaDon)}
                           className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-full transition"
                         >
-                          <ChevronDown 
-                            className={`h-5 w-5 transform transition-transform ${expandedOrder === order.MaHoaDon ? 'rotate-180' : ''}`} 
+                          <ChevronDown
+                            className={`h-5 w-5 transform transition-transform ${expandedOrder === order.MaHoaDon ? 'rotate-180' : ''}`}
                           />
                         </button>
                       </div>
@@ -178,7 +178,7 @@ const Orders = () => {
                   {expandedOrder === order.MaHoaDon && (
                     <div className="p-6">
                       <h4 className="font-medium mb-4">Chi tiết đơn hàng</h4>
-                      
+
                       {/* Products */}
                       <div className="space-y-4 mb-6">
                         {order.ChiTietHoaDons?.map((item) => (
@@ -186,8 +186,8 @@ const Orders = () => {
                             <div className="w-16 h-16 shrink-0 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
                               {item.SanPham.HinhAnh ? (
                                 <img
-                                  src={item.SanPham.HinhAnh.startsWith('/uploads') 
-                                    ? `http://localhost:5000${item.SanPham.HinhAnh}` 
+                                  src={item.SanPham.HinhAnh.startsWith('/uploads')
+                                    ? `http://localhost:5000${item.SanPham.HinhAnh}`
                                     : item.SanPham.HinhAnh}
                                   alt={item.SanPham.TenSanPham}
                                   className="w-full h-full object-cover"
@@ -205,9 +205,9 @@ const Orders = () => {
                               )}
                             </div>
                             <div className="flex-1">
-                              <Link 
+                              <Link
                                 to={`/products/${item.MaSanPham}`}
-                                className="font-medium hover:text-pink-500"
+                                className="font-medium hover:text-primary-600"
                               >
                                 {item.SanPham.TenSanPham}
                               </Link>
@@ -234,7 +234,7 @@ const Orders = () => {
                         </div>
                         <div className="flex justify-between font-semibold text-lg border-t pt-3 mt-3">
                           <span>Tổng cộng</span>
-                          <span className="text-pink-600">{formatPrice(order.TongTien)}</span>
+                          <span className="text-primary-700">{formatPrice(order.TongTien)}</span>
                         </div>
                       </div>
 
@@ -247,11 +247,11 @@ const Orders = () => {
                         <div className="flex items-center mt-2 text-gray-700">
                           <Clock className="h-4 w-4 mr-2" />
                           <span>
-                            {order.TrangThai === 'Đã giao hàng' 
-                              ? 'Đã giao thành công' 
+                            {order.TrangThai === 'Đã giao hàng'
+                              ? 'Đã giao thành công'
                               : order.TrangThai === 'Đã hủy'
-                              ? 'Đơn hàng đã bị hủy'
-                              : 'Dự kiến giao trong 2-3 ngày làm việc'}
+                                ? 'Đơn hàng đã bị hủy'
+                                : 'Dự kiến giao trong 2-3 ngày làm việc'}
                           </span>
                         </div>
                       </div>

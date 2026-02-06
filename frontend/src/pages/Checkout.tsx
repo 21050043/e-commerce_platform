@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { ChevronRight, CreditCard, Truck, MapPin, Check } from 'lucide-react';
+import { ChevronRight, CreditCard, Truck, MapPin } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import api from '../services/api';
@@ -72,7 +72,7 @@ const Checkout = () => {
       setSelectedWard(null);
     }
   }, [selectedDistrict]);
-  
+
   const { user, isAuthenticated } = useAuth();
   const { cart: cartItems, clearAll } = useCart();
   const navigate = useNavigate();
@@ -132,7 +132,7 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
 
     if (!addressDetail || !selectedProvince || !selectedDistrict || !selectedWard) {
       alert('Vui lòng nhập đầy đủ địa chỉ giao hàng');
@@ -160,19 +160,19 @@ const Checkout = () => {
 
       // Gửi yêu cầu tạo đơn hàng
       const response = await api.post(API_ENDPOINTS.ORDER.CREATE, orderData);
-      
+
       // Đảm bảo đơn hàng đã được tạo thành công
       if (response.status === 201 || response.status === 200) {
         // Hiển thị thông báo thành công
         addToast('Đặt hàng thành công! Bạn có thể xem chi tiết trong trang Đơn hàng của tôi.', 'success');
-        
+
         // Đảm bảo chuyển hướng trước khi xóa giỏ hàng để tránh tự động chuyển về /cart
         // Sử dụng setTimeout để đảm bảo việc chuyển hướng diễn ra trước
         setTimeout(() => {
           // Xóa giỏ hàng sau khi đã chuyển hướng
           clearAll();
         }, 100);
-        
+
         // Chuyển hướng ngay lập tức đến trang đơn hàng
         navigate('/orders', { replace: true });
       } else {
@@ -190,7 +190,7 @@ const Checkout = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4 text-center">Thanh Toán</h1>
@@ -210,7 +210,7 @@ const Checkout = () => {
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
               <span className="ml-2">Đang tải...</span>
             </div>
           ) : (
@@ -220,10 +220,10 @@ const Checkout = () => {
                 {/* Shipping Address */}
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                   <div className="flex items-center mb-4">
-                    <MapPin className="text-pink-500 mr-2" size={24} />
+                    <MapPin className="text-primary-600 mr-2" size={24} />
                     <h2 className="text-xl font-semibold">Địa chỉ giao hàng</h2>
                   </div>
-                  
+
                   <div className="mb-4">
                     <label className="block text-gray-700 mb-2">
                       Địa chỉ nhà, đường <span className="text-red-500">*</span>
@@ -232,7 +232,7 @@ const Checkout = () => {
                       type="text"
                       value={addressDetail}
                       onChange={e => setAddressDetail(e.target.value)}
-                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="Nhập số nhà, tên đường..."
                       required
                     />
@@ -255,13 +255,13 @@ const Checkout = () => {
                           {(searchProvince.length === 0
                             ? provinces
                             : provinces.filter(p => {
-                                const terms = searchProvince.toLowerCase().split(/\s+/).filter(Boolean);
-                                return terms.every(term => p.name.toLowerCase().includes(term));
-                              })
+                              const terms = searchProvince.toLowerCase().split(/\s+/).filter(Boolean);
+                              return terms.every(term => p.name.toLowerCase().includes(term));
+                            })
                           ).map(p => (
                             <li
                               key={p.code}
-                              className={`px-4 py-2 cursor-pointer hover:bg-pink-100 ${selectedProvince?.code === p.code ? 'bg-pink-200' : ''}`}
+                              className={`px-4 py-2 cursor-pointer hover:bg-primary-50 ${selectedProvince?.code === p.code ? 'bg-primary-100' : ''}`}
                               onMouseDown={() => {
                                 setSelectedProvince(p);
                                 setSearchProvince(p.name);
@@ -272,8 +272,8 @@ const Checkout = () => {
                             const terms = searchProvince.toLowerCase().split(/\s+/).filter(Boolean);
                             return terms.every(term => p.name.toLowerCase().includes(term));
                           }).length === 0) && (
-                            <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
-                          )}
+                              <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
+                            )}
                         </ul>
                       )}
                     </div>
@@ -297,13 +297,13 @@ const Checkout = () => {
                           {(searchDistrict.length === 0
                             ? districts
                             : districts.filter(d => {
-                                const terms = searchDistrict.toLowerCase().split(/\s+/).filter(Boolean);
-                                return terms.every(term => d.name.toLowerCase().includes(term));
-                              })
+                              const terms = searchDistrict.toLowerCase().split(/\s+/).filter(Boolean);
+                              return terms.every(term => d.name.toLowerCase().includes(term));
+                            })
                           ).map(d => (
                             <li
                               key={d.code}
-                              className={`px-4 py-2 cursor-pointer hover:bg-pink-100 ${selectedDistrict?.code === d.code ? 'bg-pink-200' : ''}`}
+                              className={`px-4 py-2 cursor-pointer hover:bg-primary-50 ${selectedDistrict?.code === d.code ? 'bg-primary-100' : ''}`}
                               onMouseDown={() => {
                                 setSelectedDistrict(d);
                                 setSearchDistrict(d.name);
@@ -314,8 +314,8 @@ const Checkout = () => {
                             const terms = searchDistrict.toLowerCase().split(/\s+/).filter(Boolean);
                             return terms.every(term => d.name.toLowerCase().includes(term));
                           }).length === 0) && (
-                            <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
-                          )}
+                              <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
+                            )}
                         </ul>
                       )}
                     </div>
@@ -339,13 +339,13 @@ const Checkout = () => {
                           {(searchWard.length === 0
                             ? wards
                             : wards.filter(w => {
-                                const terms = searchWard.toLowerCase().split(/\s+/).filter(Boolean);
-                                return terms.every(term => w.name.toLowerCase().includes(term));
-                              })
+                              const terms = searchWard.toLowerCase().split(/\s+/).filter(Boolean);
+                              return terms.every(term => w.name.toLowerCase().includes(term));
+                            })
                           ).map(w => (
                             <li
                               key={w.code}
-                              className={`px-4 py-2 cursor-pointer hover:bg-pink-100 ${selectedWard?.code === w.code ? 'bg-pink-200' : ''}`}
+                              className={`px-4 py-2 cursor-pointer hover:bg-primary-50 ${selectedWard?.code === w.code ? 'bg-primary-100' : ''}`}
                               onMouseDown={() => {
                                 setSelectedWard(w);
                                 setSearchWard(w.name);
@@ -356,8 +356,8 @@ const Checkout = () => {
                             const terms = searchWard.toLowerCase().split(/\s+/).filter(Boolean);
                             return terms.every(term => w.name.toLowerCase().includes(term));
                           }).length === 0) && (
-                            <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
-                          )}
+                              <li className="px-4 py-2 text-gray-400">Không tìm thấy</li>
+                            )}
                         </ul>
                       )}
                     </div>
@@ -370,7 +370,7 @@ const Checkout = () => {
                     <CreditCard className="text-pink-500 mr-2" size={24} />
                     <h2 className="text-xl font-semibold">Phương thức thanh toán</h2>
                   </div>
-                  
+
                   <div>
                     <div className="mb-2">
                       <label className="flex items-center">
@@ -439,7 +439,7 @@ const Checkout = () => {
                     <Truck className="text-pink-500 mr-2" size={24} />
                     <h2 className="text-xl font-semibold">Phương thức vận chuyển</h2>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center justify-between p-4 border rounded-md bg-gray-50">
                       <div>
@@ -456,7 +456,7 @@ const Checkout = () => {
               <div className="lg:w-1/3">
                 <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
                   <h2 className="text-xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
-                  
+
                   <div className="border-t pt-4 mb-4">
                     <p className="text-gray-700 mb-1">Sản phẩm ({cart.length}):</p>
                     {cart.map((item) => (
@@ -483,7 +483,7 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between font-semibold border-t border-b py-4 my-2">
                       <span>Tổng cộng</span>
-                      <span className="text-pink-600">{formatPrice(calculateTotalPrice())}</span>
+                      <span className="text-primary-700">{formatPrice(calculateTotalPrice())}</span>
                     </div>
                   </div>
 
@@ -496,11 +496,10 @@ const Checkout = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className={`w-full py-3 px-4 rounded-md text-white font-semibold ${
-                      submitting
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-pink-500 hover:bg-pink-600'
-                    } transition`}
+                    className={`w-full py-3 px-4 rounded-md text-white font-semibold ${submitting
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-primary-600 hover:bg-primary-700'
+                      } transition`}
                   >
                     {submitting ? 'Đang xử lý...' : 'Đặt hàng'}
                   </button>

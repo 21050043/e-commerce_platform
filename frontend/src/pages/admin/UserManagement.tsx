@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { UserPlus, Edit, Trash, Search, RefreshCw, Bell, X } from 'lucide-react';
+import { UserPlus, Search, RefreshCw, Bell, X } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 import {
   getAllCustomers,
   getAllStaff,
   getAllVendors,
-  getUserById,
   createUser,
   listVendorApplications,
   approveVendorApplication,
@@ -14,7 +13,7 @@ import {
 import type { UserResponse } from '../../services/user.service';
 import { useToast } from '../../contexts/ToastContext';
 import { useLocation } from 'react-router-dom';
-import { getMyOrders, getOrdersByCustomerId } from '../../services/order.service';
+import { getOrdersByCustomerId } from '../../services/order.service';
 
 const UserManagement = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -56,7 +55,7 @@ const UserManagement = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         let response;
         if (activeTab === 'customers') {
           response = await getAllCustomers(currentPage, 10);
@@ -153,11 +152,11 @@ const UserManagement = () => {
     setUserOrders([]);
   };
 
-  const handleDisableUser = (user: UserResponse) => {
+  const handleDisableUser = () => {
     addToast(
       <span>Bạn có chắc chắn muốn vô hiệu hóa tài khoản này không?
         <button onClick={() => confirmDisableUser()} className="ml-4 px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700">Xác nhận</button>
-        <button onClick={() => {}} className="ml-2 px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Hủy</button>
+        <button onClick={() => { }} className="ml-2 px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Hủy</button>
       </span>,
       'warning'
     );
@@ -237,7 +236,7 @@ const UserManagement = () => {
               onClick={openVendorApps}
               title="Đăng ký vendor chờ duyệt"
             >
-              <Bell className="w-7 h-7 text-blue-600" />
+              <Bell className="w-7 h-7 text-primary-600" />
             </button>
           </div>
           <button
@@ -253,38 +252,35 @@ const UserManagement = () => {
           <div className="border-b mb-6">
             <div className="flex space-x-4">
               <button
-                className={`pb-3 px-2 ${
-                  activeTab === 'customers'
-                    ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`pb-3 px-2 ${activeTab === 'customers'
+                  ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
+                  : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 onClick={() => handleTabChange('customers')}
               >
                 Khách hàng
               </button>
               <button
-                className={`pb-3 px-2 ${
-                  activeTab === 'vendors'
-                    ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`pb-3 px-2 ${activeTab === 'vendors'
+                  ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
+                  : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 onClick={() => handleTabChange('vendors')}
               >
                 Người bán
               </button>
               <button
-                className={`pb-3 px-2 ${
-                  activeTab === 'staff'
-                    ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`pb-3 px-2 ${activeTab === 'staff'
+                  ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
+                  : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 onClick={() => handleTabChange('staff')}
               >
                 Nhân viên
               </button>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -299,7 +295,7 @@ const UserManagement = () => {
               </div>
               <button
                 onClick={handleRefresh}
-                className="bg-blue-50 text-blue-600 p-2 rounded-md hover:bg-blue-100 transition-colors"
+                className="bg-primary-50 text-primary-600 p-2 rounded-md hover:bg-blue-100 transition-colors"
                 title="Làm mới"
               >
                 <RefreshCw size={18} />
@@ -309,7 +305,7 @@ const UserManagement = () => {
 
           {loading ? (
             <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
@@ -372,7 +368,7 @@ const UserManagement = () => {
                               <button
                                 className="p-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
                                 title="Vô hiệu hóa tài khoản"
-                                onClick={() => handleDisableUser(user)}
+                                onClick={() => handleDisableUser()}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75l10.5 10.5m0-10.5L6.75 17.25" />
@@ -394,11 +390,10 @@ const UserManagement = () => {
                       <button
                         key={index}
                         onClick={() => handlePageChange(index + 1)}
-                        className={`px-4 py-2 rounded-md ${
-                          currentPage === index + 1
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                        }`}
+                        className={`px-4 py-2 rounded-md ${currentPage === index + 1
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
                       >
                         {index + 1}
                       </button>
@@ -414,7 +409,7 @@ const UserManagement = () => {
       {showVendorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-8 relative">
-            <button onClick={() => setShowVendorModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500 transition">
+            <button onClick={() => setShowVendorModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-primary-600 transition">
               <X className="w-7 h-7" />
             </button>
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-600">
@@ -438,7 +433,7 @@ const UserManagement = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {vendorApps.map((app) => (
-                      <tr key={app.MaNguoiBan} className="hover:bg-pink-50 transition">
+                      <tr key={app.MaNguoiBan} className="hover:bg-primary-50 transition">
                         <td className="px-4 py-2">{app.TenCuaHang || '—'}</td>
                         <td className="px-4 py-2">{app.LoaiHinh === 'CA_NHAN' ? 'Cá nhân' : 'Doanh nghiệp'}</td>
                         <td className="px-4 py-2">{app.DanhMuc?.TenDanhMuc || app.MaDanhMucChinh}</td>
@@ -461,7 +456,7 @@ const UserManagement = () => {
       {showDetailModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 relative animate-fade-in">
-            <button onClick={handleCloseDetail} className="absolute top-3 right-3 text-gray-400 hover:text-pink-500 transition">
+            <button onClick={handleCloseDetail} className="absolute top-3 right-3 text-gray-400 hover:text-primary-600 transition">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -469,7 +464,7 @@ const UserManagement = () => {
             <div className="flex flex-col md:flex-row gap-6 items-center mb-6">
               {/* Avatar */}
               <div className="flex-shrink-0">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white">
                   {(selectedUser.TenKhachHang || selectedUser.TenNhanVien || 'U').charAt(0)}
                 </div>
               </div>
@@ -477,7 +472,7 @@ const UserManagement = () => {
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-gray-700 flex items-center gap-1">
-                    <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     Tên:
                   </span>
                   <span>{selectedUser.TenKhachHang || selectedUser.TenNhanVien}</span>
@@ -511,7 +506,7 @@ const UserManagement = () => {
             {selectedUser.MaKhachHang && (
               <div className="mt-6">
                 <h3 className="font-semibold mb-3 text-gray-800 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M3 12h18M3 17h18" /></svg>
+                  <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M3 12h18M3 17h18" /></svg>
                   Đơn hàng của tài khoản này
                 </h3>
                 {ordersLoading ? (
@@ -530,16 +525,16 @@ const UserManagement = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                    {userOrders.map(order => (
-                          <tr key={order.MaHoaDon} className="hover:bg-pink-50 transition">
+                        {userOrders.map(order => (
+                          <tr key={order.MaHoaDon} className="hover:bg-primary-50 transition">
                             <td className="px-4 py-2 font-medium text-gray-800">#{order.MaHoaDon}</td>
                             <td className="px-4 py-2 text-gray-600">{new Date(order.NgayLap).toLocaleString('vi-VN')}</td>
-                            <td className="px-4 py-2 text-right text-pink-600 font-semibold">{order.TongTien.toLocaleString('vi-VN')} ₫</td>
+                            <td className="px-4 py-2 text-right text-primary-600 font-semibold">{order.TongTien.toLocaleString('vi-VN')} ₫</td>
                             <td className="px-4 py-2 text-center">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.TrangThai === 'Đã giao hàng' ? 'bg-green-100 text-green-700' : order.TrangThai === 'Đã hủy' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{order.TrangThai}</span>
                             </td>
                           </tr>
-                    ))}
+                        ))}
                       </tbody>
                     </table>
                   </div>
