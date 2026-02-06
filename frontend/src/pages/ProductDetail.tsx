@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import type { ProductResponse } from '../services/product.service';
-import { formatPrice } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 
 interface Product {
   MaSanPham: number;
@@ -208,7 +208,7 @@ const ProductDetail = () => {
 
               {/* Price */}
               <div className="text-2xl font-bold text-primary-600 mb-4">
-                {formatPrice(product.GiaSanPham)}
+                {formatCurrency(product.GiaSanPham)}
               </div>
 
               {/* Description */}
@@ -293,8 +293,8 @@ const ProductDetail = () => {
               <button
                 onClick={() => setActiveTab('description')}
                 className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'description'
-                    ? 'text-primary-600 border-b-2 border-primary-500'
-                    : 'text-gray-500 hover:text-primary-500'
+                  ? 'text-primary-600 border-b-2 border-primary-500'
+                  : 'text-gray-500 hover:text-primary-500'
                   }`}
               >
                 Mô tả sản phẩm
@@ -302,8 +302,8 @@ const ProductDetail = () => {
               <button
                 onClick={() => setActiveTab('reviews')}
                 className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'reviews'
-                    ? 'text-primary-600 border-b-2 border-primary-500'
-                    : 'text-gray-500 hover:text-primary-500'
+                  ? 'text-primary-600 border-b-2 border-primary-500'
+                  : 'text-gray-500 hover:text-primary-500'
                   }`}
               >
                 Đánh giá ({reviewCount})
@@ -397,7 +397,7 @@ const ProductDetail = () => {
                       {relatedProduct.TenSanPham}
                     </h3>
                     <p className="text-primary-600 font-bold">
-                      {formatPrice(relatedProduct.GiaSanPham)}
+                      {formatCurrency(relatedProduct.GiaSanPham)}
                     </p>
                   </div>
                 </Link>

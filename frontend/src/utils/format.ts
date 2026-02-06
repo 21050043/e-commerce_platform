@@ -1,8 +1,15 @@
-export function formatPrice(price: number) {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+export function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
 
-export function formatDate(dateString: string) {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return new Date(dateString).toLocaleDateString('vi-VN', options);
-} 
+export function formatDate(dateString: string | Date) {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}

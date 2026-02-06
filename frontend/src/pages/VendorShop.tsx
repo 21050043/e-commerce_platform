@@ -4,7 +4,7 @@ import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, Star, Loader, AlertTriangle, Store, Phone, MapPin } from 'lucide-react';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
-import { formatPrice } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 
 interface VendorShopData {
   vendor: {
@@ -188,7 +188,7 @@ const VendorShop = () => {
                       {product.TenSanPham}
                     </h3>
                     <p className="text-primary-700 font-bold text-lg">
-                      {formatPrice(product.GiaSanPham)}
+                      {formatCurrency(product.GiaSanPham)}
                     </p>
                     <div className="mt-2 text-sm text-gray-600">
                       <span className="inline-block bg-gray-100 px-2 py-1 rounded">

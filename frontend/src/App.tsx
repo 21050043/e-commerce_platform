@@ -21,11 +21,12 @@ import ProductManagement from './pages/admin/ProductManagement';
 import UserManagement from './pages/admin/UserManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import ProductForm from './pages/admin/ProductForm';
-import NotFound from './pages/NotFound';
+import SellerDashboard from './pages/seller/Dashboard';
 import SearchResults from './pages/SearchResults';
 import BusinessLicense from './pages/BusinessLicense';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
+import NotFound from './pages/NotFound';
 import './App.css'
 
 function App() {
@@ -49,7 +50,7 @@ function App() {
               <Route path="/business-license" element={<BusinessLicense />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-use" element={<TermsOfUse />} />
-              
+
               {/* Protected Customer Routes */}
               <Route path="/checkout" element={
                 <ProtectedRoute>
@@ -66,26 +67,16 @@ function App() {
                   <Account />
                 </ProtectedRoute>
               } />
-              
-              {/* Admin Routes - cho Admin, Staff và Vendor */}
+
+              {/* Admin Routes - Strictly for Admin and Staff */}
               <Route path="/admin" element={
-                <ProtectedRoute requiredRoles={[0, 1, 3]}>
+                <ProtectedRoute requiredRoles={[0, 1]}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
               <Route path="/admin/products" element={
-                <ProtectedRoute requiredRoles={[0, 1, 3]}>
+                <ProtectedRoute requiredRoles={[0, 1]}>
                   <ProductManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/products/new" element={
-                <ProtectedRoute requiredRoles={[0, 1, 3]}>
-                  <ProductForm />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/products/edit/:productId" element={
-                <ProtectedRoute requiredRoles={[0, 1, 3]}>
-                  <ProductForm />
                 </ProtectedRoute>
               } />
               <Route path="/admin/users" element={
@@ -94,11 +85,38 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/admin/orders" element={
-                <ProtectedRoute requiredRoles={[0, 1, 3]}>
+                <ProtectedRoute requiredRoles={[0, 1]}>
                   <OrderManagement />
                 </ProtectedRoute>
               } />
-              
+
+              {/* Seller Center Routes - Only for Vendors */}
+              <Route path="/seller" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <SellerDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/products" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <ProductManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/products/new" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <ProductForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/products/edit/:productId" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <ProductForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/orders" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <OrderManagement />
+                </ProtectedRoute>
+              } />
+
               {/* 404 Not Found */}
               <Route path="*" element={<NotFound />} />
 

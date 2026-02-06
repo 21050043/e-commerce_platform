@@ -8,6 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStaff: boolean;
+  isVendor: boolean;
   loading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
@@ -39,16 +40,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         setLoading(true);
         const storedUser = getCurrentUser();
-        
+
         // Kiểm tra xem có token trong localStorage không
         const token = localStorage.getItem('accessToken');
-        
+
         if (token && storedUser) {
           // Tự động refresh token khi khởi động ứng dụng
           try {
             await refreshToken();
             setUser(storedUser);
-            
+
             // Thiết lập interval để refresh token tự động (mỗi 14 phút)
             // Token thường có thời hạn 15 phút, refresh trước 1 phút
             const interval = setInterval(async () => {
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 localStorage.removeItem('user');
               }
             }, 14 * 60 * 1000); // 14 phút
-            
+
             setTokenRefreshInterval(interval);
           } catch (error) {
             console.error('Failed to refresh token on init:', error);
@@ -80,7 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     initAuth();
-    
+
     // Cleanup interval khi component unmount
     return () => {
       if (tokenRefreshInterval) {
@@ -96,10 +97,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         clearInterval(tokenRefreshInterval);
         setTokenRefreshInterval(null);
       }
-      
+
       const response = await loginApi(data);
       setUser(response.user);
-      
+
       // Thiết lập interval để refresh token tự động (mỗi 14 phút)
       const interval = setInterval(async () => {
         try {
@@ -112,7 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.removeItem('user');
         }
       }, 14 * 60 * 1000); // 14 phút
-      
+
       setTokenRefreshInterval(interval);
     } catch (error) {
       throw error;
@@ -126,10 +127,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         clearInterval(tokenRefreshInterval);
         setTokenRefreshInterval(null);
       }
-      
+
       const response = await registerApi(data);
       setUser(response.user);
-      
+
       // Thiết lập interval để refresh token tự động (mỗi 14 phút)
       const interval = setInterval(async () => {
         try {
@@ -142,7 +143,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.removeItem('user');
         }
       }, 14 * 60 * 1000); // 14 phút
-      
+
       setTokenRefreshInterval(interval);
     } catch (error) {
       throw error;
@@ -155,7 +156,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       clearInterval(tokenRefreshInterval);
       setTokenRefreshInterval(null);
     }
-    
+
     await logoutApi();
     setUser(null);
   };
@@ -163,12 +164,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isAuthenticated = !!user;
   const isAdmin = user?.MaVaiTro === 0;
   const isStaff = user?.MaVaiTro === 1;
+  const isVendor = user?.MaVaiTro === 3;
 
   const value = {
     user,
     isAuthenticated,
     isAdmin,
     isStaff,
+    isVendor,
     loading,
     login,
     register,

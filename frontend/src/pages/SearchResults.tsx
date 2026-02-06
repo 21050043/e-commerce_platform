@@ -4,6 +4,7 @@ import MainLayout from '../layouts/MainLayout';
 import { Loader, Search } from 'lucide-react';
 import { searchProducts } from '../services/product.service';
 import { useQuery } from '../hooks/useQuery';
+import { formatCurrency } from '../utils/format';
 
 const SearchResults = () => {
   const query = useQuery().get('q') || '';
@@ -74,7 +75,7 @@ const SearchResults = () => {
                   </div>
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.TenSanPham}</h3>
-                    <p className="text-primary-700 font-bold text-lg">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.GiaSanPham)}</p>
+                    <p className="text-primary-700 font-bold text-lg">{formatCurrency(product.GiaSanPham)}</p>
                   </div>
                 </Link>
               ))}

@@ -44,15 +44,15 @@ const About = () => {
                 {/* Card 2 */}
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border border-gray-100 hover:shadow-lg transition">
                   <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Vy Ngọc Nhân" className="w-20 h-20 rounded-full mb-3 border-4 border-primary-100 object-cover" />
-                  <div className="font-semibold text-lg text-gray-800">Vy Ngọc Nhân</div>
-                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: 22050030</div>
+                  <div className="font-semibold text-lg text-gray-800">Vũ Hải Sơn</div>
+                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: </div>
                   <div className="text-gray-500 text-xs">Trách nhiệm: &amp; </div>
                 </div>
                 {/* Card 3 */}
                 <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border border-gray-100 hover:shadow-lg transition">
                   <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Đặng Văn Nhật Thanh" className="w-20 h-20 rounded-full mb-3 border-4 border-primary-100 object-cover" />
-                  <div className="font-semibold text-lg text-gray-800">Đặng Văn Nhật Thanh</div>
-                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: 23050029</div>
+                  <div className="font-semibold text-lg text-gray-800">Huỳnh Quốc Việt</div>
+                  <div className="text-primary-600 font-medium text-sm mb-1">MSSV: </div>
                   <div className="text-gray-500 text-xs">Trách nhiệm: &amp; </div>
                 </div>
               </div>

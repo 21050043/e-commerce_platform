@@ -8,7 +8,7 @@ import type { ProductResponse } from '../services/product.service';
 import type { CategoryResponse } from '../services/category.service';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 import { getCategoryImage } from '../utils/image';
 import { getRandomRating } from '../utils/random';
 
@@ -259,7 +259,7 @@ const Home = () => {
                       <h3 className="font-semibold text-gray-800 mb-1 hover:text-primary-600 transition-colors">{product.TenSanPham}</h3>
                       <p className="text-sm text-gray-500 mb-2">{product.DanhMuc?.TenDanhMuc}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-primary-600">{formatPrice(product.GiaSanPham)}</span>
+                        <span className="text-lg font-bold text-primary-600">{formatCurrency(product.GiaSanPham)}</span>
                         <button
                           className="bg-primary-600 hover:bg-primary-700 text-white text-sm px-3 py-1 rounded-full transition-colors"
                           onClick={(e) => addToCart(e, product)}

@@ -5,6 +5,7 @@ import { ChevronRight, Trash2, Minus, Plus, ShoppingBag, ArrowRight } from 'luci
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
+import { formatCurrency } from '../utils/format';
 
 const Cart = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -18,12 +19,6 @@ const Cart = () => {
     setLoading(false);
   }, []);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
 
   const proceedToCheckout = () => {
     if (isAuthenticated) {
@@ -129,10 +124,10 @@ const Cart = () => {
                             </div>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            {formatPrice(item.price)}
+                            {formatCurrency(item.price)}
                           </td>
                           <td className="py-4 px-6 text-right font-semibold">
-                            {formatPrice(item.totalPrice)}
+                            {formatCurrency(item.totalPrice)}
                           </td>
                           <td className="py-4 px-6 text-center">
                             <button
@@ -177,7 +172,7 @@ const Cart = () => {
                   <div className="border-t pt-4">
                     <div className="flex justify-between mb-2">
                       <span>Tạm tính</span>
-                      <span>{formatPrice(totalPrice)}</span>
+                      <span>{formatCurrency(totalPrice)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span>Phí vận chuyển</span>
@@ -185,7 +180,7 @@ const Cart = () => {
                     </div>
                     <div className="flex justify-between font-semibold border-t border-b py-4 my-2">
                       <span>Tổng cộng</span>
-                      <span className="text-primary-700">{formatPrice(totalPrice)}</span>
+                      <span className="text-primary-700">{formatCurrency(totalPrice)}</span>
                     </div>
                   </div>
 

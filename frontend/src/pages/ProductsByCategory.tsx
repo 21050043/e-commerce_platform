@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import type { ProductResponse } from '../services/product.service';
-import { formatPrice } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 import { getRandomRating } from '../utils/random';
 
 interface Product {
@@ -215,7 +215,7 @@ const ProductsByCategory = () => {
                             <p className="text-sm text-gray-500 mb-2">{product.DanhMuc?.TenDanhMuc}</p>
                             <div className="flex justify-between items-center">
                               <span className="text-lg font-bold text-primary-600">
-                                {formatPrice(product.GiaSanPham)}
+                                {formatCurrency(product.GiaSanPham)}
                               </span>
                               <button
                                 className="bg-primary-600 hover:bg-primary-700 text-white text-sm px-3 py-1 rounded-full transition-colors"

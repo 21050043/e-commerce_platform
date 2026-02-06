@@ -3,6 +3,8 @@ import type { FormEvent, ChangeEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Upload, Trash } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
+import SellerLayout from '../../layouts/SellerLayout';
+import { useLocation } from 'react-router-dom';
 import { getProductById } from '../../services/product.service';
 import { getAllCategories } from '../../services/category.service';
 // import type { ProductResponse } from '../../services/product.service';
@@ -13,6 +15,9 @@ import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 
 const ProductForm = () => {
+  const location = useLocation();
+  const isSellerPath = location.pathname.startsWith('/seller');
+  const Layout = isSellerPath ? SellerLayout : AdminLayout;
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const isEditMode = !!productId;
@@ -46,7 +51,7 @@ const ProductForm = () => {
   useEffect(() => {
     if (user && !isVendor) {
       addToast('Chỉ người bán mới có thể tạo/cập nhật sản phẩm', 'error');
-      navigate('/admin/products');
+      navigate(isSellerPath ? '/seller' : '/admin');
     }
   }, [user, isVendor, navigate, addToast]);
 
@@ -54,23 +59,23 @@ const ProductForm = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Lấy danh sách danh mục
         const categoriesData = await getAllCategories();
         setCategories(categoriesData);
-        
+
         // Nếu là chế độ chỉnh sửa, lấy thông tin sản phẩm
         if (isEditMode && productId) {
           const product = await getProductById(parseInt(productId));
-          
+
           // Check if product is suspended
           if (product.TrangThaiKiemDuyet === 'SUSPENDED') {
             setProductSuspended(true);
             addToast('Sản phẩm này đã bị tạm dừng. Bạn không thể chỉnh sửa.', 'error');
-            navigate('/admin/products');
+            navigate(isSellerPath ? '/seller/products' : '/admin/products');
             return;
           }
-          
+
           setFormData({
             TenSanPham: product.TenSanPham,
             MaDanhMuc: product.MaDanhMuc.toString(),
@@ -79,12 +84,12 @@ const ProductForm = () => {
             GiaSanPham: product.GiaSanPham.toString(),
             imageFile: null,
           });
-          
+
           if (product.HinhAnh) {
             setImagePreview(product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_BASE_URL}${product.HinhAnh}`);
           }
         }
-        
+
         setError(null);
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu:', error);
@@ -106,7 +111,7 @@ const ProductForm = () => {
     const file = e.target.files?.[0];
     if (file) {
       setFormData(prev => ({ ...prev, imageFile: file }));
-      
+
       // Tạo URL xem trước
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
@@ -120,27 +125,27 @@ const ProductForm = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
-      
+
       const formDataToSend = new FormData();
       formDataToSend.append('TenSanPham', formData.TenSanPham);
       formDataToSend.append('MaDanhMuc', formData.MaDanhMuc);
       formDataToSend.append('MoTa', formData.MoTa);
       formDataToSend.append('SoLuong', formData.SoLuong);
       formDataToSend.append('GiaSanPham', formData.GiaSanPham);
-      
+
       if (formData.imageFile) {
         formDataToSend.append('image', formData.imageFile);
       }
-      
-      const url = isEditMode 
+
+      const url = isEditMode
         ? API_ENDPOINTS.VENDOR.PRODUCTS.UPDATE(parseInt(productId!))
         : API_ENDPOINTS.VENDOR.PRODUCTS.CREATE;
-      
+
       const method = isEditMode ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -148,14 +153,14 @@ const ProductForm = () => {
         },
         body: formDataToSend,
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Lỗi khi lưu sản phẩm');
       }
-      
+
       addToast(isEditMode ? 'Cập nhật sản phẩm thành công' : 'Tạo sản phẩm thành công', 'success');
-      navigate('/admin/products');
+      navigate(isSellerPath ? '/seller/products' : '/admin/products');
     } catch (error: any) {
       console.error('Lỗi khi lưu sản phẩm:', error);
       addToast(error.message || 'Có lỗi xảy ra khi lưu sản phẩm', 'error');
@@ -165,12 +170,12 @@ const ProductForm = () => {
   };
 
   return (
-    <AdminLayout>
+    <Layout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate('/admin/products')}
+              onClick={() => navigate(isSellerPath ? '/seller/products' : '/admin/products')}
               className="p-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
             >
               <ArrowLeft size={18} />
@@ -201,10 +206,10 @@ const ProductForm = () => {
               </div>
             </div>
           )}
-          
+
           {loading && !error ? (
             <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
             </div>
           ) : error ? (
             <div className="text-center py-4 text-red-500">{error}</div>
@@ -224,7 +229,7 @@ const ProductForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={productSuspended}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                   </div>
 
@@ -239,7 +244,7 @@ const ProductForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={productSuspended}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     >
                       <option value="">-- Chọn danh mục --</option>
                       {categories.map((category) => (
@@ -264,7 +269,7 @@ const ProductForm = () => {
                         min="0"
                         required
                         disabled={productSuspended}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       />
                     </div>
                     <div>
@@ -280,7 +285,7 @@ const ProductForm = () => {
                         min="0"
                         required
                         disabled={productSuspended}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       />
                     </div>
                   </div>
@@ -296,7 +301,7 @@ const ProductForm = () => {
                       onChange={handleInputChange}
                       rows={5}
                       disabled={productSuspended}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${productSuspended ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
@@ -343,7 +348,7 @@ const ProductForm = () => {
               <div className="flex justify-end pt-6">
                 <button
                   type="button"
-                  onClick={() => navigate('/admin/products')}
+                  onClick={() => navigate(isSellerPath ? '/seller/products' : '/admin/products')}
                   className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-2"
                 >
                   Hủy
@@ -351,11 +356,10 @@ const ProductForm = () => {
                 <button
                   type="submit"
                   disabled={loading || productSuspended}
-                  className={`flex items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                    productSuspended 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${productSuspended
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-primary-600 hover:bg-primary-700 shadow-md transition-all transform hover:scale-[1.02] active:scale-95'
+                    }`}
                 >
                   <Save size={18} />
                   {loading ? 'Đang lưu...' : productSuspended ? 'Không thể lưu' : 'Lưu sản phẩm'}
@@ -365,7 +369,7 @@ const ProductForm = () => {
           )}
         </div>
       </div>
-    </AdminLayout>
+    </Layout>
   );
 };
 

@@ -5,7 +5,8 @@ INSERT INTO VaiTro (MaVaiTro, TenVaiTro)
 VALUES 
     (0, 'Quản trị viên'),
     (1, 'Nhân viên'),
-    (2, 'Khách hàng');
+    (2, 'Khách hàng'),
+    (3, 'Người bán');
 
 -- Seed NhanVien (passwords are already bcrypt hashed)
 INSERT INTO NhanVien (MaVaiTro, TenNhanVien, SoDienThoai, MatKhau, DiaChi)
@@ -17,7 +18,7 @@ VALUES
 -- Seed KhachHang (passwords are already bcrypt hashed)
 INSERT INTO KhachHang (MaVaiTro, TenKhachHang, SoDienThoai, MatKhau, DiaChi)
 VALUES
-    (2, 'Khách hàng 1', '0923456789', '$2a$12$kDOXSl3QsobIKnqa0.7/kuJzEwQiqxQmKnoLw6HBiWsDFHeTdr55e', '123 Đường KH, Quận 1, TP HCM'),
+    (3, 'Khách hàng 1', '0923456789', '$2a$12$kDOXSl3QsobIKnqa0.7/kuJzEwQiqxQmKnoLw6HBiWsDFHeTdr55e', '123 Đường KH, Quận 1, TP HCM'),
     (2, 'Khách hàng 2', '0923456780', '$2a$12$3WErTWo5laf8.5Ks3/OItuwAkQvRToX/hZ.cI8SxT4ywBSNWiq2DG', '456 Đường KH, Quận 2, TP HCM'),
     (2, 'Khách hàng 3', '0923456781', '$2a$12$hHzaPBHADKEAPG5yoqrGZO2HagmBG3WRlirwx9fMWvDrV6tmJVGUK', '789 Đường KH, Quận 3, TP HCM');
 

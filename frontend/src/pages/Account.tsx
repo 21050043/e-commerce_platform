@@ -348,7 +348,7 @@ const Account = () => {
                             <p className="font-medium text-gray-800">Tài khoản người bán đã được phê duyệt</p>
                             <p className="text-sm text-gray-600">Bạn có thể quản lý sản phẩm tại khu vực người bán.</p>
                           </div>
-                          <Link to="/admin" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Vào khu vực người bán</Link>
+                          <Link to="/seller" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Vào khu vực người bán</Link>
                         </div>
                       </div>
                     ) : (

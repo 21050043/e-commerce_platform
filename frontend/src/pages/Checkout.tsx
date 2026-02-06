@@ -7,6 +7,7 @@ import { useCart } from '../contexts/CartContext';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
+import { formatCurrency } from '../utils/format';
 
 interface CartItem {
   productId: number;
@@ -123,12 +124,6 @@ const Checkout = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -466,7 +461,7 @@ const Checkout = () => {
                           <p className="text-sm text-gray-500">Số lượng: {item.quantity}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                          <p className="font-medium">{formatCurrency(item.price * item.quantity)}</p>
                         </div>
                       </div>
                     ))}
@@ -475,7 +470,7 @@ const Checkout = () => {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span>Tạm tính</span>
-                      <span>{formatPrice(calculateTotalPrice())}</span>
+                      <span>{formatCurrency(calculateTotalPrice())}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span>Phí vận chuyển</span>
@@ -483,7 +478,7 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between font-semibold border-t border-b py-4 my-2">
                       <span>Tổng cộng</span>
-                      <span className="text-primary-700">{formatPrice(calculateTotalPrice())}</span>
+                      <span className="text-primary-700">{formatCurrency(calculateTotalPrice())}</span>
                     </div>
                   </div>
 

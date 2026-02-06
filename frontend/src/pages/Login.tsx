@@ -51,6 +51,9 @@ const Login = () => {
           if (user.MaVaiTro === 0 || user.MaVaiTro === 1) {
             // Admin hoặc nhân viên
             navigate('/admin');
+          } else if (user.MaVaiTro === 3) {
+            // Người bán
+            navigate('/seller');
           } else {
             // Khách hàng
             navigate('/');

@@ -5,7 +5,7 @@ import { ChevronRight, Loader, Package, Calendar, CreditCard, Clock, ChevronDown
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
-import { formatPrice, formatDate } from '../utils/format';
+import { formatCurrency, formatDate } from '../utils/format';
 import { getStatusColor } from '../utils/order';
 
 interface OrderDetail {
@@ -154,7 +154,7 @@ const Orders = () => {
                           </div>
                           <div className="flex items-center">
                             <Package className="h-4 w-4 mr-1" />
-                            <span className="font-medium">{formatPrice(order.TongTien)}</span>
+                            <span className="font-medium">{formatCurrency(order.TongTien)}</span>
                           </div>
                         </div>
                       </div>
@@ -212,11 +212,11 @@ const Orders = () => {
                                 {item.SanPham.TenSanPham}
                               </Link>
                               <p className="text-sm text-gray-600">
-                                {formatPrice(item.DonGia)} x {item.SoLuong}
+                                {formatCurrency(item.DonGia)} x {item.SoLuong}
                               </p>
                             </div>
                             <div className="font-medium text-right">
-                              {formatPrice(item.ThanhTien)}
+                              {formatCurrency(item.ThanhTien)}
                             </div>
                           </div>
                         ))}
@@ -226,7 +226,7 @@ const Orders = () => {
                       <div className="border-t pt-4">
                         <div className="flex justify-between mb-2">
                           <span className="text-gray-700">Tổng tiền sản phẩm</span>
-                          <span>{formatPrice(order.TongTien)}</span>
+                          <span>{formatCurrency(order.TongTien)}</span>
                         </div>
                         <div className="flex justify-between mb-2">
                           <span className="text-gray-700">Phí vận chuyển</span>
@@ -234,7 +234,7 @@ const Orders = () => {
                         </div>
                         <div className="flex justify-between font-semibold text-lg border-t pt-3 mt-3">
                           <span>Tổng cộng</span>
-                          <span className="text-primary-700">{formatPrice(order.TongTien)}</span>
+                          <span className="text-primary-700">{formatCurrency(order.TongTien)}</span>
                         </div>
                       </div>
 
