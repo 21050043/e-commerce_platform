@@ -6,7 +6,7 @@ import { getStatusColor } from '../../../utils/order';
 interface OrderDetailModalProps {
     order: any;
     onClose: () => void;
-    onStatusChange: (id: number, status: string) => Promise<void>;
+    onStatusChange?: (id: number, status: string) => Promise<void>;
 }
 
 export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClose, onStatusChange }) => (
@@ -74,17 +74,21 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClo
                 </div>
             </div>
             <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-                {order.TrangThai === 'Đã đặt hàng' && (
+                {onStatusChange && (
                     <>
-                        <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đang xử lý'); onClose(); }} className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Duyệt đơn</button>
-                        <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đã hủy'); onClose(); }} className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Hủy đơn</button>
+                        {order.TrangThai === 'Đã đặt hàng' && (
+                            <>
+                                <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đang xử lý'); onClose(); }} className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Duyệt đơn</button>
+                                <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đã hủy'); onClose(); }} className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Hủy đơn</button>
+                            </>
+                        )}
+                        {order.TrangThai === 'Đang xử lý' && (
+                            <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đang giao hàng'); onClose(); }} className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Giao hàng</button>
+                        )}
+                        {order.TrangThai === 'Đang giao hàng' && (
+                            <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đã giao hàng'); onClose(); }} className="px-5 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Đã giao hàng</button>
+                        )}
                     </>
-                )}
-                {order.TrangThai === 'Đang xử lý' && (
-                    <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đang giao hàng'); onClose(); }} className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Giao hàng</button>
-                )}
-                {order.TrangThai === 'Đang giao hàng' && (
-                    <button onClick={() => { onStatusChange(order.MaHoaDon, 'Đã giao hàng'); onClose(); }} className="px-5 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Đã giao hàng</button>
                 )}
                 <button onClick={onClose} className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg">Đóng</button>
             </div>

@@ -22,6 +22,8 @@ import UserManagement from './pages/admin/UserManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import ProductForm from './pages/admin/ProductForm';
 import SellerDashboard from './pages/seller/Dashboard';
+import SellerOrders from './pages/seller/Orders';
+import SellerSettings from './pages/seller/Settings';
 import SearchResults from './pages/SearchResults';
 import BusinessLicense from './pages/BusinessLicense';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -96,6 +98,11 @@ function App() {
                   <SellerDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/seller/orders" element={
+                <ProtectedRoute requiredRoles={[3]}>
+                  <SellerOrders />
+                </ProtectedRoute>
+              } />
               <Route path="/seller/products" element={
                 <ProtectedRoute requiredRoles={[3]}>
                   <ProductManagement />
@@ -111,9 +118,9 @@ function App() {
                   <ProductForm />
                 </ProtectedRoute>
               } />
-              <Route path="/seller/orders" element={
+              <Route path="/seller/settings" element={
                 <ProtectedRoute requiredRoles={[3]}>
-                  <OrderManagement />
+                  <SellerSettings />
                 </ProtectedRoute>
               } />
 

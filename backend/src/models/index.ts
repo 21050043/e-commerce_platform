@@ -10,31 +10,39 @@ import SanPham from './SanPham.model';
 import HoaDon from './HoaDon.model';
 import ChiTietHoaDon from './ChiTietHoaDon.model';
 import NguoiBan from './NguoiBan.model';
-import { Model, DataTypes } from 'sequelize';
+import DonHangNguoiBan from './DonHangNguoiBan.model';
+import { DataTypes } from 'sequelize';
 
-// Thiết lập các mối quan hệ giữa các model
-
-// VaiTro - NhanVien
+// ─────────────────────────────────────────────
+// Quan hệ: VaiTro
+// ─────────────────────────────────────────────
 VaiTro.hasMany(NhanVien, { foreignKey: 'MaVaiTro', as: 'NhanViens' });
 NhanVien.belongsTo(VaiTro, { foreignKey: 'MaVaiTro', as: 'VaiTro' });
 
-// VaiTro - KhachHang
 VaiTro.hasMany(KhachHang, { foreignKey: 'MaVaiTro', as: 'KhachHangs' });
 KhachHang.belongsTo(VaiTro, { foreignKey: 'MaVaiTro', as: 'VaiTro' });
 
-// DanhMuc - SanPham
+// ─────────────────────────────────────────────
+// Quan hệ: DanhMuc ↔ SanPham
+// ─────────────────────────────────────────────
 DanhMuc.hasMany(SanPham, { foreignKey: 'MaDanhMuc', as: 'SanPhams' });
 SanPham.belongsTo(DanhMuc, { foreignKey: 'MaDanhMuc', as: 'DanhMuc' });
 
-// KhachHang - NguoiBan (1-1 vendor profile)
+// ─────────────────────────────────────────────
+// Quan hệ: KhachHang ↔ NguoiBan (1-1 vendor profile)
+// ─────────────────────────────────────────────
 KhachHang.hasOne(NguoiBan, { foreignKey: 'MaKhachHang', as: 'NguoiBan' });
 NguoiBan.belongsTo(KhachHang, { foreignKey: 'MaKhachHang', as: 'KhachHang' });
 
-// NguoiBan - SanPham (vendor owns products)
+// ─────────────────────────────────────────────
+// Quan hệ: NguoiBan ↔ SanPham
+// ─────────────────────────────────────────────
 NguoiBan.hasMany(SanPham, { foreignKey: 'MaNguoiBan', as: 'SanPhams' });
 SanPham.belongsTo(NguoiBan, { foreignKey: 'MaNguoiBan', as: 'NguoiBan' });
 
-// NguoiBan - DanhMuc (many-to-many via NguoiBanDanhMuc)
+// ─────────────────────────────────────────────
+// Quan hệ: NguoiBan ↔ DanhMuc (many-to-many)
+// ─────────────────────────────────────────────
 const NguoiBanDanhMuc = sequelize.define('NguoiBanDanhMuc', {
   MaNguoiBan: {
     type: DataTypes.INTEGER,
@@ -54,26 +62,40 @@ const NguoiBanDanhMuc = sequelize.define('NguoiBanDanhMuc', {
 NguoiBan.belongsToMany(DanhMuc, { through: NguoiBanDanhMuc, foreignKey: 'MaNguoiBan', otherKey: 'MaDanhMuc', as: 'DanhMucs' });
 DanhMuc.belongsToMany(NguoiBan, { through: NguoiBanDanhMuc, foreignKey: 'MaDanhMuc', otherKey: 'MaNguoiBan', as: 'NguoiBans' });
 
-// KhachHang - HoaDon
+// ─────────────────────────────────────────────
+// Quan hệ: KhachHang ↔ HoaDon (master order)
+// Lưu ý: MaNhanVien đã bỏ — Admin/Staff không tham gia luồng đơn hàng
+// ─────────────────────────────────────────────
 KhachHang.hasMany(HoaDon, { foreignKey: 'MaKhachHang', as: 'HoaDons' });
 HoaDon.belongsTo(KhachHang, { foreignKey: 'MaKhachHang', as: 'KhachHang' });
 
-// NhanVien - HoaDon
-NhanVien.hasMany(HoaDon, { foreignKey: 'MaNhanVien', as: 'HoaDons' });
-HoaDon.belongsTo(NhanVien, { foreignKey: 'MaNhanVien', as: 'NhanVien' });
-
-// HoaDon - ChiTietHoaDon
+// ─────────────────────────────────────────────
+// Quan hệ: HoaDon ↔ ChiTietHoaDon
+// ─────────────────────────────────────────────
 HoaDon.hasMany(ChiTietHoaDon, { foreignKey: 'MaHoaDon', as: 'ChiTietHoaDons' });
 ChiTietHoaDon.belongsTo(HoaDon, { foreignKey: 'MaHoaDon', as: 'HoaDon' });
 
-// SanPham - ChiTietHoaDon
+// ─────────────────────────────────────────────
+// Quan hệ: SanPham ↔ ChiTietHoaDon
+// ─────────────────────────────────────────────
 SanPham.hasMany(ChiTietHoaDon, { foreignKey: 'MaSanPham', as: 'ChiTietHoaDons' });
 ChiTietHoaDon.belongsTo(SanPham, { foreignKey: 'MaSanPham', as: 'SanPham' });
 
-// Hàm khởi tạo các model
+// ─────────────────────────────────────────────
+// Quan hệ: HoaDon ↔ DonHangNguoiBan (sub-orders)
+// Mô hình platform: 1 HoaDon → N sub-orders (1 per người bán)
+// ─────────────────────────────────────────────
+HoaDon.hasMany(DonHangNguoiBan, { foreignKey: 'MaHoaDon', as: 'DonHangNguoiBans' });
+DonHangNguoiBan.belongsTo(HoaDon, { foreignKey: 'MaHoaDon', as: 'HoaDon' });
+
+NguoiBan.hasMany(DonHangNguoiBan, { foreignKey: 'MaNguoiBan', as: 'DonHangNguoiBans' });
+DonHangNguoiBan.belongsTo(NguoiBan, { foreignKey: 'MaNguoiBan', as: 'NguoiBan' });
+
+// ─────────────────────────────────────────────
+// Khởi tạo models
+// ─────────────────────────────────────────────
 const initializeModels = async () => {
   try {
-    // Đồng bộ models nhưng không thay đổi cấu trúc bảng
     await sequelize.sync({ force: false });
     logger.db.synchronized();
   } catch (error) {
@@ -81,7 +103,6 @@ const initializeModels = async () => {
   }
 };
 
-// Export các model và hàm khởi tạo
 export {
   sequelize,
   VaiTro,
@@ -93,5 +114,6 @@ export {
   ChiTietHoaDon,
   NguoiBan,
   NguoiBanDanhMuc,
-  initializeModels
-}; 
+  DonHangNguoiBan,
+  initializeModels,
+};

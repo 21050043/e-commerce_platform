@@ -1,22 +1,17 @@
 import { useEffect, useState } from 'react';
-import { UserPlus, Search, RefreshCw, Bell, X } from 'lucide-react';
+import { UserPlus, Search, RefreshCw, X } from 'lucide-react';
 import AdminLayout from '../../layouts/AdminLayout';
 import {
   getAllCustomers,
   getAllStaff,
   getAllVendors,
   createUser,
-  listVendorApplications,
-  approveVendorApplication,
-  rejectVendorApplication,
 } from '../../services/user.service';
 import type { UserResponse } from '../../services/user.service';
 import { useToast } from '../../contexts/ToastContext';
 import { useLocation } from 'react-router-dom';
 import { getOrdersByCustomerId } from '../../services/order.service';
-import { UserDetailModal, VendorAppsModal } from './components/UserModals';
-import { formatCurrency, formatDate } from '../../utils/format';
-
+import { UserDetailModal } from './components/UserModals';
 const UserManagement = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -41,9 +36,7 @@ const UserManagement = () => {
     DiaChi: ''
   });
   const [addLoading, setAddLoading] = useState(false);
-  const [showVendorModal, setShowVendorModal] = useState(false);
-  const [vendorApps, setVendorApps] = useState<any[]>([]);
-  const [vendorLoading, setVendorLoading] = useState(false);
+  // Vendor application logic removed due to auto-approval mechanism
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -86,39 +79,7 @@ const UserManagement = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const openVendorApps = async () => {
-    try {
-      setVendorLoading(true);
-      const data = await listVendorApplications('PENDING', 1, 20);
-      setVendorApps(data.applications || []);
-      setShowVendorModal(true);
-    } catch (e) {
-      addToast('Không thể tải danh sách đăng ký vendor', 'error');
-    } finally {
-      setVendorLoading(false);
-    }
-  };
-
-  const approveVendor = async (id: number) => {
-    try {
-      await approveVendorApplication(id);
-      setVendorApps(prev => prev.filter(a => a.MaNguoiBan !== id));
-      addToast('Đã phê duyệt hồ sơ', 'success');
-    } catch (e: any) {
-      addToast(e?.response?.data?.message || 'Không thể phê duyệt', 'error');
-    }
-  };
-
-  const rejectVendor = async (id: number) => {
-    const reason = prompt('Lý do từ chối (tuỳ chọn):') || '';
-    try {
-      await rejectVendorApplication(id, reason);
-      setVendorApps(prev => prev.filter(a => a.MaNguoiBan !== id));
-      addToast('Đã từ chối hồ sơ', 'success');
-    } catch (e: any) {
-      addToast(e?.response?.data?.message || 'Không thể từ chối', 'error');
-    }
-  };
+  // Auto-approval mechanism handles vendor registration now.
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -234,13 +195,6 @@ const UserManagement = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-gray-800">Quản lý người dùng</h1>
-            <button
-              className="relative focus:outline-none"
-              onClick={openVendorApps}
-              title="Đăng ký vendor chờ duyệt"
-            >
-              <Bell className="w-7 h-7 text-primary-600" />
-            </button>
           </div>
           <button
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
@@ -419,15 +373,7 @@ const UserManagement = () => {
         />
       )}
 
-      {showVendorModal && (
-        <VendorAppsModal
-          apps={vendorApps}
-          loading={vendorLoading}
-          onApprove={approveVendor}
-          onReject={rejectVendor}
-          onClose={() => setShowVendorModal(false)}
-        />
-      )}
+      {/* VendorAppsModal removed due to auto-approval */}
 
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

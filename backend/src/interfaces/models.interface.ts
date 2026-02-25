@@ -49,11 +49,11 @@ export interface ISanPham {
   NguoiTamDung?: number | null;
 }
 
-// Interface cho HoaDon
+// Interface cho HoaDon (Master Order)
+// MaNhanVien đã bỏ — Admin/Staff không tham gia luồng đơn hàng platform
 export interface IHoaDon {
   MaHoaDon?: number;
   MaKhachHang: number;
-  MaNhanVien?: number | null;
   NgayLap?: Date;
   TongTien: number;
   PhuongThucTT: string;
@@ -69,7 +69,7 @@ export interface IChiTietHoaDon {
   SoLuong: number;
   DonGia: number;
   ThanhTien: number;
-} 
+}
 
 // Interface cho NguoiBan (Vendor)
 export interface INguoiBan {
@@ -84,4 +84,16 @@ export interface INguoiBan {
   TrangThai?: 'PENDING' | 'APPROVED' | 'REJECTED';
   LyDoTuChoi?: string | null;
   NgayDuyet?: Date | null;
+}
+
+// Interface cho DonHangNguoiBan (Sub-order per người bán)
+// Mỗi HoaDon master được tách thành N sub-orders, 1 per người bán.
+export interface IDonHangNguoiBan {
+  MaDonHangNB?: number;
+  MaHoaDon: number;
+  MaNguoiBan: number;
+  TrangThai: 'Đã đặt hàng' | 'Đang xử lý' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy';
+  TongTienNB: number;
+  GhiChu?: string | null;
+  NgayCapNhat?: Date;
 }

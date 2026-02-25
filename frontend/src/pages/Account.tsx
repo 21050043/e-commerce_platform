@@ -35,7 +35,7 @@ const Account = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'thongTin' | 'matKhau'>('thongTin');
 
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showVendorModal, setShowVendorModal] = useState(false);
@@ -218,8 +218,8 @@ const Account = () => {
         addToast('Bạn phải đồng ý với điều khoản và chính sách hoạt động', 'warning');
         return;
       }
-      if (!vendorForm.DiaChiKinhDoanh || vendorForm.categories.length === 0 || !vendorForm.SoDienThoaiLienHe) {
-        addToast('Vui lòng điền đủ thông tin bắt buộc', 'error');
+      if (!vendorForm.TenCuaHang || !vendorForm.DiaChiKinhDoanh || vendorForm.categories.length === 0 || !vendorForm.SoDienThoaiLienHe) {
+        addToast('Vui lòng điền đủ thông tin bắt buộc (Tên cửa hàng, Địa chỉ, Danh mục, SĐT)', 'error');
         return;
       }
       await applyVendor({
@@ -231,8 +231,9 @@ const Account = () => {
         SoDienThoaiLienHe: vendorForm.SoDienThoaiLienHe,
         agreed: vendorForm.agreed,
       } as any);
-      setVendorStatus('PENDING');
-      addToast('Đã gửi hồ sơ đăng ký người bán', 'success');
+      setVendorStatus('APPROVED');
+      await refreshUser();
+      addToast('Đăng ký người bán thành công! Chào mừng bạn đến với Kênh Người Bán.', 'success');
       closeVendorModal();
     } catch (err: any) {
       addToast(err?.response?.data?.message || 'Không thể gửi hồ sơ', 'error');
@@ -345,10 +346,10 @@ const Account = () => {
                       <div className="mb-6 p-4 border rounded-lg bg-green-50">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-gray-800">Tài khoản người bán đã được phê duyệt</p>
-                            <p className="text-sm text-gray-600">Bạn có thể quản lý sản phẩm tại khu vực người bán.</p>
+                            <p className="font-medium text-gray-800">Tài khoản của bạn đủ điều kiện để trở thành người bán hàng</p>
+                            <p className="text-sm text-gray-600">Bạn có thể quản lý sản phẩm tại khu vực bán hàng.</p>
                           </div>
-                          <Link to="/seller" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Vào khu vực người bán</Link>
+                          <Link to="/seller" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Vào khu vực bán hàng</Link>
                         </div>
                       </div>
                     ) : (
@@ -369,7 +370,7 @@ const Account = () => {
                             className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
                             disabled={vendorStatus === 'PENDING'}
                           >
-                            {vendorStatus === 'PENDING' ? 'Đang chờ duyệt' : 'Đăng ký vendor'}
+                            {vendorStatus === 'PENDING' ? 'Đang chờ duyệt' : 'Đăng ký bán hàng'}
                           </button>
                         </div>
                       </div>
@@ -544,7 +545,7 @@ const Account = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative">
             <button onClick={closeVendorModal} className="absolute top-3 right-3 text-gray-400 hover:text-primary-600">×</button>
-            <h3 className="text-xl font-semibold mb-4">Đăng ký người bán (Vendor)</h3>
+            <h3 className="text-xl font-semibold mb-4">Đăng ký bán hàng (Vendor)</h3>
             <form onSubmit={submitVendor} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -555,8 +556,8 @@ const Account = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Tên cửa hàng (không bắt buộc)</label>
-                  <input name="TenCuaHang" value={vendorForm.TenCuaHang} onChange={onChangeVendor} className="w-full border rounded px-3 py-2" />
+                  <label className="block text-sm text-gray-700 mb-1">Tên cửa hàng</label>
+                  <input name="TenCuaHang" value={vendorForm.TenCuaHang} onChange={onChangeVendor} required className="w-full border rounded px-3 py-2" placeholder="Nhập tên shop của bạn" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm text-gray-700 mb-1">Địa chỉ kinh doanh</label>

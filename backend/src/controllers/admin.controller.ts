@@ -15,7 +15,7 @@ export default class AdminController {
   public getDashboardSummary = async (req: Request, res: Response): Promise<Response> => {
     try {
       const userRole = req.user?.role;
-      
+
       if (userRole === 3) {
         // Vendor dashboard - chỉ hiển thị dữ liệu của vendor
         const summary = await this.adminService.getVendorDashboardSummary(req.user!.id);
@@ -39,7 +39,7 @@ export default class AdminController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      
+
       const customers = await this.adminService.getAllCustomers(page, limit);
       return res.status(200).json(customers);
     } catch (error: any) {
@@ -53,7 +53,7 @@ export default class AdminController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      
+
       const staff = await this.adminService.getAllStaff(page, limit);
       return res.status(200).json(staff);
     } catch (error: any) {
@@ -80,7 +80,7 @@ export default class AdminController {
     try {
       const id = parseInt(req.params.id);
       const roleType = req.query.role as string;
-      
+
       const user = await this.adminService.getUserById(id, roleType === 'staff' ? 1 : 2);
       return res.status(200).json(user);
     } catch (error: any) {
@@ -99,7 +99,7 @@ export default class AdminController {
 
       const userData = req.body;
       const newUser = await this.adminService.createUser(userData);
-      
+
       return res.status(201).json({
         message: 'Tạo người dùng thành công',
         user: newUser
@@ -121,9 +121,9 @@ export default class AdminController {
       const id = parseInt(req.params.id);
       const userData = req.body;
       const roleType = req.query.role as string;
-      
+
       const updatedUser = await this.adminService.updateUser(id, roleType === 'staff' ? 1 : 2, userData);
-      
+
       return res.status(200).json({
         message: 'Cập nhật người dùng thành công',
         user: updatedUser
@@ -139,9 +139,9 @@ export default class AdminController {
     try {
       const id = parseInt(req.params.id);
       const roleType = req.query.role as string;
-      
+
       await this.adminService.deleteUser(id, roleType === 'staff' ? 1 : 2);
-      
+
       return res.status(200).json({
         message: 'Xóa người dùng thành công'
       });
@@ -162,9 +162,9 @@ export default class AdminController {
       const id = parseInt(req.params.id);
       const { newRole } = req.body;
       const roleType = req.query.role as string;
-      
+
       await this.adminService.changeUserRole(id, roleType === 'staff' ? 1 : 2, newRole);
-      
+
       return res.status(200).json({
         message: 'Thay đổi vai trò người dùng thành công'
       });
@@ -182,7 +182,7 @@ export default class AdminController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      
+
       const result = await this.productService.getAllProducts(page, limit);
       return res.status(200).json(result);
     } catch (error: any) {
@@ -205,14 +205,15 @@ export default class AdminController {
   };
 
   /**
-   * Quản lý đơn hàng (sử dụng lại OrderService)
+   * Quản lý đơn hàng (Admin chỉ xem tổng quan — không can thiệp vào luồng giao dịch)
+   * Trong mô hình platform, người bán tự quản lý đơn hàng của mình.
    */
   public getAllOrders = async (req: Request, res: Response): Promise<Response> => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      
-      const result = await this.orderService.getAllOrders(page, limit);
+
+      const result = await this.adminService.getAllOrders(page, limit);
       return res.status(200).json(result);
     } catch (error: any) {
       return res.status(500).json({
@@ -233,30 +234,14 @@ export default class AdminController {
     }
   };
 
-  public updateOrderStatus = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const orderId = parseInt(req.params.id);
-      const { trangThai } = req.body;
-      
-      const order = await this.orderService.updateOrderStatus(orderId, trangThai);
-      return res.status(200).json({
-        message: 'Cập nhật trạng thái đơn hàng thành công',
-        order
-      });
-    } catch (error: any) {
-      return res.status(404).json({
-        message: error.message
-      });
-    }
-  };
+  /**
+   * NOTE: updateOrderStatus bị bỏ trong mô hình platform.
+   * Người bán (role 3) tự cập nhật trạng thái qua /api/seller/orders/:id/status.
+   * Admin không can thiệp vào luồng giao dịch của người bán.
+   */
 
   /**
-   * Lấy đơn hàng của một khách hàng bất kỳ (cho admin/staff)
+   * Lấy đơn hàng của một khách hàng bất kỳ (cho admin/staff xem).
    */
   public getOrdersByCustomerId = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -294,7 +279,7 @@ export default class AdminController {
       }
 
       const product = await this.productService.suspendProduct(productId, lyDoTamDung, adminId);
-      
+
       return res.status(200).json({
         message: 'Tạm dừng sản phẩm thành công',
         product
@@ -313,7 +298,7 @@ export default class AdminController {
     try {
       const productId = parseInt(req.params.id);
       const product = await this.productService.unsuspendProduct(productId);
-      
+
       return res.status(200).json({
         message: 'Hủy tạm dừng sản phẩm thành công',
         product

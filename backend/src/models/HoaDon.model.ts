@@ -1,18 +1,13 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { IHoaDon } from '../interfaces/models.interface';
 import { sequelize } from '../config/db.config';
-import KhachHang from './KhachHang.model';
-import NhanVien from './NhanVien.model';
-import ChiTietHoaDon from './ChiTietHoaDon.model';
 
-// Interface cho các thuộc tính HoaDon khi tạo mới
-interface HoaDonCreationAttributes extends Optional<IHoaDon, 'MaHoaDon' | 'NgayLap' | 'TrangThai'> {}
+// Bỏ MaNhanVien — Admin/Staff không còn tham gia luồng đơn hàng trong mô hình platform
+interface HoaDonCreationAttributes extends Optional<IHoaDon, 'MaHoaDon' | 'NgayLap' | 'TrangThai'> { }
 
-// Model HoaDon kế thừa từ Model Sequelize
 class HoaDon extends Model<IHoaDon, HoaDonCreationAttributes> implements IHoaDon {
   public MaHoaDon!: number;
   public MaKhachHang!: number;
-  public MaNhanVien?: number | null;
   public NgayLap?: Date;
   public TongTien!: number;
   public PhuongThucTT!: string;
@@ -20,7 +15,6 @@ class HoaDon extends Model<IHoaDon, HoaDonCreationAttributes> implements IHoaDon
   public TrangThai?: string;
 }
 
-// Khởi tạo model
 HoaDon.init(
   {
     MaHoaDon: {
@@ -34,14 +28,6 @@ HoaDon.init(
       references: {
         model: 'KhachHang',
         key: 'MaKhachHang',
-      },
-    },
-    MaNhanVien: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'NhanVien',
-        key: 'MaNhanVien',
       },
     },
     NgayLap: {
@@ -65,7 +51,7 @@ HoaDon.init(
     TrangThai: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: 'Đang xử lý',
+      defaultValue: 'Đã đặt hàng',
     },
   },
   {
@@ -80,4 +66,4 @@ HoaDon.init(
   }
 );
 
-export default HoaDon; 
+export default HoaDon;

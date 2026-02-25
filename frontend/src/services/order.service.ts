@@ -17,7 +17,6 @@ export interface OrderRequest {
 export interface OrderResponse {
   MaHoaDon: number;
   MaKhachHang: number;
-  MaNhanVien?: number;
   NgayLap: string;
   TongTien: number;
   PhuongThucTT: string;
@@ -28,11 +27,6 @@ export interface OrderResponse {
     TenKhachHang: string;
     SoDienThoai: string;
     DiaChi?: string;
-  };
-  NhanVien?: {
-    MaNhanVien: number;
-    TenNhanVien: string;
-    SoDienThoai: string;
   };
   ChiTietHoaDons?: {
     MaChiTiet: number;
@@ -59,13 +53,13 @@ export const getMyOrders = async (): Promise<OrderResponse[]> => {
   try {
     console.log('Gọi API lấy đơn hàng của tôi');
     const response = await api.get(API_ENDPOINTS.ORDER.GET_MY_ORDERS);
-    
+
     // Kiểm tra dữ liệu trả về
     if (!response.data) {
       console.error('Không có dữ liệu đơn hàng');
       return [];
     }
-    
+
     console.log(`Nhận được ${Array.isArray(response.data) ? response.data.length : 0} đơn hàng`);
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
@@ -77,7 +71,7 @@ export const getMyOrders = async (): Promise<OrderResponse[]> => {
 export const getOrderById = async (id: number): Promise<OrderResponse> => {
   // Đối với admin, sử dụng endpoint ADMIN
   let url = '';
-  
+
   // Kiểm tra người dùng có phải là admin không
   const userRole = localStorage.getItem('role');
   if (userRole === '1') {
@@ -85,7 +79,7 @@ export const getOrderById = async (id: number): Promise<OrderResponse> => {
   } else {
     url = API_ENDPOINTS.ORDER.GET_BY_ID(id);
   }
-  
+
   const response = await api.get(url);
   return response.data;
 };
@@ -104,7 +98,7 @@ export const getAllOrders = async (page = 1, limit = 10): Promise<{
 export const updateOrderStatus = async (id: number, status: string): Promise<OrderResponse> => {
   const response = await api.put(API_ENDPOINTS.ADMIN.ORDERS.UPDATE_STATUS(id), { trangThai: status });
   return response.data;
-}; 
+};
 
 export const getOrdersByCustomerId = async (customerId: number): Promise<OrderResponse[]> => {
   const response = await api.get(`${API_ENDPOINTS.ADMIN.ORDERS.GET_ALL}/by-customer/${customerId}`);

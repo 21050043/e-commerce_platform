@@ -17,17 +17,17 @@ export default class AdminService {
   public async getVendorDashboardSummary(vendorCustomerId: number) {
     try {
       // Tìm vendor profile từ customer ID
-      const vendorProfile = await NguoiBan.findOne({ 
-        where: { MaKhachHang: vendorCustomerId } 
+      const vendorProfile = await NguoiBan.findOne({
+        where: { MaKhachHang: vendorCustomerId }
       });
-      
+
       if (!vendorProfile) {
         throw new Error('Không tìm thấy hồ sơ người bán');
       }
 
       // Đếm sản phẩm của vendor
-      const totalProducts = await SanPham.count({ 
-        where: { MaNguoiBan: vendorProfile.MaNguoiBan } 
+      const totalProducts = await SanPham.count({
+        where: { MaNguoiBan: vendorProfile.MaNguoiBan }
       });
 
       // Đếm đơn hàng có sản phẩm của vendor này
@@ -79,7 +79,7 @@ export default class AdminService {
       const totalCustomers = await KhachHang.count();
       const totalOrders = await HoaDon.count();
       const pendingVendors = await NguoiBan.count({ where: { TrangThai: 'PENDING' } });
-      
+
       // Tính tổng doanh thu
       const revenue = await HoaDon.sum('TongTien', {
         where: {
@@ -103,20 +103,44 @@ export default class AdminService {
   }
 
   /**
+   * Admin xem toàn bộ hoá đơn (chỉ đọc — không thay đổi trạng thái).
+   * Trong mô hình platform, người bán tự quản lý đơn hàng của mình.
+   */
+  public async getAllOrders(page = 1, limit = 10) {
+    try {
+      const offset = (page - 1) * limit;
+      const { count, rows } = await HoaDon.findAndCountAll({
+        include: [{ model: KhachHang, as: 'KhachHang' }],
+        limit,
+        offset,
+        order: [['NgayLap', 'DESC']],
+      });
+      return {
+        total: count,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
+        orders: rows,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Quản lý khách hàng
    */
   public async getAllCustomers(page = 1, limit = 10) {
     try {
       const offset = (page - 1) * limit;
-      
+
       const { count, rows } = await KhachHang.findAndCountAll({
-        attributes: { 
-          exclude: ['MatKhau'] 
+        attributes: {
+          exclude: ['MatKhau']
         },
-        include: [{ 
-          model: VaiTro, 
-          as: 'VaiTro'
-        }],
+        include: [
+          { model: VaiTro, as: 'VaiTro' },
+          { model: NguoiBan, as: 'NguoiBan' }
+        ],
         limit,
         offset,
         order: [['MaKhachHang', 'ASC']]
@@ -143,7 +167,10 @@ export default class AdminService {
       const { count, rows } = await KhachHang.findAndCountAll({
         attributes: { exclude: ['MatKhau'] },
         where: { MaVaiTro: 3 },
-        include: [{ model: VaiTro, as: 'VaiTro' }],
+        include: [
+          { model: VaiTro, as: 'VaiTro' },
+          { model: NguoiBan, as: 'NguoiBan' }
+        ],
         limit,
         offset,
         order: [['MaKhachHang', 'ASC']]
@@ -230,13 +257,13 @@ export default class AdminService {
   public async getAllStaff(page = 1, limit = 10) {
     try {
       const offset = (page - 1) * limit;
-      
+
       const { count, rows } = await NhanVien.findAndCountAll({
-        attributes: { 
-          exclude: ['MatKhau'] 
+        attributes: {
+          exclude: ['MatKhau']
         },
-        include: [{ 
-          model: VaiTro, 
+        include: [{
+          model: VaiTro,
           as: 'VaiTro'
         }],
         limit,
@@ -291,10 +318,10 @@ export default class AdminService {
    */
   public async createUser(userData: any) {
     const t = await sequelize.transaction();
-    
+
     try {
       const { MaVaiTro, MatKhau, SoDienThoai, ...rest } = userData;
-      
+
       // Kiểm tra số điện thoại đã tồn tại chưa
       let existingUser;
       if (MaVaiTro === 2) {
@@ -305,9 +332,9 @@ export default class AdminService {
       if (existingUser) {
         throw new Error('Số điện thoại đã được sử dụng');
       }
-      
+
       let newUser;
-      
+
       if (MaVaiTro === 2) {
         // Tạo khách hàng
         newUser = await KhachHang.create({
@@ -325,13 +352,13 @@ export default class AdminService {
           MatKhau // plain text, model sẽ tự hash
         }, { transaction: t });
       }
-      
+
       await t.commit();
-      
+
       // Trả về người dùng không kèm mật khẩu
       const userObj = newUser.get({ plain: true });
       const { MatKhau: _, ...userWithoutPassword } = userObj;
-      
+
       return userWithoutPassword;
     } catch (error) {
       await t.rollback();
@@ -346,17 +373,17 @@ export default class AdminService {
     try {
       // Không cho phép cập nhật mật khẩu qua API này
       const { MatKhau, ...updateData } = userData;
-      
+
       if (role === 2) {
         // Khách hàng
         const user = await KhachHang.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         await user.update(updateData);
-        
+
         // Trả về user không kèm mật khẩu
         const userObj = user.get({ plain: true });
         const { MatKhau: _, ...userWithoutPassword } = userObj;
@@ -364,13 +391,13 @@ export default class AdminService {
       } else {
         // Nhân viên hoặc Admin
         const user = await NhanVien.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         await user.update(updateData);
-        
+
         // Trả về user không kèm mật khẩu
         const userObj = user.get({ plain: true });
         const { MatKhau: _, ...userWithoutPassword } = userObj;
@@ -389,34 +416,34 @@ export default class AdminService {
       if (role === 2) {
         // Khách hàng
         const user = await KhachHang.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         await user.destroy();
       } else {
         // Nhân viên hoặc Admin
         const user = await NhanVien.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         if (user.MaVaiTro === 0) {
           // Kiểm tra xem còn admin khác không
           const adminCount = await NhanVien.count({
             where: { MaVaiTro: 0 }
           });
-          
+
           if (adminCount <= 1) {
             throw new Error('Không thể xóa admin duy nhất');
           }
         }
-        
+
         await user.destroy();
       }
-      
+
       return true;
     } catch (error) {
       throw error;
@@ -431,34 +458,34 @@ export default class AdminService {
       if (role === 2) {
         // Khách hàng
         const user = await KhachHang.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         await user.update({ MaVaiTro: newRole });
       } else {
         // Nhân viên hoặc Admin
         const user = await NhanVien.findByPk(id);
-        
+
         if (!user) {
           throw new Error('Người dùng không tồn tại');
         }
-        
+
         // Kiểm tra nếu là admin cuối cùng
         if (user.MaVaiTro === 0 && newRole !== 0) {
           const adminCount = await NhanVien.count({
             where: { MaVaiTro: 0 }
           });
-          
+
           if (adminCount <= 1) {
             throw new Error('Không thể thay đổi vai trò của admin duy nhất');
           }
         }
-        
+
         await user.update({ MaVaiTro: newRole });
       }
-      
+
       return true;
     } catch (error) {
       throw error;

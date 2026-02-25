@@ -149,33 +149,26 @@ router.get(
 
 // Vendor applications endpoints moved to /api/vendor (mounted with admin role)
 
-// Order management - Admin, nhân viên và vendor
+// Order management — Admin chỉ xem, KHÔNG thay đổi trạng thái
+// Trong mô hình platform, người bán tự cập nhật trạng thái qua /api/seller/orders/:id/status
 router.get(
   '/orders',
   authMiddleware,
-  roleMiddleware([0, 1, 3]),
+  roleMiddleware([0, 1]),
   adminController.getAllOrders
 );
 
 router.get(
   '/orders/:id',
   authMiddleware,
-  roleMiddleware([0, 1, 3]),
+  roleMiddleware([0, 1]),
   adminController.getOrderById
-);
-
-router.put(
-  '/orders/:id/status',
-  authMiddleware,
-  roleMiddleware([0, 1, 3]),
-  orderStatusValidation,
-  adminController.updateOrderStatus
 );
 
 router.get(
   '/orders/by-customer/:customerId',
   authMiddleware,
-  roleMiddleware([0, 1, 3]),
+  roleMiddleware([0, 1]),
   adminController.getOrdersByCustomerId
 );
 

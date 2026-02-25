@@ -40,38 +40,7 @@ export default class VendorController {
     }
   };
 
-  public listApplications = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const status = (req.query.status as 'PENDING' | 'APPROVED' | 'REJECTED') || 'PENDING';
-      const page = parseInt((req.query.page as string) || '1');
-      const limit = parseInt((req.query.limit as string) || '10');
-      const result = await this.adminService.listVendorApplications(status, page, limit);
-      return res.status(200).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Không thể lấy danh sách hồ sơ người bán' });
-    }
-  };
-
-  public approve = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const id = parseInt(req.params.id);
-      const result = await this.adminService.approveVendorApplication(id);
-      return res.status(200).json({ message: 'Đã phê duyệt người bán', application: result });
-    } catch (error: any) {
-      return res.status(400).json({ message: error.message || 'Không thể phê duyệt' });
-    }
-  };
-
-  public reject = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const id = parseInt(req.params.id);
-      const { reason } = req.body;
-      const result = await this.adminService.rejectVendorApplication(id, reason || '');
-      return res.status(200).json({ message: 'Đã từ chối hồ sơ người bán', application: result });
-    } catch (error: any) {
-      return res.status(400).json({ message: error.message || 'Không thể từ chối' });
-    }
-  };
+  // Admin methods (listApplications, approve, reject) removed as registration is now auto-approved.
 }
 
 

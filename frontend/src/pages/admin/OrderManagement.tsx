@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Eye, Search, RefreshCw, AlertCircle } from 'lucide-react';
-import { API_ENDPOINTS } from '../../constants/api';
-import { useToast } from '../../contexts/ToastContext';
+import { useLocation } from 'react-router-dom';
 import SellerLayout from '../../layouts/SellerLayout';
 import AdminLayout from '../../layouts/AdminLayout';
-import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency, formatDate } from '../../utils/format';
 import { getStatusColor } from '../../utils/order';
 import { OrderDetailModal, UnprocessedOrdersModal } from './components/OrderModals';
-import api from '../../services/api';
-import { useLocation } from 'react-router-dom';
-import { getAllOrders, updateOrderStatus, getOrderById } from '../../services/order.service';
+import { getAllOrders, getOrderById } from '../../services/order.service';
 import type { OrderResponse } from '../../services/order.service';
 
 const OrderManagement = () => {
@@ -78,15 +74,8 @@ const OrderManagement = () => {
     setSelectedOrder(null);
   };
 
-  const handleStatusChange = async (id: number, status: string) => {
-    try {
-      await updateOrderStatus(id, status);
-      handleRefresh();
-    } catch (error) {
-      console.error('Lỗi khi cập nhật trạng thái:', error);
-      setError('Đã xảy ra lỗi khi cập nhật trạng thái. Vui lòng thử lại sau.');
-    }
-  };
+  // handleStatusChange bị loại bỏ vì Admin không còn quyền cập nhật trạng thái đơn hàng master.
+  // Mỗi đơn hàng con (sub-order) sẽ được người bán tự quản lý.
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -313,7 +302,6 @@ const OrderManagement = () => {
           <OrderDetailModal
             order={selectedOrder}
             onClose={handleCloseDetail}
-            onStatusChange={handleStatusChange}
           />
         )}
 

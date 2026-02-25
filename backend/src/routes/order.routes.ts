@@ -6,17 +6,14 @@ import { authMiddleware, roleMiddleware } from '../middlewares/auth.middleware';
 const router = Router();
 const orderController = new OrderController();
 
-// Validation middleware
+// Validation cho tạo đơn hàng
 const createOrderValidation = [
-  body('PhuongThucTT')
-    .notEmpty().withMessage('Phương thức thanh toán không được để trống'),
-  body('DiaChi')
-    .notEmpty().withMessage('Địa chỉ không được để trống'),
+  body('PhuongThucTT').notEmpty().withMessage('Phương thức thanh toán không được để trống'),
+  body('DiaChi').notEmpty().withMessage('Địa chỉ không được để trống'),
   body('TongTien')
     .notEmpty().withMessage('Tổng tiền không được để trống')
     .isFloat({ min: 0 }).withMessage('Tổng tiền phải là số dương'),
-  body('items')
-    .isArray({ min: 1 }).withMessage('Đơn hàng phải có ít nhất một sản phẩm'),
+  body('items').isArray({ min: 1 }).withMessage('Đơn hàng phải có ít nhất một sản phẩm'),
   body('items.*.MaSanPham')
     .notEmpty().withMessage('Mã sản phẩm không được để trống')
     .isInt().withMessage('Mã sản phẩm phải là số nguyên'),
@@ -28,51 +25,16 @@ const createOrderValidation = [
     .isFloat({ min: 0 }).withMessage('Đơn giá phải là số dương'),
   body('items.*.ThanhTien')
     .notEmpty().withMessage('Thành tiền không được để trống')
-    .isFloat({ min: 0 }).withMessage('Thành tiền phải là số dương')
+    .isFloat({ min: 0 }).withMessage('Thành tiền phải là số dương'),
 ];
 
-const updateOrderStatusValidation = [
-  body('trangThai')
-    .notEmpty().withMessage('Trạng thái không được để trống')
-    .isIn(['Đang xử lý', 'Đang giao hàng', 'Đã giao hàng', 'Đã hủy'])
-    .withMessage('Trạng thái không hợp lệ')
-];
+// ─── Khách hàng đặt hàng ───────────────────────────────────────────
+router.post('/', authMiddleware, createOrderValidation, orderController.createOrder);
 
-// Customer routes
-router.post(
-  '/',
-  authMiddleware,
-  createOrderValidation,
-  orderController.createOrder
-);
+// ─── Khách hàng xem đơn hàng của mình ─────────────────────────────
+router.get('/my-orders', authMiddleware, orderController.getOrdersByCustomerId);
 
-router.get(
-  '/my-orders',
-  authMiddleware,
-  orderController.getOrdersByCustomerId
-);
+// ─── Xem chi tiết 1 hoá đơn (khách hàng + người bán) ──────────────
+router.get('/:id', authMiddleware, orderController.getOrderById);
 
-// Common route
-router.get(
-  '/:id',
-  authMiddleware,
-  orderController.getOrderById
-);
-
-// Admin/Staff routes
-router.get(
-  '/',
-  authMiddleware,
-  roleMiddleware([0, 1]), // Admin và nhân viên
-  orderController.getAllOrders
-);
-
-router.put(
-  '/:id/status',
-  authMiddleware,
-  roleMiddleware([0, 1]),
-  updateOrderStatusValidation,
-  orderController.updateOrderStatus
-);
-
-export default router; 
+export default router;

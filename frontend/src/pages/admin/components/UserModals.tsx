@@ -23,9 +23,40 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, orders, 
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">{user.TenKhachHang || user.TenNhanVien}</h2>
                     <p className="text-gray-500">{user.SoDienThoai}</p>
-                    <div className="mt-2 text-sm text-gray-600 italic">Địa chỉ: {user.DiaChi || 'Chưa cập nhật'}</div>
+                    <div className="mt-2 text-sm text-gray-600 italic">Địa chỉ cá nhân: {user.DiaChi || 'Chưa cập nhật'}</div>
                 </div>
             </div>
+
+            {user.NguoiBan && (
+                <div className="mb-8 p-5 bg-orange-50 rounded-2xl border border-orange-100">
+                    <h3 className="text-lg font-bold text-orange-800 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        Thông tin cửa hàng
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p className="text-orange-600 font-semibold uppercase text-[10px] tracking-wider mb-1">Tên cửa hàng</p>
+                            <p className="text-gray-800 font-bold text-base">{user.NguoiBan.TenCuaHang || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <p className="text-orange-600 font-semibold uppercase text-[10px] tracking-wider mb-1">Loại hình</p>
+                            <p className="text-gray-800 font-medium">{user.NguoiBan.LoaiHinh === 'DOANH_NGHIEP' ? 'Doanh nghiệp' : 'Cá nhân'}</p>
+                        </div>
+                        <div>
+                            <p className="text-orange-600 font-semibold uppercase text-[10px] tracking-wider mb-1">SĐT liên hệ</p>
+                            <p className="text-gray-800 font-medium">{user.NguoiBan.SoDienThoaiLienHe}</p>
+                        </div>
+                        <div>
+                            <p className="text-orange-600 font-semibold uppercase text-[10px] tracking-wider mb-1">Email liên hệ</p>
+                            <p className="text-gray-800 font-medium">{user.NguoiBan.EmailLienHe || 'Trống'}</p>
+                        </div>
+                        <div className="md:col-span-2 mt-1">
+                            <p className="text-orange-600 font-semibold uppercase text-[10px] tracking-wider mb-1">Địa chỉ kinh doanh</p>
+                            <p className="text-gray-800 font-medium leading-relaxed">{user.NguoiBan.DiaChiKinhDoanh}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <h3 className="text-lg font-bold mb-4 border-b pb-2">Lịch sử đơn hàng</h3>
             {loading ? (

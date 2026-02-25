@@ -16,11 +16,12 @@ VALUES
     (1, 'Nhân viên 2', '0912345679', '$2a$12$M9kPXni1vigAngFnz2Y7vuMRwjF1CuoAlczkXLOUrWa81O3ewtky6', '789 Đường NV, Quận 3, TP HCM');
 
 -- Seed KhachHang (passwords are already bcrypt hashed)
+-- MaVaiTro: 2 = khách hàng, 3 = người bán (đã đăng ký shop)
 INSERT INTO KhachHang (MaVaiTro, TenKhachHang, SoDienThoai, MatKhau, DiaChi)
 VALUES
-    (3, 'Khách hàng 1', '0923456789', '$2a$12$kDOXSl3QsobIKnqa0.7/kuJzEwQiqxQmKnoLw6HBiWsDFHeTdr55e', '123 Đường KH, Quận 1, TP HCM'),
-    (2, 'Khách hàng 2', '0923456780', '$2a$12$3WErTWo5laf8.5Ks3/OItuwAkQvRToX/hZ.cI8SxT4ywBSNWiq2DG', '456 Đường KH, Quận 2, TP HCM'),
-    (2, 'Khách hàng 3', '0923456781', '$2a$12$hHzaPBHADKEAPG5yoqrGZO2HagmBG3WRlirwx9fMWvDrV6tmJVGUK', '789 Đường KH, Quận 3, TP HCM');
+    (3, 'Nguyễn Văn An', '0923456789', '$2a$12$kDOXSl3QsobIKnqa0.7/kuJzEwQiqxQmKnoLw6HBiWsDFHeTdr55e', '123 Đường KH, Quận 1, TP HCM'),
+    (2, 'Trần Thị Bình', '0923456780', '$2a$12$3WErTWo5laf8.5Ks3/OItuwAkQvRToX/hZ.cI8SxT4ywBSNWiq2DG', '456 Đường KH, Quận 2, TP HCM'),
+    (2, 'Lê Văn Cường', '0923456781', '$2a$12$hHzaPBHADKEAPG5yoqrGZO2HagmBG3WRlirwx9fMWvDrV6tmJVGUK', '789 Đường KH, Quận 3, TP HCM');
 
 -- Seed DanhMuc
 INSERT INTO DanhMuc (TenDanhMuc, HinhAnh)
@@ -32,10 +33,10 @@ VALUES
     ('Nguồn & Phụ kiện', 'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'),
     ('Linh kiện thụ động', 'https://images.unsplash.com/photo-1614811568291-7649b81b7e64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');
 
--- Seed NguoiBan
-INSERT INTO NguoiBan (MaKhachHang, LoaiHinh, TenCuaHang, DiaChiKinhDoanh, EmailLienHe, MaDanhMucChinh, SoDienThoaiLienHe, TrangThai)
+-- Seed NguoiBan (TrangThai = APPROVED, NgayDuyet = NOW vì auto-approve)
+INSERT INTO NguoiBan (MaKhachHang, LoaiHinh, TenCuaHang, DiaChiKinhDoanh, EmailLienHe, MaDanhMucChinh, SoDienThoaiLienHe, TrangThai, NgayDuyet)
 VALUES
-    (1, 'CA_NHAN', 'Linh Kiện Official', '123 Đường Vendor, Quận 1, TP HCM', 'contact@electronic-hub.vn', 1, '0934567890', 'APPROVED');
+    (1, 'CA_NHAN', 'Linh Kiện Official', '123 Đường Vendor, Quận 1, TP HCM', 'contact@electronic-hub.vn', 1, '0934567890', 'APPROVED', NOW());
 
 -- Seed SanPham
 INSERT INTO SanPham (TenSanPham, MaDanhMuc, MoTa, SoLuong, GiaSanPham, HinhAnh, MaNguoiBan)
@@ -52,7 +53,7 @@ VALUES
     ('Mắt nhận hồng ngoại PIR HC-SR501', 2, 'Cảm biến chuyển động hồng ngoại thân nhiệt', 70, 35000, 'https://images.unsplash.com/photo-1563213126-a4273aed9016?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1),
 
     -- Danh mục 3: Module chức năng
-    ('Module Bluetooth HC-05', 3, 'Module Bluetooth SPP (Serial Port Protocol) cho giao tiếp không dây', 60, 85000, 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',1),
+    ('Module Bluetooth HC-05', 3, 'Module Bluetooth SPP (Serial Port Protocol) cho giao tiếp không dây', 60, 85000, 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1),
     ('Module nạp Relay 5V 1 Kênh', 3, 'Điều khiển các thiết bị điện xoay chiều công suất lớn', 150, 12000, 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1),
     ('Module RFID RC522', 3, 'Module đọc thẻ từ RFID 13.56MHz cho hệ thống kiểm soát cửa', 40, 55000, 'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1),
 
@@ -71,12 +72,12 @@ VALUES
     ('Bộ 50 Tụ gốm nhiều giá trị', 6, 'Tụ gốm lọc nguồn, ổn định tín hiệu trong mạch', 200, 8000, 'https://images.unsplash.com/photo-1614811568291-7649b81b7e64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1),
     ('Combo 10 LED 5mm Đỏ-Xanh-Vàng', 6, 'Đèn LED báo hiệu trạng thái, hiển thị cơ bản', 400, 5000, 'https://images.unsplash.com/photo-1614811568291-7649b81b7e64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80', 1);
 
--- Seed HoaDon
-INSERT INTO HoaDon (MaKhachHang, MaNhanVien, NgayLap, TongTien, PhuongThucTT, DiaChi, TrangThai)
+-- Seed HoaDon (bỏ MaNhanVien - người bán tự xử lý)
+INSERT INTO HoaDon (MaKhachHang, NgayLap, TongTien, PhuongThucTT, DiaChi, TrangThai)
 VALUES
-    (1, 2, DATE_SUB(NOW(), INTERVAL 5 DAY), 650000, 'Tiền mặt', '123 Đường KH, Quận 1, TP HCM', 'Đã giao hàng'),
-    (2, 3, DATE_SUB(NOW(), INTERVAL 3 DAY), 850000, 'Chuyển khoản', '456 Đường KH, Quận 2, TP HCM', 'Đang giao hàng'),
-    (3, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY), 1200000, 'Momo', '789 Đường KH, Quận 3, TP HCM', 'Đang xử lý');
+    (1, DATE_SUB(NOW(), INTERVAL 5 DAY), 650000, 'Tiền mặt', '123 Đường KH, Quận 1, TP HCM', 'Đã giao hàng'),
+    (2, DATE_SUB(NOW(), INTERVAL 3 DAY), 850000, 'Chuyển khoản', '456 Đường KH, Quận 2, TP HCM', 'Đang giao hàng'),
+    (3, DATE_SUB(NOW(), INTERVAL 1 DAY), 1200000, 'Momo', '789 Đường KH, Quận 3, TP HCM', 'Đang xử lý');
 
 -- Seed ChiTietHoaDon
 INSERT INTO ChiTietHoaDon (MaHoaDon, MaSanPham, SoLuong, DonGia, ThanhTien)
@@ -84,3 +85,13 @@ VALUES
     (1, 3, 1, 650000, 650000),
     (2, 2, 1, 850000, 850000),
     (3, 7, 1, 1200000, 1200000);
+
+-- Seed DonHangNguoiBan (sub-orders - người bán quản lý trạng thái)
+-- HoaDon 1 → NguoiBan 1 → Đã giao hàng
+-- HoaDon 2 → NguoiBan 1 → Đang giao hàng
+-- HoaDon 3 → NguoiBan 1 → Đang xử lý
+INSERT INTO DonHangNguoiBan (MaHoaDon, MaNguoiBan, TrangThai, TongTienNB)
+VALUES
+    (1, 1, 'Đã giao hàng', 650000),
+    (2, 1, 'Đang giao hàng', 850000),
+    (3, 1, 'Đang xử lý', 1200000);

@@ -82,11 +82,12 @@ export const API_ENDPOINTS = {
       UPDATE: (id: number) => `${API_BASE_URL}/vendor/products/${id}`,
       DELETE: (id: number) => `${API_BASE_URL}/vendor/products/${id}`
     },
-    APPLICATIONS: {
-      LIST: (status: 'PENDING' | 'APPROVED' | 'REJECTED' = 'PENDING', page = 1, limit = 10) =>
-        `${API_BASE_URL}/vendor/applications?status=${status}&page=${page}&limit=${limit}`,
-      APPROVE: (id: number) => `${API_BASE_URL}/vendor/applications/${id}/approve`,
-      REJECT: (id: number) => `${API_BASE_URL}/vendor/applications/${id}/reject`
-    }
   },
-}; 
+  SELLER_ORDER: {
+    STATS: `${API_BASE_URL}/seller/orders/stats`,
+    GET_ALL: (page = 1, limit = 10, trangThai?: string) =>
+      `${API_BASE_URL}/seller/orders?page=${page}&limit=${limit}${trangThai && trangThai !== 'all' ? `&trangThai=${encodeURIComponent(trangThai)}` : ''}`,
+    GET_BY_ID: (id: number) => `${API_BASE_URL}/seller/orders/${id}`,
+    UPDATE_STATUS: (id: number) => `${API_BASE_URL}/seller/orders/${id}/status`,
+  },
+};

@@ -26,6 +26,7 @@ export interface UserResponse {
     MaVaiTro: number;
     TenVaiTro: string;
   };
+  NguoiBan?: VendorProfileResponse;
 }
 
 export interface VendorApplicationRequest {
@@ -90,25 +91,7 @@ export const updateVendorProfile = async (data: VendorProfileUpdateRequest): Pro
   return response.data;
 };
 
-// Admin: vendor applications
-export const listVendorApplications = async (
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' = 'PENDING',
-  page = 1,
-  limit = 10
-): Promise<{ total: number; totalPages: number; currentPage: number; applications: VendorProfileResponse[] }> => {
-  const response = await api.get(API_ENDPOINTS.VENDOR.APPLICATIONS.LIST(status, page, limit));
-  return response.data;
-};
-
-export const approveVendorApplication = async (id: number): Promise<{ message: string }> => {
-  const response = await api.put(API_ENDPOINTS.VENDOR.APPLICATIONS.APPROVE(id));
-  return response.data;
-};
-
-export const rejectVendorApplication = async (id: number, reason: string): Promise<{ message: string }> => {
-  const response = await api.put(API_ENDPOINTS.VENDOR.APPLICATIONS.REJECT(id), { reason });
-  return response.data;
-};
+// Admin functions related to vendor applications (list, approve, reject) removed due to auto-approval.
 
 // Admin functions
 export const getAllCustomers = async (page = 1, limit = 10): Promise<{
@@ -137,7 +120,7 @@ export const getAllVendors = async (page = 1, limit = 10): Promise<{
   currentPage: number;
   users: UserResponse[];
 }> => {
-  const response = await api.get(`${API_ENDPOINTS.ADMIN.USERS.GET_ALL_CUSTOMERS.replace('/customers','/vendors')}?page=${page}&limit=${limit}`);
+  const response = await api.get(`${API_ENDPOINTS.ADMIN.USERS.GET_ALL_CUSTOMERS.replace('/customers', '/vendors')}?page=${page}&limit=${limit}`);
   return { ...response.data, users: response.data.users };
 };
 

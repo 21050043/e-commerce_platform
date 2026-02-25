@@ -37,11 +37,6 @@ router.post('/products', authMiddleware, roleMiddleware([3]), upload.single('ima
 router.put('/products/:id', authMiddleware, roleMiddleware([3]), upload.single('image'), productController.updateProduct);
 router.delete('/products/:id', authMiddleware, roleMiddleware([3]), productController.deleteProduct);
 
-// Admin: vendor applications
-router.get('/applications', authMiddleware, roleMiddleware([0]), vendorController.listApplications);
-router.put('/applications/:id/approve', authMiddleware, roleMiddleware([0]), vendorController.approve);
-router.put('/applications/:id/reject', authMiddleware, roleMiddleware([0]), vendorController.reject);
-
 export default router;
 
 

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { login as loginApi, register as registerApi, getCurrentUser, logout as logoutApi, refreshToken } from '../services/auth.service';
+import { getUserProfile } from '../services/user.service';
 import type { LoginRequest, RegisterRequest } from '../services/auth.service';
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -161,6 +163,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const userData = await getUserProfile();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   const isAuthenticated = !!user;
   const isAdmin = user?.MaVaiTro === 0;
   const isStaff = user?.MaVaiTro === 1;
@@ -176,6 +188,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     logout,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

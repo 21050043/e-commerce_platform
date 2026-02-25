@@ -22,6 +22,7 @@ import adminRoutes from './routes/admin.routes';
 import orderDetailRoutes from './routes/order-detail.routes';
 import uploadRoutes from './routes/upload.routes';
 import vendorRoutes from './routes/vendor.routes';
+import sellerOrderRoutes from './routes/seller-order.routes';
 
 // Load environment variables
 dotenv.config();
@@ -82,6 +83,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/order-details', orderDetailRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/vendor', vendorRoutes);
+app.use('/api/seller/orders', sellerOrderRoutes);
 
 // Thêm route trực tiếp cho việc cập nhật sản phẩm
 const productController = new ProductController();
@@ -91,7 +93,7 @@ app.put('/api/products-update/:id', upload.single('image'), (req, res) => {
   console.log('Request URL:', req.originalUrl);
   console.log('Product ID:', req.params.id);
   console.log('Request has file:', !!req.file);
-  
+
   try {
     productController.updateProduct(req, res);
   } catch (error: any) {
