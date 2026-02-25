@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { ChevronRight, Star, ShoppingCart, Minus, Plus, Loader, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Star, ShoppingCart, Minus, Plus, AlertTriangle, User, Mail, Phone, ExternalLink } from 'lucide-react';
+import Skeleton from '../components/ui/Skeleton';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
@@ -104,9 +106,34 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <MainLayout>
-        <div className="flex justify-center items-center py-20">
-          <Loader className="animate-spin h-8 w-8 text-primary-600" />
-          <span className="ml-2">Đang tải thông tin sản phẩm...</span>
+        <div className="bg-gray-50 py-4 mb-8">
+          <div className="container mx-auto px-4">
+            <Skeleton height={20} width={300} />
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row -mx-4">
+            <div className="md:w-1/2 px-4 mb-8">
+              <Skeleton height={500} className="w-full rounded-2xl" />
+            </div>
+            <div className="md:w-1/2 px-4 space-y-4">
+              <Skeleton height={40} width="80%" />
+              <Skeleton height={60} className="w-full rounded-xl" />
+              <div className="flex gap-2">
+                {[...Array(5)].map((_, i) => <Skeleton key={i} variant="circle" height={16} width={16} />)}
+                <Skeleton height={16} width={100} />
+              </div>
+              <Skeleton height={32} width={150} />
+              <div className="space-y-2">
+                <Skeleton height={16} width="100%" />
+                <Skeleton height={16} width="100%" />
+                <Skeleton height={16} width="60%" />
+              </div>
+              <div className="pt-6">
+                <Skeleton height={50} width={200} className="rounded-xl" />
+              </div>
+            </div>
+          </div>
         </div>
       </MainLayout>
     );
@@ -171,22 +198,38 @@ const ProductDetail = () => {
 
             {/* Product Info */}
             <div className="md:w-1/2 px-4">
-              <h1 className="text-3xl font-bold text-gray-800 mb-1">{product.TenSanPham}</h1>
+              <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">{product.TenSanPham}</h1>
+
               {product.NguoiBan && (
-                <div className="mb-3 p-3 rounded-lg border border-primary-100 bg-primary-50/50">
+                <div className="mb-6 p-5 rounded-3xl border border-gray-100 bg-gray-50/50 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-sm text-gray-600">Người bán:</span>{' '}
-                      <span className="font-medium text-gray-800">{product.NguoiBan.TenCuaHang || 'Người bán'}</span>
-                      <span className="ml-2 text-sm text-gray-600">Liên hệ:</span>{' '}
-                      <span className="text-sm text-gray-800">{product.NguoiBan.SoDienThoaiLienHe}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-primary-600 shadow-sm">
+                        <User size={24} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cửa hàng</p>
+                        <h3 className="font-bold text-gray-900 text-lg">{product.NguoiBan.TenCuaHang || 'Kênh Người Bán'}</h3>
+                      </div>
                     </div>
                     <Link
                       to={`/vendor/${product.NguoiBan.MaNguoiBan}`}
-                      className="text-primary-600 hover:text-primary-800 text-sm font-medium underline"
+                      className="p-2 rounded-xl bg-white text-primary-600 hover:bg-primary-600 hover:text-white transition-all shadow-sm border border-primary-100"
+                      title="Xem cửa hàng"
                     >
-                      Xem cửa hàng
+                      <ExternalLink size={20} />
                     </Link>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 text-sm font-medium text-gray-500 pt-2 border-t border-gray-100/50">
+                    <div className="flex items-center gap-2">
+                      <Phone size={14} className="text-gray-400" />
+                      {product.NguoiBan.SoDienThoaiLienHe}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail size={14} className="text-gray-400" />
+                      {(product.NguoiBan as any).Email || 'support@ehub.vn'}
+                    </div>
                   </div>
                 </div>
               )}
@@ -269,15 +312,17 @@ const ProductDetail = () => {
               )}
 
               {/* Add to Cart Button */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <button
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={addToCart}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-md flex items-center justify-center"
+                  className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200 transition-all disabled:opacity-50 disabled:bg-gray-400 disabled:shadow-none"
                   disabled={product.SoLuong === 0}
                 >
-                  <ShoppingCart className="mr-2" size={20} />
-                  {product.SoLuong === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
-                </button>
+                  <ShoppingCart className="mr-3" size={24} />
+                  {product.SoLuong === 0 ? 'Hết hàng tạm thời' : 'Thêm vào giỏ hàng ngay'}
+                </motion.button>
               </div>
             </div>
           </div>
@@ -289,85 +334,80 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-lg shadow-sm">
             {/* Tab Headers */}
-            <div className="flex border-b">
-              <button
-                onClick={() => setActiveTab('description')}
-                className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'description'
-                  ? 'text-primary-600 border-b-2 border-primary-500'
-                  : 'text-gray-500 hover:text-primary-500'
-                  }`}
-              >
-                Mô tả sản phẩm
-              </button>
-              <button
-                onClick={() => setActiveTab('reviews')}
-                className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'reviews'
-                  ? 'text-primary-600 border-b-2 border-primary-500'
-                  : 'text-gray-500 hover:text-primary-500'
-                  }`}
-              >
-                Đánh giá ({reviewCount})
-              </button>
+            <div className="flex border-b border-gray-100 px-6">
+              {[
+                { id: 'description', label: 'Mô tả chi tiết' },
+                { id: 'reviews', label: `Đánh giá (${reviewCount})` }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`relative py-6 px-8 font-bold text-sm focus:outline-none transition-colors ${activeTab === tab.id
+                    ? 'text-primary-600'
+                    : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                >
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-primary-600 rounded-t-full"
+                    />
+                  )}
+                </button>
+              ))}
             </div>
 
             {/* Tab Content */}
-            <div className="p-6">
-              {activeTab === 'description' ? (
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Chi tiết sản phẩm</h3>
-                  <div className="text-gray-700 space-y-4">
-                    <p>{product.MoTa || 'Chưa có mô tả chi tiết cho sản phẩm này.'}</p>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Đánh giá từ khách hàng</h3>
-                  <div className="border-b pb-4 mb-4">
-                    <div className="flex items-center mb-2">
-                      <div className="font-semibold mr-2">Khách hàng 1</div>
-                      <div className="flex items-center text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={14}
-                            fill={i < 5 ? 'currentColor' : 'none'}
-                            className={i < 5 ? 'text-yellow-400' : 'text-gray-300'}
-                          />
-                        ))}
+            <div className="p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {activeTab === 'description' ? (
+                    <div className="prose prose-primary max-w-none">
+                      <h3 className="text-2xl font-black text-gray-900 mb-6">Thông tin kỹ thuật & Tính năng</h3>
+                      <div className="text-gray-700 space-y-4 text-lg leading-relaxed">
+                        <p>{product.MoTa || 'Hệ thống đang cập nhật nội dung chi tiết cho sản phẩm này.'}</p>
                       </div>
                     </div>
-                    <p className="text-gray-700">
-                      Sản phẩm chất lượng tốt, giao hàng nhanh. Tôi rất hài lòng với dịch vụ của shop.
-                    </p>
-                  </div>
-                  <div className="border-b pb-4 mb-4">
-                    <div className="flex items-center mb-2">
-                      <div className="font-semibold mr-2">Khách hàng 2</div>
-                      <div className="flex items-center text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={14}
-                            fill={i < 4 ? 'currentColor' : 'none'}
-                            className={i < 4 ? 'text-yellow-400' : 'text-gray-300'}
-                          />
-                        ))}
-                      </div>
+                  ) : (
+                    <div className="space-y-8">
+                      <h3 className="text-2xl font-black text-gray-900 mb-6">Phản hồi từ cộng đồng</h3>
+                      {[
+                        { name: 'Khách hàng 1', text: 'Sản phẩm chất lượng vượt mong đợi, linh kiện nhúng rất ổn định. Đóng gói cực kỳ chuyên nghiệp!', rating: 5 },
+                        { name: 'Khách hàng 2', text: 'Giao hàng siêu tốc. Mình dùng cho dự án IoT thấy rất tốt, sẽ tiếp tục ủng hộ Ehub.', rating: 4 }
+                      ].map((rev, idx) => (
+                        <div key={idx} className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                                {rev.name[0]}
+                              </div>
+                              <div className="font-bold text-gray-900">{rev.name}</div>
+                            </div>
+                            <div className="flex items-center text-yellow-400">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={16}
+                                  fill={i < rev.rating ? 'currentColor' : 'none'}
+                                  className={i < rev.rating ? 'text-yellow-400' : 'text-gray-200'}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-gray-700 leading-relaxed italic">"{rev.text}"</p>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-gray-700">
-                      Sản phẩm đúng như mô tả, đóng gói cẩn thận. Tôi sẽ mua lại lần sau.
-                    </p>
-                  </div>
-                  <div className="flex justify-center mt-4">
-                    <Link
-                      to={`/products/${productId}/reviews`}
-                      className="text-primary-600 hover:text-primary-800 font-medium"
-                    >
-                      Xem tất cả đánh giá
-                    </Link>
-                  </div>
-                </div>
-              )}
+                  )}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>

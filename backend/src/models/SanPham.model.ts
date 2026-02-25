@@ -6,7 +6,7 @@ import ChiTietHoaDon from './ChiTietHoaDon.model';
 import NguoiBan from './NguoiBan.model';
 
 // Interface cho các thuộc tính SanPham khi tạo mới
-interface SanPhamCreationAttributes extends Optional<ISanPham, 'MaSanPham' | 'Ngaytao' | 'NgayCapNhat' | 'HinhAnh'> {}
+interface SanPhamCreationAttributes extends Optional<ISanPham, 'MaSanPham' | 'Ngaytao' | 'NgayCapNhat' | 'HinhAnh'> { }
 
 // Model SanPham kế thừa từ Model Sequelize
 class SanPham extends Model<ISanPham, SanPhamCreationAttributes> implements ISanPham {
@@ -24,6 +24,7 @@ class SanPham extends Model<ISanPham, SanPhamCreationAttributes> implements ISan
   public LyDoTamDung?: string | null;
   public NgayTamDung?: Date | null;
   public NguoiTamDung?: number | null;
+  public NguoiBan?: NguoiBan;
 }
 
 // Khởi tạo model

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Menu, ChevronDown, User, LogOut, Store, ExternalLink
@@ -50,7 +51,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
     const isActive = (path: string) => location.pathname === path;
 
-    const themeClasses = {
+    const themes = {
         primary: {
             header: 'bg-primary-600',
             avatar: 'bg-primary-700',
@@ -67,7 +68,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             navHover: 'hover:bg-secondary-50 hover:text-secondary-700',
             dropdownHover: 'hover:bg-secondary-50'
         }
-    }[accentColor as 'primary' | 'secondary'] || themeClasses.primary;
+    };
+
+    const themeClasses = themes[accentColor as 'primary' | 'secondary'] || themes.primary;
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -159,9 +162,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
                 {/* Content */}
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 focus:outline-none scroll-smooth">
-                    <div className="container mx-auto px-4 py-8">
+                    <motion.div
+                        key={location.pathname}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="container mx-auto px-4 py-8"
+                    >
                         {children}
-                    </div>
+                    </motion.div>
                 </main>
             </div>
         </div>

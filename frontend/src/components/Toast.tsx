@@ -39,7 +39,7 @@ const ToastItem = ({ toast, onClose }: { toast: ToastType; onClose: () => void }
   const { bgColor, borderColor, iconClass } = getToastConfig();
 
   return (
-    <div 
+    <div
       id={`toast-${toast.id}`}
       className={`toast-enter ${bgColor} text-white p-4 rounded-lg shadow-md flex items-center mb-3 border-l-4 ${borderColor} opacity-0 translate-x-full`}
     >
@@ -88,7 +88,7 @@ const Toast = () => {
 
       .toast-container {
         position: fixed;
-        top: 20px;
+        top: 80px;
         right: 20px;
         z-index: 9999;
         width: 320px;
@@ -128,9 +128,9 @@ const Toast = () => {
         font-style: italic;
       }
     `;
-    
+
     document.head.appendChild(styleEl);
-    
+
     return () => {
       document.head.removeChild(styleEl);
     };
@@ -143,10 +143,10 @@ const Toast = () => {
   return (
     <div className="toast-container">
       {toasts.map((toast) => (
-        <ToastItem 
-          key={toast.id} 
-          toast={toast} 
-          onClose={() => removeToast(toast.id)} 
+        <ToastItem
+          key={toast.id}
+          toast={toast}
+          onClose={() => removeToast(toast.id)}
         />
       ))}
     </div>

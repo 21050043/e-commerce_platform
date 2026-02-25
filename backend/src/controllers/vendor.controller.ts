@@ -3,8 +3,10 @@ import VendorService from '../services/vendor.service';
 import AdminService from '../services/admin.service';
 
 export default class VendorController {
-  private vendorService = new VendorService();
-  private adminService = new AdminService();
+  constructor(
+    private vendorService = new VendorService(),
+    private adminService = new AdminService()
+  ) { }
 
   public applyVendor = async (req: Request, res: Response): Promise<Response> => {
     try {

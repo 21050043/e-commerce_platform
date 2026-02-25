@@ -27,7 +27,7 @@ const Register = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.TenKhachHang || !form.SoDienThoai || !form.MatKhau || !form.MatKhauNhapLai || !form.DiaChi) {
+    if (!form.TenKhachHang || !form.SoDienThoai || !form.MatKhau || !form.MatKhauNhapLai) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }

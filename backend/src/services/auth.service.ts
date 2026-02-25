@@ -14,9 +14,9 @@ export default class AuthService {
   public async login(loginDto: ILoginDto): Promise<{ tokens: IAuthTokens; user: any }> {
     try {
       const { SoDienThoai, MatKhau } = loginDto;
-      
+
       // Kiểm tra số điện thoại trong cả hai bảng NhanVien và KhachHang
-      let nhanVienUser = await NhanVien.findOne({ 
+      let nhanVienUser = await NhanVien.findOne({
         where: { SoDienThoai },
         include: ['VaiTro']
       });
@@ -35,7 +35,7 @@ export default class AuthService {
         };
 
         const tokens = this.generateTokens(tokenData);
-        
+
         const userObject: any = nhanVienUser.get({ plain: true });
         delete userObject.MatKhau;
 
@@ -44,9 +44,9 @@ export default class AuthService {
           user: userObject
         };
       }
-      
+
       // Nếu không tìm thấy trong bảng NhanVien, tìm trong bảng KhachHang
-      const khachHangUser = await KhachHang.findOne({ 
+      const khachHangUser = await KhachHang.findOne({
         where: { SoDienThoai },
         include: ['VaiTro']
       });
@@ -67,7 +67,7 @@ export default class AuthService {
       };
 
       const tokens = this.generateTokens(tokenData);
-      
+
       const userObject: any = khachHangUser.get({ plain: true });
       delete userObject.MatKhau;
 
@@ -93,8 +93,6 @@ export default class AuthService {
         throw new Error('Số điện thoại đã được sử dụng');
       }
 
-      // Hash mật khẩu
-      const hashedPassword = await bcrypt.hash(MatKhau, 10);
 
       let user;
       if (isNhanVien) {
@@ -105,7 +103,7 @@ export default class AuthService {
         user = await KhachHang.create({
           TenKhachHang,
           SoDienThoai,
-          MatKhau: hashedPassword,
+          MatKhau,
           DiaChi: DiaChi || '',
           MaVaiTro: 2 // Mã vai trò khách hàng
         });
@@ -136,7 +134,7 @@ export default class AuthService {
     try {
       // Xác thực refresh token
       const decoded = jwt.verify(refreshToken, this.REFRESH_TOKEN_SECRET) as IRefreshTokenData;
-      
+
       // Tạo token mới với cùng thông tin nhưng tokenId mới
       const tokenData: ITokenData = {
         id: decoded.id,

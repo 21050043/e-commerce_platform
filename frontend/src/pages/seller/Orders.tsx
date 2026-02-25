@@ -33,6 +33,34 @@ const NEXT_STATUS: Record<string, string[]> = {
 
 const ALL_STATUSES = ['all', ...Object.keys(STATUS_CONFIG)];
 
+// ─── Action labels for decisions ─────────────────────────────────────────────
+const ACTION_CONFIG: Record<string, { label: string; description: string; color: string; icon: React.ElementType }> = {
+    'Đang xử lý': {
+        label: 'Xác nhận & Chuẩn bị hàng',
+        description: 'Bắt đầu quy trình đóng gói sản phẩm cho khách',
+        color: 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100',
+        icon: Package
+    },
+    'Đang giao hàng': {
+        label: 'Giao cho đơn vị vận chuyển',
+        description: 'Đơn hàng đã sẵn sàng và được gởi cho nhân viên giao hàng',
+        color: 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-100',
+        icon: Truck
+    },
+    'Đã giao hàng': {
+        label: 'Xác nhận đã giao thành công',
+        description: 'Đánh dấu đơn hàng đã đến tay khách hàng an toàn',
+        color: 'bg-green-600 text-white hover:bg-green-700 shadow-green-100',
+        icon: CheckCircle
+    },
+    'Đã hủy': {
+        label: 'Hủy đơn hàng này',
+        description: 'Ngừng xử lý đơn hàng (hết hàng, khách đổi ý, v.v.)',
+        color: 'bg-white text-red-600 border-2 border-red-100 hover:bg-red-50 hover:border-red-200 shadow-none',
+        icon: XCircle
+    },
+};
+
 // ─── OrderDetailPanel ─────────────────────────────────────────────────────────
 
 interface OrderDetailPanelProps {
@@ -48,58 +76,127 @@ const OrderDetailPanel = ({ order, onClose, onStatusChange }: OrderDetailPanelPr
     const items = order.HoaDon?.ChiTietHoaDons ?? [];
 
     const handleStatusClick = async (status: string) => {
+        if (status === 'Đã hủy' && !window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
         setUpdating(true);
         await onStatusChange(order.MaDonHangNB, status);
         setUpdating(false);
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl mx-4 max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b">
+                <div className="flex items-center justify-between p-8 border-b border-gray-50">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-800">
-                            Đơn hàng #{order.HoaDon?.MaHoaDon}
-                        </h2>
-                        <p className="text-sm text-gray-500 mt-0.5">
-                            Sub-order #{order.MaDonHangNB} &bull; {order.HoaDon?.NgayLap ? formatDate(order.HoaDon.NgayLap) : '—'}
+                        <div className="flex items-center gap-3 mb-1">
+                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                                Chi tiết đơn hàng
+                            </h2>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${STATUS_CONFIG[order.TrangThai]?.color || 'bg-gray-100'}`}>
+                                {order.TrangThai}
+                            </span>
+                        </div>
+                        <p className="text-sm text-gray-400 font-medium">
+                            Mã hóa đơn: <span className="text-gray-600">#{order.HoaDon?.MaHoaDon}</span> &bull; {order.HoaDon?.NgayLap ? formatDate(order.HoaDon.NgayLap) : '—'}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 transition"
+                        className="p-3 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 active:scale-90"
                     >
-                        <XCircle size={22} className="text-gray-500" />
+                        <XCircle size={24} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="p-6 space-y-6">
+                <div className="p-8 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+                    {/* Tiến trình quyết định (Action Section) - Đưa lên đầu để nổi bật */}
+                    {nextStatuses.length > 0 && (
+                        <div className="bg-gradient-to-br from-secondary-50 to-white border border-secondary-100 rounded-3xl p-6 shadow-sm">
+                            <h3 className="text-xs font-black text-secondary-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-secondary-500 animate-pulse" />
+                                Quyết định của bạn
+                            </h3>
+                            <div className="grid gap-3">
+                                {nextStatuses.map((s) => {
+                                    const action = ACTION_CONFIG[s];
+                                    if (!action) return null;
+                                    const Icon = action.icon;
+                                    const isCancel = s === 'Đã hủy';
+
+                                    return (
+                                        <button
+                                            key={s}
+                                            onClick={() => handleStatusClick(s)}
+                                            disabled={updating}
+                                            className={`group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 ${action.color}`}
+                                        >
+                                            <div className={`p-3 rounded-xl ${isCancel ? 'bg-red-50 text-red-500' : 'bg-white/20 text-white'} transition-colors`}>
+                                                <Icon size={20} />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-bold text-sm leading-tight">{action.label}</p>
+                                                <p className={`text-[11px] mt-0.5 opacity-80 ${isCancel ? 'text-gray-500' : 'text-white/80'}`}>
+                                                    {action.description}
+                                                </p>
+                                            </div>
+                                            {!isCancel && (
+                                                <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <CheckCircle size={18} />
+                                                </div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Khách hàng */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                            Thông tin khách hàng
-                        </h3>
-                        <p className="font-semibold text-gray-800">{kh?.TenKhachHang || '—'}</p>
-                        <p className="text-sm text-gray-600">{kh?.SoDienThoai || '—'}</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                            <span className="font-medium">Địa chỉ giao:</span> {order.HoaDon?.DiaChi}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                            <span className="font-medium">Thanh toán:</span> {order.HoaDon?.PhuongThucTT}
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-gray-50/50 rounded-2xl p-5 border border-gray-100">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
+                                Khách hàng & Liên hệ
+                            </h3>
+                            <div className="space-y-2">
+                                <p className="font-bold text-gray-900 flex items-center gap-2">
+                                    <span className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs">
+                                        {(kh?.TenKhachHang || 'K')[0]}
+                                    </span>
+                                    {kh?.TenKhachHang || '—'}
+                                </p>
+                                <p className="text-sm text-gray-600 pl-10 font-medium">{kh?.SoDienThoai || '—'}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-gray-50/50 rounded-2xl p-5 border border-gray-100">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
+                                Vận chuyển & Thanh toán
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                                <p className="text-gray-600 leading-relaxed font-medium">
+                                    <span className="text-gray-400 block text-[10px] uppercase font-bold mb-1">Địa chỉ</span>
+                                    {order.HoaDon?.DiaChi}
+                                </p>
+                                <div className="flex items-center gap-2 text-gray-600 font-medium mt-3">
+                                    <span className="px-2 py-0.5 rounded-md bg-white border border-gray-100 text-[10px] shadow-sm">
+                                        {order.HoaDon?.PhuongThucTT}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Sản phẩm */}
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                            Sản phẩm trong đơn ({items.length})
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-between">
+                            Danh sách sản phẩm
+                            <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[9px]">{items.length} món</span>
                         </h3>
                         <div className="space-y-3">
                             {items.map((item) => (
-                                <div key={item.MaChiTiet} className="flex items-center gap-4 p-3 border rounded-xl">
-                                    <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                                <div key={item.MaChiTiet} className="group flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:border-secondary-200 transition-all duration-300 shadow-sm hover:shadow-md">
+                                    <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-50 group-hover:scale-105 transition-transform duration-300">
                                         {item.SanPham?.HinhAnh ? (
                                             <img
                                                 src={item.SanPham.HinhAnh.startsWith('/uploads')
@@ -111,17 +208,17 @@ const OrderDetailPanel = ({ order, onClose, onStatusChange }: OrderDetailPanelPr
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
-                                                <Package size={20} className="text-gray-400" />
+                                                <Package size={24} className="text-gray-300" />
                                             </div>
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-gray-800 truncate">{item.SanPham?.TenSanPham}</p>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="font-bold text-gray-900 group-hover:text-secondary-600 transition-colors truncate">{item.SanPham?.TenSanPham}</p>
+                                        <p className="text-xs text-gray-400 mt-1 font-semibold tracking-wide">
                                             {formatCurrency(item.DonGia)} × {item.SoLuong}
                                         </p>
                                     </div>
-                                    <p className="font-semibold text-gray-800 shrink-0">
+                                    <p className="font-black text-gray-900 tracking-tight shrink-0">
                                         {formatCurrency(item.ThanhTien)}
                                     </p>
                                 </div>
@@ -130,43 +227,15 @@ const OrderDetailPanel = ({ order, onClose, onStatusChange }: OrderDetailPanelPr
                     </div>
 
                     {/* Tổng tiền */}
-                    <div className="flex justify-between items-center border-t pt-4">
-                        <span className="font-semibold text-gray-700">Doanh thu của bạn</span>
-                        <span className="text-xl font-bold text-secondary-600">
+                    <div className="bg-gray-900 rounded-3xl p-6 text-white flex justify-between items-center shadow-lg shadow-gray-200">
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Doanh thu dự kiến</p>
+                            <p className="text-xs text-gray-500 italic">Áp dụng cho đơn hàng con #{order.MaDonHangNB}</p>
+                        </div>
+                        <span className="text-3xl font-black tracking-tighter text-secondary-400">
                             {formatCurrency(order.TongTienNB)}
                         </span>
                     </div>
-
-                    {/* Cập nhật trạng thái */}
-                    {nextStatuses.length > 0 && (
-                        <div>
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                                Cập nhật trạng thái
-                            </h3>
-                            <div className="flex flex-wrap gap-2">
-                                {nextStatuses.map((s) => {
-                                    const cfg = STATUS_CONFIG[s];
-                                    const Icon = cfg.icon;
-                                    const isCancel = s === 'Đã hủy';
-                                    return (
-                                        <button
-                                            key={s}
-                                            onClick={() => handleStatusClick(s)}
-                                            disabled={updating}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
-                        ${isCancel
-                                                    ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
-                                                    : 'bg-secondary-50 text-secondary-700 border border-secondary-200 hover:bg-secondary-100'
-                                                } disabled:opacity-50`}
-                                        >
-                                            <Icon size={14} />
-                                            {s}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

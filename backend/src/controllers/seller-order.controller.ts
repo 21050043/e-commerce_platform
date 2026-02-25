@@ -7,7 +7,7 @@ import NguoiBan from '../models/NguoiBan.model';
  * Người bán (role 3) quản lý sub-orders (DonHangNguoiBan) của mình.
  */
 export default class SellerOrderController {
-    private sellerOrderService = new SellerOrderService();
+    constructor(private sellerOrderService = new SellerOrderService()) { }
 
     /**
      * Helper: lấy MaNguoiBan từ MaKhachHang (trong JWT token).

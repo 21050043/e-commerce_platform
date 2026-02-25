@@ -52,6 +52,7 @@ export default class OrderService {
         const product = await SanPham.findByPk(item.MaSanPham, {
           transaction: t,
           lock: t.LOCK.UPDATE,
+          include: [{ model: NguoiBan, as: 'NguoiBan' }]
         });
 
         if (!product) {
@@ -60,9 +61,18 @@ export default class OrderService {
         if (product.SoLuong < item.SoLuong) {
           throw new Error(`Sản phẩm "${product.TenSanPham}" không đủ số lượng`);
         }
-        if (!product.MaNguoiBan) {
-          throw new Error(`Sản phẩm "${product.TenSanPham}" chưa có người bán`);
+        if (!product.MaNguoiBan || !product.NguoiBan) {
+          throw new Error(`Sản phẩm "${product.TenSanPham}" chưa có người bán hợp lệ`);
         }
+
+        // CHỈNH SỬA BẢO MẬT: Kiểm tra trạng thái shop
+        if (product.NguoiBan.TrangThai !== 'APPROVED') {
+          throw new Error(`Cửa hàng "${product.NguoiBan.TenCuaHang}" hiện không tiếp nhận đơn hàng mới`);
+        }
+
+        // CHỈNH SỬA BẢO MẬT: Lấy giá từ DB để tính toán, không tin client
+        const securePrice = product.GiaSanPham;
+        const secureSubTotal = securePrice * item.SoLuong;
 
         // Tạo chi tiết hoá đơn
         await ChiTietHoaDon.create(
@@ -70,8 +80,8 @@ export default class OrderService {
             MaHoaDon: order.MaHoaDon,
             MaSanPham: item.MaSanPham,
             SoLuong: item.SoLuong,
-            DonGia: item.DonGia,
-            ThanhTien: item.ThanhTien,
+            DonGia: securePrice,
+            ThanhTien: secureSubTotal,
           },
           { transaction: t }
         );
@@ -82,13 +92,15 @@ export default class OrderService {
           { transaction: t }
         );
 
-        // Cộng dồn tổng tiền theo người bán
+        // Cộng dồn tổng tiền theo người bán (dùng giá sạch từ DB)
         const prev = sellerTotals.get(product.MaNguoiBan) ?? 0;
-        sellerTotals.set(product.MaNguoiBan, prev + item.ThanhTien);
+        sellerTotals.set(product.MaNguoiBan, prev + secureSubTotal);
       }
 
       // 3. Tạo DonHangNguoiBan (1 sub-order per người bán)
+      let finalTotal = 0;
       for (const [maNguoiBan, tongTienNB] of sellerTotals.entries()) {
+        finalTotal += tongTienNB;
         await DonHangNguoiBan.create(
           {
             MaHoaDon: order.MaHoaDon,
@@ -99,6 +111,9 @@ export default class OrderService {
           { transaction: t }
         );
       }
+
+      // CHỈNH SỬA BẢO MẬT: Cập nhật lại tổng tiền thật của HoaDon master
+      await order.update({ TongTien: finalTotal }, { transaction: t });
 
       await t.commit();
 

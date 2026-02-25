@@ -8,7 +8,7 @@ import OrderService from '../services/order.service';
  * Người bán dùng SellerOrderController để quản lý sub-orders của họ.
  */
 export default class OrderController {
-  private orderService = new OrderService();
+  constructor(private orderService = new OrderService()) { }
 
   public createOrder = async (req: Request, res: Response): Promise<Response> => {
     try {
