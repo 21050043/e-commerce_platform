@@ -11,13 +11,6 @@ export default class VendorService {
    */
   public async applyVendor(data: {
     MaKhachHang: number;
-    LoaiHinh: 'CA_NHAN' | 'DOANH_NGHIEP';
-    TenCuaHang?: string;
-    DiaChiKinhDoanh: string;
-    EmailLienHe?: string;
-    MaDanhMucChinh?: number;
-    categories?: number[];
-    SoDienThoaiLienHe: string;
     agreed: boolean;
   }) {
     if (!data.agreed) {
@@ -34,46 +27,20 @@ export default class VendorService {
       let vendor: NguoiBan;
 
       if (existing && existing.TrangThai === 'REJECTED') {
-        // Tái kích hoạt hồ sơ bị từ chối — auto-approve ngay
+        // Tái kích hoạt hồ sơ bị từ chối
         await existing.update({
-          LoaiHinh: data.LoaiHinh,
-          TenCuaHang: data.TenCuaHang,
-          DiaChiKinhDoanh: data.DiaChiKinhDoanh,
-          EmailLienHe: data.EmailLienHe,
-          MaDanhMucChinh: data.MaDanhMucChinh,
-          SoDienThoaiLienHe: data.SoDienThoaiLienHe,
           TrangThai: 'APPROVED',
           LyDoTuChoi: null,
           NgayDuyet: new Date(),
         }, { transaction: t });
         vendor = existing;
       } else {
-        // Tạo mới — auto-approve ngay lập tức
-        const maDanhMucChinh = (data.MaDanhMucChinh || (data.categories && data.categories[0])) as number;
+        // Tạo mới hồ sơ với thông tin tối thiểu
         vendor = await NguoiBan.create({
           MaKhachHang: data.MaKhachHang,
-          LoaiHinh: data.LoaiHinh,
-          TenCuaHang: data.TenCuaHang,
-          DiaChiKinhDoanh: data.DiaChiKinhDoanh,
-          EmailLienHe: data.EmailLienHe,
-          MaDanhMucChinh: maDanhMucChinh,
-          SoDienThoaiLienHe: data.SoDienThoaiLienHe,
           TrangThai: 'APPROVED',
           NgayDuyet: new Date(),
         }, { transaction: t });
-
-        if (data.categories && data.categories.length > 0) {
-          const values = data.categories.map(catId => `(${vendor.MaNguoiBan}, ${catId})`).join(',');
-          await sequelize.query(
-            `INSERT INTO NguoiBanDanhMuc (MaNguoiBan, MaDanhMuc) VALUES ${values}`,
-            { transaction: t }
-          );
-        } else if (data.MaDanhMucChinh) {
-          await sequelize.query(
-            `INSERT INTO NguoiBanDanhMuc (MaNguoiBan, MaDanhMuc) VALUES (${vendor.MaNguoiBan}, ${data.MaDanhMucChinh})`,
-            { transaction: t }
-          );
-        }
       }
 
       // Nâng role KhachHang → 3 (Người bán)
@@ -93,7 +60,7 @@ export default class VendorService {
   public async getMyVendorProfile(khachHangId: number) {
     return await NguoiBan.findOne({
       where: { MaKhachHang: khachHangId },
-      include: [{ model: DanhMuc, as: 'DanhMucs' }, { model: KhachHang, as: 'KhachHang' }],
+      include: [{ model: KhachHang, as: 'KhachHang' }],
     });
   }
 

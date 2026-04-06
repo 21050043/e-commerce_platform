@@ -39,17 +39,15 @@ CREATE TABLE IF NOT EXISTS DanhMuc (
 CREATE TABLE IF NOT EXISTS NguoiBan (
     MaNguoiBan INT AUTO_INCREMENT PRIMARY KEY,
     MaKhachHang INT NOT NULL,
-    LoaiHinh ENUM('CA_NHAN','DOANH_NGHIEP') NOT NULL,
-    TenCuaHang VARCHAR(150),
-    DiaChiKinhDoanh VARCHAR(255) NOT NULL,
-    EmailLienHe VARCHAR(150),
-    MaDanhMucChinh INT NOT NULL,
-    SoDienThoaiLienHe VARCHAR(15) NOT NULL,
+    LoaiHinh ENUM('CA_NHAN','DOANH_NGHIEP') NULL,
+    TenCuaHang VARCHAR(150) NULL,
+    DiaChiKinhDoanh VARCHAR(255) NULL,
+    EmailLienHe VARCHAR(150) NULL,
+    SoDienThoaiLienHe VARCHAR(15) NULL,
     TrangThai ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'APPROVED',
     LyDoTuChoi VARCHAR(255),
     NgayDuyet DATETIME NULL,
-    CONSTRAINT FK_NguoiBan_KhachHang FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang),
-    CONSTRAINT FK_NguoiBan_DanhMuc FOREIGN KEY (MaDanhMucChinh) REFERENCES DanhMuc(MaDanhMuc)
+    CONSTRAINT FK_NguoiBan_KhachHang FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang)
 );
 
 -- Create table SanPham
@@ -113,11 +111,4 @@ CREATE TABLE IF NOT EXISTS DonHangNguoiBan (
     CONSTRAINT CHK_DHNB_TrangThai CHECK (TrangThai IN ('Đã đặt hàng', 'Đang xử lý', 'Đang giao hàng', 'Đã giao hàng', 'Đã hủy'))
 );
 
--- Bridge table: NguoiBan <-> DanhMuc (many-to-many business categories)
-CREATE TABLE IF NOT EXISTS NguoiBanDanhMuc (
-    MaNguoiBan INT NOT NULL,
-    MaDanhMuc INT NOT NULL,
-    PRIMARY KEY (MaNguoiBan, MaDanhMuc),
-    CONSTRAINT FK_NBDM_NguoiBan FOREIGN KEY (MaNguoiBan) REFERENCES NguoiBan(MaNguoiBan) ON DELETE CASCADE,
-    CONSTRAINT FK_NBDM_DanhMuc FOREIGN KEY (MaDanhMuc) REFERENCES DanhMuc(MaDanhMuc) ON DELETE CASCADE
-);
+

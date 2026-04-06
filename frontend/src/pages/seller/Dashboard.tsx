@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../../utils/format';
 import { Package, ShoppingBag, TrendingUp, DollarSign, Clock, AlertCircle, ArrowRight } from 'lucide-react';
 import SellerLayout from '../../layouts/SellerLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import { getSellerStats, type SellerStats } from '../../services/seller-order.service';
+import { useToast } from '../../contexts/ToastContext';
+import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -27,8 +29,9 @@ const itemVariants: any = {
 };
 
 const SellerDashboard = () => {
-    // ... (logic remains same)
     const { user } = useAuth();
+    const { addToast } = useToast();
+    const navigate = useNavigate();
     const [stats, setStats] = useState<SellerStats>({
         totalOrders: 0,
         pendingOrders: 0,
@@ -39,14 +42,17 @@ const SellerDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
+    useSellerProfileCheck();
+
     useEffect(() => {
         const fetchStats = async () => {
             try {
                 setLoading(true);
+                // Lấy thống kê
                 const data = await getSellerStats();
                 setStats(data);
             } catch (error) {
-                console.error('Lỗi khi tải thống kê:', error);
+                console.error('Lỗi khi tải dữ liệu dashboard:', error);
             } finally {
                 setLoading(false);
             }
@@ -54,6 +60,7 @@ const SellerDashboard = () => {
 
         fetchStats();
     }, []);
+
 
     const statCards = [
         {
@@ -111,34 +118,47 @@ const SellerDashboard = () => {
                             </div>
                         ))
                     ) : (
-                        statCards.map((card, idx) => (
-                            <motion.div
-                                key={idx}
-                                variants={itemVariants}
-                                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" }}
-                                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all active:scale-95 cursor-default"
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className={`p-3 rounded-xl bg-opacity-10 bg-${card.color}-500 text-${card.color}-600 relative`}>
-                                        <card.icon size={24} />
-                                        {card.alert && (
-                                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse" />
-                                        )}
+                        statCards.map((card, idx) => {
+                            // Ánh xạ màu sắc để tránh lỗi Tailwind JIT không nhận diện class động
+                            const colorMap: Record<string, string> = {
+                                blue: 'bg-blue-500 text-blue-600',
+                                orange: 'bg-orange-500 text-orange-600',
+                                teal: 'bg-teal-500 text-teal-600',
+                                indigo: 'bg-indigo-500 text-indigo-600',
+                            };
+                            const colorClass = colorMap[card.color] || 'bg-gray-500 text-gray-600';
+
+                            return (
+                                <motion.div
+                                    key={idx}
+                                    variants={itemVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" }}
+                                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all active:scale-95 cursor-default"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className={`p-3 rounded-xl bg-opacity-10 ${colorClass} relative`}>
+                                            <card.icon size={24} />
+                                            {card.alert && (
+                                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                                            )}
+                                        </div>
+                                        <TrendingUp size={16} className="text-green-500" />
                                     </div>
-                                    <TrendingUp size={16} className="text-green-500" />
-                                </div>
-                                <h3 className="text-gray-500 text-sm font-medium">{card.title}</h3>
-                                <p className="text-2xl font-bold text-gray-800 mt-1">{card.value}</p>
-                                {card.link && (
-                                    <Link
-                                        to={card.link}
-                                        className="inline-flex items-center gap-1 text-xs text-secondary-600 hover:text-secondary-800 mt-2 font-medium"
-                                    >
-                                        Xem chi tiết <ArrowRight size={11} />
-                                    </Link>
-                                )}
-                            </motion.div>
-                        ))
+                                    <h3 className="text-gray-500 text-sm font-medium">{card.title}</h3>
+                                    <p className="text-2xl font-bold text-gray-800 mt-1">{card.value}</p>
+                                    {card.link && (
+                                        <Link
+                                            to={card.link}
+                                            className="inline-flex items-center gap-1 text-xs text-secondary-600 hover:text-secondary-800 mt-2 font-medium"
+                                        >
+                                            Xem chi tiết <ArrowRight size={11} />
+                                        </Link>
+                                    )}
+                                </motion.div>
+                            );
+                        })
                     )}
                 </div>
 

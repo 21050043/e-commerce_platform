@@ -75,12 +75,12 @@ export interface IChiTietHoaDon {
 export interface INguoiBan {
   MaNguoiBan?: number;
   MaKhachHang: number;
-  LoaiHinh: 'CA_NHAN' | 'DOANH_NGHIEP';
+  LoaiHinh?: 'CA_NHAN' | 'DOANH_NGHIEP';
   TenCuaHang?: string | null;
-  DiaChiKinhDoanh: string;
+  DiaChiKinhDoanh?: string | null;
   EmailLienHe?: string | null;
-  MaDanhMucChinh: number;
-  SoDienThoaiLienHe: string;
+  SoDienThoaiLienHe?: string | null;
+
   TrangThai?: 'PENDING' | 'APPROVED' | 'REJECTED';
   LyDoTuChoi?: string | null;
   NgayDuyet?: Date | null;

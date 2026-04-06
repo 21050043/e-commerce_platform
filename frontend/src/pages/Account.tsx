@@ -4,9 +4,8 @@ import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, User, Save, Loader, AlertTriangle, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getAllCategories } from '../services/category.service';
-import type { CategoryResponse } from '../services/category.service';
-import { applyVendor, getMyVendorProfile, updateVendorProfile, type VendorProfileResponse } from '../services/user.service';
+import { getMyVendorProfile, updateVendorProfile, type VendorProfileResponse } from '../services/user.service';
+
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 
@@ -39,18 +38,10 @@ const Account = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showVendorModal, setShowVendorModal] = useState(false);
-  const [vendorForm, setVendorForm] = useState({
-    LoaiHinh: 'CA_NHAN',
-    TenCuaHang: '',
-    DiaChiKinhDoanh: '',
-    EmailLienHe: '',
-    categories: [] as number[],
-    SoDienThoaiLienHe: '',
-    agreed: false,
-  });
   const [vendorStatus, setVendorStatus] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null);
   const [vendorProfile, setVendorProfile] = useState<VendorProfileResponse | null>(null);
-  const [categories, setCategories] = useState<CategoryResponse[]>([]);
+
+  const [activeVendorTab, setActiveVendorTab] = useState<'privacy' | 'terms'>('privacy');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -84,12 +75,7 @@ const Account = () => {
           }
         } else {
           setVendorStatus(null);
-          setVendorProfile(null);
         }
-      } catch { }
-      try {
-        const cats = await getAllCategories();
-        setCategories(cats);
       } catch { }
     })();
   }, [isAuthenticated, user, navigate]);
@@ -109,7 +95,6 @@ const Account = () => {
       setSuccessMessage(null);
       setSubmitting(true);
 
-      // Gửi yêu cầu cập nhật thông tin cá nhân
       const payload: any = {
         SoDienThoai: formData.SoDienThoai,
         DiaChi: formData.DiaChi,
@@ -121,27 +106,23 @@ const Account = () => {
       }
       await api.put(API_ENDPOINTS.USER.UPDATE_PROFILE, payload);
 
-      // Nếu user là seller (role 3) và có vendor profile đã được phê duyệt, cập nhật địa chỉ kinh doanh
       if (user?.MaVaiTro === 3 && vendorProfile && vendorProfile.TrangThai === 'APPROVED' && formData.DiaChiKinhDoanh) {
         try {
           await updateVendorProfile({
             DiaChiKinhDoanh: formData.DiaChiKinhDoanh
           });
-          // Refresh vendor profile
           const updatedProfile = await getMyVendorProfile();
           if (updatedProfile) {
             setVendorProfile(updatedProfile);
           }
-        } catch (vendorErr: any) {
+        } catch (vendorErr) {
           console.error('Error updating vendor profile:', vendorErr);
-          // Không throw error, chỉ log vì user profile đã được cập nhật thành công
         }
       }
 
       setSuccessMessage('Cập nhật thông tin thành công!');
       addToast('Cập nhật thông tin tài khoản thành công!', 'success');
     } catch (err: any) {
-      console.error('Error updating profile:', err);
       const errorMessage = err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật thông tin';
       setError(errorMessage);
       addToast(errorMessage, 'error');
@@ -152,7 +133,6 @@ const Account = () => {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (formData.MatKhauMoi !== formData.XacNhanMatKhau) {
       setError('Xác nhận mật khẩu không khớp');
       addToast('Xác nhận mật khẩu không khớp', 'error');
@@ -164,7 +144,6 @@ const Account = () => {
       setSuccessMessage(null);
       setSubmitting(true);
 
-      // Gửi yêu cầu đổi mật khẩu
       await api.put(API_ENDPOINTS.USER.CHANGE_PASSWORD, {
         MatKhauCu: formData.MatKhauCu,
         MatKhauMoi: formData.MatKhauMoi,
@@ -179,7 +158,6 @@ const Account = () => {
         XacNhanMatKhau: '',
       }));
     } catch (err: any) {
-      console.error('Error changing password:', err);
       const errorMessage = err.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu';
       setError(errorMessage);
       addToast(errorMessage, 'error');
@@ -200,41 +178,30 @@ const Account = () => {
 
   const openVendorModal = () => setShowVendorModal(true);
   const closeVendorModal = () => setShowVendorModal(false);
-  const onChangeVendor = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target as any;
-    setVendorForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-  const toggleCategory = (id: number) => {
-    setVendorForm(prev => {
-      const set = new Set(prev.categories);
-      if (set.has(id)) set.delete(id); else set.add(id);
-      return { ...prev, categories: Array.from(set) };
-    });
-  };
+
+  const [vendorAgreed, setVendorAgreed] = useState(false);
+
   const submitVendor = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!vendorForm.agreed) {
+      if (!vendorAgreed) {
         addToast('Bạn phải đồng ý với điều khoản và chính sách hoạt động', 'warning');
         return;
       }
-      if (!vendorForm.TenCuaHang || !vendorForm.DiaChiKinhDoanh || vendorForm.categories.length === 0 || !vendorForm.SoDienThoaiLienHe) {
-        addToast('Vui lòng điền đủ thông tin bắt buộc (Tên cửa hàng, Địa chỉ, Danh mục, SĐT)', 'error');
-        return;
+      
+      const response = await api.post('/vendor/apply', {
+        agreed: vendorAgreed,
+      });
+
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        await refreshUser();
       }
-      await applyVendor({
-        LoaiHinh: vendorForm.LoaiHinh as 'CA_NHAN' | 'DOANH_NGHIEP',
-        TenCuaHang: vendorForm.TenCuaHang || undefined,
-        DiaChiKinhDoanh: vendorForm.DiaChiKinhDoanh,
-        EmailLienHe: vendorForm.EmailLienHe || undefined,
-        MaDanhMucChinh: vendorForm.categories[0],
-        SoDienThoaiLienHe: vendorForm.SoDienThoaiLienHe,
-        agreed: vendorForm.agreed,
-      } as any);
+
       setVendorStatus('APPROVED');
-      await refreshUser();
       addToast('Đăng ký người bán thành công! Chào mừng bạn đến với Kênh Người Bán.', 'success');
       closeVendorModal();
+      navigate('/seller/settings');
     } catch (err: any) {
       addToast(err?.response?.data?.message || 'Không thể gửi hồ sơ', 'error');
     }
@@ -253,7 +220,6 @@ const Account = () => {
 
   return (
     <MainLayout>
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center">
@@ -267,11 +233,9 @@ const Account = () => {
         </div>
       </section>
 
-      {/* Account Content */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Sidebar */}
             <div className="md:w-1/4">
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div className="flex items-center mb-6">
@@ -320,10 +284,8 @@ const Account = () => {
               </div>
             </div>
 
-            {/* Main Content */}
             <div className="md:w-3/4">
               <div className="bg-white rounded-lg shadow-md p-6">
-                {/* Notifications */}
                 {error && (
                   <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-start">
                     <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
@@ -337,11 +299,9 @@ const Account = () => {
                   </div>
                 )}
 
-                {/* Info Tab */}
                 {activeTab === 'thongTin' && (
                   <>
                     <h2 className="text-xl font-semibold mb-6">Thông tin tài khoản</h2>
-                    {/* Vendor section */}
                     {user?.MaVaiTro === 3 ? (
                       <div className="mb-6 p-4 border rounded-lg bg-green-50">
                         <div className="flex items-center justify-between">
@@ -420,7 +380,6 @@ const Account = () => {
                           ></textarea>
                         </div>
 
-                        {/* Hiển thị địa chỉ kinh doanh nếu user là seller (role 3) và có vendor profile đã được phê duyệt */}
                         {user?.MaVaiTro === 3 && vendorProfile && vendorProfile.TrangThai === 'APPROVED' && (
                           <div>
                             <label className="block text-gray-700 mb-2">
@@ -462,7 +421,6 @@ const Account = () => {
                   </>
                 )}
 
-                {/* Password Tab */}
                 {activeTab === 'matKhau' && (
                   <>
                     <h2 className="text-xl font-semibold mb-6">Đổi mật khẩu</h2>
@@ -474,7 +432,7 @@ const Account = () => {
                             Mật khẩu hiện tại
                           </label>
                           <input
-                            type="text"
+                            type="password"
                             name="MatKhauCu"
                             value={formData.MatKhauCu}
                             onChange={handleInputChange}
@@ -488,7 +446,7 @@ const Account = () => {
                             Mật khẩu mới
                           </label>
                           <input
-                            type="text"
+                            type="password"
                             name="MatKhauMoi"
                             value={formData.MatKhauMoi}
                             onChange={handleInputChange}
@@ -542,56 +500,211 @@ const Account = () => {
       </section>
 
       {showVendorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative">
-            <button onClick={closeVendorModal} className="absolute top-3 right-3 text-gray-400 hover:text-primary-600">×</button>
-            <h3 className="text-xl font-semibold mb-4">Đăng ký bán hàng (Vendor)</h3>
-            <form onSubmit={submitVendor} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-700 mb-1">Loại hình</label>
-                  <select name="LoaiHinh" value={vendorForm.LoaiHinh} onChange={onChangeVendor} className="w-full border rounded px-3 py-2">
-                    <option value="CA_NHAN">Cá nhân</option>
-                    <option value="DOANH_NGHIEP">Doanh nghiệp</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700 mb-1">Tên cửa hàng</label>
-                  <input name="TenCuaHang" value={vendorForm.TenCuaHang} onChange={onChangeVendor} required className="w-full border rounded px-3 py-2" placeholder="Nhập tên shop của bạn" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-1">Địa chỉ kinh doanh</label>
-                  <input name="DiaChiKinhDoanh" value={vendorForm.DiaChiKinhDoanh} onChange={onChangeVendor} required className="w-full border rounded px-3 py-2" />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700 mb-1">Email liên hệ (không bắt buộc)</label>
-                  <input type="email" name="EmailLienHe" value={vendorForm.EmailLienHe} onChange={onChangeVendor} className="w-full border rounded px-3 py-2" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-1">Danh mục kinh doanh (chọn nhiều)</label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {categories.map(c => (
-                      <label key={c.MaDanhMuc} className={`flex items-center gap-2 border rounded px-3 py-2 cursor-pointer ${vendorForm.categories.includes(c.MaDanhMuc) ? 'bg-primary-50 border-primary-300' : ''}`}>
-                        <input type="checkbox" checked={vendorForm.categories.includes(c.MaDanhMuc)} onChange={() => toggleCategory(c.MaDanhMuc)} />
-                        <span className="text-sm">{c.TenDanhMuc}</span>
-                      </label>
-                    ))}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
+            <button 
+              onClick={closeVendorModal} 
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+            >
+              ×
+            </button>
+            
+            <div className="flex flex-col h-[80vh] md:h-[600px]">
+              <div className="p-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+                <h3 className="text-2xl font-bold">Đăng ký trở thành Người bán</h3>
+                <p className="opacity-80 text-sm mt-1">Vui lòng đọc kỹ các điều khoản và chính sách trước khi tham gia</p>
+              </div>
+
+              <div className="flex border-b">
+                <button
+                  className={`flex-1 py-4 text-sm font-bold transition-all ${activeVendorTab === 'privacy' ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50/30' : 'text-gray-500 hover:bg-gray-50'}`}
+                  onClick={() => setActiveVendorTab('privacy')}
+                >
+                  1. Chính sách bảo mật
+                </button>
+                <button
+                  className={`flex-1 py-4 text-sm font-bold transition-all ${activeVendorTab === 'terms' ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50/30' : 'text-gray-500 hover:bg-gray-50'}`}
+                  onClick={() => setActiveVendorTab('terms')}
+                >
+                  2. Điều khoản sử dụng
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                {activeVendorTab === 'privacy' ? (
+                  <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
+                    <h4 className="text-gray-900 font-bold text-xl mb-4">Chính sách bảo mật thông tin người bán</h4>
+                    <p>Chúng tôi cam kết bảo mật tuyệt đối các thông tin kinh doanh của bạn. Khi đăng ký, bạn đồng ý cung cấp các thông tin liên hệ và địa chỉ kinh doanh chính xác để hệ thống vận hành.</p>
+                    
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">1. Thu Thập Thông Tin</h5>
+                      <p className="mb-2">Chúng tôi thu thập thông tin cá nhân của bạn khi bạn:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Đăng ký tài khoản trên website</li>
+                        <li>Đặt hàng và thanh toán</li>
+                        <li>Liên hệ với chúng tôi qua email hoặc điện thoại</li>
+                        <li>Sử dụng các dịch vụ của chúng tôi</li>
+                      </ul>
+                      <p className="mt-2">Thông tin thu thập bao gồm: họ tên, số điện thoại, địa chỉ email, địa chỉ giao hàng, và thông tin thanh toán (nếu có).</p>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">2. Sử Dụng Thông Tin</h5>
+                      <p className="mb-2">Chúng tôi sử dụng thông tin cá nhân của bạn để:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Xử lý đơn hàng và giao hàng</li>
+                        <li>Liên hệ với bạn về đơn hàng và dịch vụ</li>
+                        <li>Cải thiện chất lượng dịch vụ</li>
+                        <li>Gửi thông tin khuyến mãi (nếu bạn đồng ý)</li>
+                        <li>Tuân thủ các yêu cầu pháp lý</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">3. Bảo Mật Thông Tin</h5>
+                      <p className="mb-2">Chúng tôi cam kết bảo mật thông tin cá nhân của bạn bằng các biện pháp:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Mã hóa mật khẩu bằng thuật toán bcrypt</li>
+                        <li>Sử dụng HTTPS để bảo vệ dữ liệu truyền tải</li>
+                        <li>Giới hạn quyền truy cập thông tin chỉ cho nhân viên có thẩm quyền</li>
+                        <li>Thường xuyên cập nhật và kiểm tra hệ thống bảo mật</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">4. Chia Sẻ Thông Tin</h5>
+                      <p className="mb-2">Chúng tôi không bán, cho thuê hoặc chia sẻ thông tin cá nhân của bạn với bên thứ ba, trừ các trường hợp:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Khi có yêu cầu từ cơ quan pháp luật</li>
+                        <li>Với các đối tác vận chuyển để giao hàng (chỉ thông tin cần thiết)</li>
+                        <li>Khi bạn đồng ý chia sẻ</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">5. Quyền Của Bạn</h5>
+                      <p className="mb-2">Bạn có quyền:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Truy cập và xem thông tin cá nhân của mình</li>
+                        <li>Yêu cầu chỉnh sửa hoặc xóa thông tin</li>
+                        <li>Từ chối nhận thông tin khuyến mãi</li>
+                        <li>Khiếu nại về việc xử lý thông tin cá nhân</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">6. Liên Hệ</h5>
+                      <ul className="space-y-1 ml-4">
+                        <li><strong>Email:</strong> 21050043@student.bdu.edu.vn</li>
+                        <li><strong>Điện thoại:</strong> 0938 320 498</li>
+                        <li><strong>Địa chỉ:</strong> Trường đại học Bình Dương, TP. Thủ dầu Một, Bình Dương</li>
+                      </ul>
+                    </section>
                   </div>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-1">Số điện thoại liên hệ</label>
-                  <input name="SoDienThoaiLienHe" value={vendorForm.SoDienThoaiLienHe} onChange={onChangeVendor} required className="w-full border rounded px-3 py-2" />
-                </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
+                    <h4 className="text-gray-900 font-bold text-xl mb-4">Điều khoản vận hành và sử dụng dịch vụ</h4>
+                    
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">1. Chấp Nhận Điều Khoản</h5>
+                      <p>Bằng việc truy cập và sử dụng website này, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản và điều kiện sử dụng. Nếu bạn không đồng ý với bất kỳ phần nào, bạn không nên sử dụng website.</p>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">2. Đăng Ký Tài Khoản</h5>
+                      <p className="mb-2">Khi đăng ký tài khoản, bạn cam kết:</p>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Cung cấp thông tin chính xác, đầy đủ và cập nhật</li>
+                        <li>Bảo mật thông tin đăng nhập của bạn</li>
+                        <li>Chịu trách nhiệm cho mọi hoạt động dưới tài khoản của bạn</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">3. Đặt Hàng và Thanh Toán</h5>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Cung cấp thông tin giao hàng chính xác</li>
+                        <li>Thanh toán đầy đủ theo giá đã công bố</li>
+                        <li>Chấp nhận các điều kiện về vận chuyển và giao hàng</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">4. Quyền Sở Hữu Trí Tuệ</h5>
+                      <p>Tất cả nội dung trên website đều thuộc quyền sở hữu của chúng tôi. Bạn không được sao chép, phân phối cho mục đích thương mại mà không có sự đồng ý.</p>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">5. Hành Vi Bị Cấm</h5>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Sử dụng website cho mục đích bất hợp pháp</li>
+                        <li>Gây nhiễu hoặc làm gián đoạn hoạt động của website</li>
+                        <li>Giả mạo danh tính hoặc thông tin cá nhân</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">6. Trách Nhiệm</h5>
+                      <p>Chúng tôi không chịu trách nhiệm cho thiệt hại gián tiếp hoặc lỗi kỹ thuật ngoài tầm kiểm soát.</p>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">7. Hoàn Trả và Đổi Trả</h5>
+                      <ul className="space-y-1 list-disc list-inside ml-4">
+                        <li>Hàng hóa bị lỗi hoặc không đúng mô tả sẽ được đổi trả miễn phí</li>
+                        <li>Yêu cầu đổi trả trong vòng 7 ngày kể từ ngày nhận hàng</li>
+                        <li>Hàng hóa phải còn nguyên vẹn, chưa sử dụng</li>
+                      </ul>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">8. Thay Đổi Điều Khoản</h5>
+                      <p>Chúng tôi có quyền thay đổi các điều khoản bất cứ lúc nào. Việc tiếp tục sử dụng website sau khi có thay đổi được xem như đã chấp nhận các điều khoản mới.</p>
+                    </section>
+
+                    <section>
+                      <h5 className="font-bold text-gray-900 text-lg mb-2">9. Liên Hệ</h5>
+                      <ul className="space-y-1 ml-4">
+                        <li><strong>Email:</strong> 21050043@student.bdu.edu.vn</li>
+                        <li><strong>Điện thoại:</strong> 0938 320 498</li>
+                      </ul>
+                    </section>
+                  </div>
+                )}
               </div>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" name="agreed" checked={vendorForm.agreed} onChange={onChangeVendor} />
-                Tôi đồng ý với điều khoản và chính sách hoạt động
-              </label>
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={closeVendorModal} className="px-4 py-2 bg-gray-100 rounded-md">Hủy</button>
-                <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">Gửi đăng ký</button>
+
+              <div className="p-6 border-t bg-white">
+                <form onSubmit={submitVendor} className="space-y-4">
+                  <label className="flex items-start gap-3 cursor-pointer group p-2 rounded-xl hover:bg-primary-50 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      className="mt-1 w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer" 
+                      checked={vendorAgreed} 
+                      onChange={(e) => setVendorAgreed(e.target.checked)} 
+                    />
+                    <span className="text-sm text-gray-700 leading-tight">Tôi đã đọc kỹ và hoàn toàn đồng ý với các <strong>chính sách bảo mật</strong> và <strong>điều khoản sử dụng</strong> nêu trên.</span>
+                  </label>
+
+                  
+                  <div className="flex gap-3 pt-2">
+                    <button 
+                      type="button" 
+                      onClick={closeVendorModal} 
+                      className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-gray-200 transition-all"
+                    >
+                      Để sau
+                    </button>
+                    <button 
+                      type="submit" 
+                      className={`flex-1 py-3 px-4 rounded-2xl font-bold text-white transition-all shadow-lg ${vendorAgreed ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30' : 'bg-gray-300 cursor-not-allowed shadow-none'}`}
+                      disabled={!vendorAgreed}
+                    >
+                      Đăng ký
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -599,4 +712,4 @@ const Account = () => {
   );
 };
 
-export default Account; 
+export default Account;

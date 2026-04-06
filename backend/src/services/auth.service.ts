@@ -149,7 +149,7 @@ export default class AuthService {
     }
   }
 
-  private generateTokens(data: ITokenData): IAuthTokens {
+  public generateTokens(data: ITokenData): IAuthTokens {
     // Tạo access token
     const accessToken = jwt.sign(
       data,

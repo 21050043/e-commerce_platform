@@ -34,9 +34,9 @@ VALUES
     ('Linh kiện thụ động', 'https://images.unsplash.com/photo-1614811568291-7649b81b7e64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');
 
 -- Seed NguoiBan (TrangThai = APPROVED, NgayDuyet = NOW vì auto-approve)
-INSERT INTO NguoiBan (MaKhachHang, LoaiHinh, TenCuaHang, DiaChiKinhDoanh, EmailLienHe, MaDanhMucChinh, SoDienThoaiLienHe, TrangThai, NgayDuyet)
+INSERT INTO NguoiBan (MaKhachHang, LoaiHinh, TenCuaHang, DiaChiKinhDoanh, EmailLienHe, SoDienThoaiLienHe, TrangThai, NgayDuyet)
 VALUES
-    (1, 'CA_NHAN', 'Linh Kiện Official', '123 Đường Vendor, Quận 1, TP HCM', 'contact@electronic-hub.vn', 1, '0934567890', 'APPROVED', NOW());
+    (1, 'CA_NHAN', 'Linh Kiện Official', '123 Đường Vendor, Quận 1, TP HCM', 'contact@electronic-hub.vn', '0934567890', 'APPROVED', NOW());
 
 -- Seed SanPham
 INSERT INTO SanPham (TenSanPham, MaDanhMuc, MoTa, SoLuong, GiaSanPham, HinhAnh, MaNguoiBan)

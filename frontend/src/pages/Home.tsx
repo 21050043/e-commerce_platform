@@ -60,14 +60,14 @@ const Home = () => {
       id: 2,
       title: 'Cảm biến & Module',
       description: 'Đầy đủ các loại cảm biến đo đạc và module chức năng cho dự án của bạn',
-      image: 'https://images.unsplash.com/photo-1591405351990-4726e33df58a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      image: 'https://images.unsplash.com/photo-1638734255280-8bae834f8297?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       link: '/categories/2'
     },
     {
       id: 3,
       title: 'Phụ kiện kĩ thuật',
       description: 'Nguồn, dây cắm, linh kiện thụ động và dụng cụ thực hành',
-      image: 'https://images.unsplash.com/photo-1614811568291-7649b81b7e64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      image: 'https://images.unsplash.com/photo-1707622611362-13ea1bf4a466?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       link: '/categories/5'
     }
   ];

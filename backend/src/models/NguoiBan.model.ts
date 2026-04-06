@@ -7,12 +7,11 @@ interface NguoiBanCreationAttributes extends Optional<INguoiBan, 'MaNguoiBan' | 
 class NguoiBan extends Model<INguoiBan, NguoiBanCreationAttributes> implements INguoiBan {
   public MaNguoiBan!: number;
   public MaKhachHang!: number;
-  public LoaiHinh!: 'CA_NHAN' | 'DOANH_NGHIEP';
+  public LoaiHinh?: 'CA_NHAN' | 'DOANH_NGHIEP';
   public TenCuaHang?: string;
-  public DiaChiKinhDoanh!: string;
+  public DiaChiKinhDoanh?: string;
   public EmailLienHe?: string;
-  public MaDanhMucChinh!: number;
-  public SoDienThoaiLienHe!: string;
+  public SoDienThoaiLienHe?: string;
   public TrangThai?: 'PENDING' | 'APPROVED' | 'REJECTED';
   public LyDoTuChoi?: string;
   public NgayDuyet?: Date | null;
@@ -35,7 +34,7 @@ NguoiBan.init(
     },
     LoaiHinh: {
       type: DataTypes.ENUM('CA_NHAN', 'DOANH_NGHIEP'),
-      allowNull: false,
+      allowNull: true,
     },
     TenCuaHang: {
       type: DataTypes.STRING(150),
@@ -43,23 +42,15 @@ NguoiBan.init(
     },
     DiaChiKinhDoanh: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     EmailLienHe: {
       type: DataTypes.STRING(150),
       allowNull: true,
     },
-    MaDanhMucChinh: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'DanhMuc',
-        key: 'MaDanhMuc',
-      },
-    },
     SoDienThoaiLienHe: {
       type: DataTypes.STRING(15),
-      allowNull: false,
+      allowNull: true,
     },
     TrangThai: {
       type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED'),

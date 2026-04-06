@@ -41,28 +41,6 @@ NguoiBan.hasMany(SanPham, { foreignKey: 'MaNguoiBan', as: 'SanPhams' });
 SanPham.belongsTo(NguoiBan, { foreignKey: 'MaNguoiBan', as: 'NguoiBan' });
 
 // ─────────────────────────────────────────────
-// Quan hệ: NguoiBan ↔ DanhMuc (many-to-many)
-// ─────────────────────────────────────────────
-const NguoiBanDanhMuc = sequelize.define('NguoiBanDanhMuc', {
-  MaNguoiBan: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey: true,
-  },
-  MaDanhMuc: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey: true,
-  },
-}, {
-  tableName: 'NguoiBanDanhMuc',
-  timestamps: false,
-});
-
-NguoiBan.belongsToMany(DanhMuc, { through: NguoiBanDanhMuc, foreignKey: 'MaNguoiBan', otherKey: 'MaDanhMuc', as: 'DanhMucs' });
-DanhMuc.belongsToMany(NguoiBan, { through: NguoiBanDanhMuc, foreignKey: 'MaDanhMuc', otherKey: 'MaNguoiBan', as: 'NguoiBans' });
-
-// ─────────────────────────────────────────────
 // Quan hệ: KhachHang ↔ HoaDon (master order)
 // Lưu ý: MaNhanVien đã bỏ — Admin/Staff không tham gia luồng đơn hàng
 // ─────────────────────────────────────────────
@@ -98,6 +76,36 @@ const initializeModels = async () => {
   try {
     await sequelize.sync({ force: false });
     logger.db.synchronized();
+
+    // Dọn dẹp database: Xóa cột MaDanhMucChinh và bảng NguoiBanDanhMuc theo yêu cầu
+    try {
+      // Đầu tiên, làm cho cột có thể NULL để không gây lỗi khi khởi động
+      await sequelize.query('ALTER TABLE NguoiBan MODIFY MaDanhMucChinh INT NULL');
+    } catch (e) {}
+
+    try {
+      // Cố gắng xoá khoá ngoại nếu có (có thể tên khoá ngoại khác nhau ở mỗi máy)
+      // Thử xoá khoá ngoại phổ biến hoặc dựa trên tên cột
+      await sequelize.query('ALTER TABLE NguoiBan DROP FOREIGN KEY nguoisban_ibfk_2'); 
+    } catch (e) {}
+    
+    try {
+      await sequelize.query('ALTER TABLE NguoiBan DROP COLUMN MaDanhMucChinh');
+    } catch (e) {}
+
+    try {
+      await sequelize.query('DROP TABLE IF EXISTS NguoiBanDanhMuc');
+    } catch (e) {}
+
+    // Đảm bảo các trường thông tin kinh doanh có thể NULL
+    try {
+      await sequelize.query('ALTER TABLE NguoiBan MODIFY DiaChiKinhDoanh VARCHAR(255) NULL');
+      await sequelize.query('ALTER TABLE NguoiBan MODIFY TenCuaHang VARCHAR(150) NULL');
+      await sequelize.query('ALTER TABLE NguoiBan MODIFY EmailLienHe VARCHAR(150) NULL');
+      await sequelize.query('ALTER TABLE NguoiBan MODIFY SoDienThoaiLienHe VARCHAR(15) NULL');
+    } catch (e) {}
+
+
   } catch (error) {
     logger.error('Không thể đồng bộ hóa các model:', error);
   }
@@ -113,7 +121,6 @@ export {
   HoaDon,
   ChiTietHoaDon,
   NguoiBan,
-  NguoiBanDanhMuc,
   DonHangNguoiBan,
   initializeModels,
 };

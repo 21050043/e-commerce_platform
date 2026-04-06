@@ -13,8 +13,10 @@ import { API_ENDPOINTS, API_BASE_URL } from '../../constants/api';
 // import api from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 
 const ProductForm = () => {
+  useSellerProfileCheck();
   const location = useLocation();
   const isSellerPath = location.pathname.startsWith('/seller');
   const Layout = isSellerPath ? SellerLayout : AdminLayout;

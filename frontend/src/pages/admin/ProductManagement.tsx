@@ -13,8 +13,10 @@ import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency } from '../../utils/format';
 import { ProductDetailModal, SuspendModal, OutOfStockModal } from './components/ProductModals';
+import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 
 const ProductManagement = () => {
+  useSellerProfileCheck();
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 export interface Toast {
@@ -30,22 +30,7 @@ interface ToastProviderProps {
 export const ToastProvider = ({ children }: ToastProviderProps) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = (message: ReactNode, type: Toast['type']) => {
-    const newToast: Toast = {
-      id: Date.now().toString(),
-      message,
-      type,
-    };
-    
-    setToasts((prevToasts) => [...prevToasts, newToast]);
-
-    // Tự động xóa toast sau 3 giây
-    setTimeout(() => {
-      removeToast(newToast.id);
-    }, 3000);
-  };
-
-  const removeToast = (id: string) => {
+  const removeToast = useCallback((id: string) => {
     // Thêm class để kích hoạt animation trước khi xóa
     const toastElement = document.getElementById(`toast-${id}`);
     if (toastElement) {
@@ -59,7 +44,23 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
       // Trường hợp không tìm thấy element (hiếm gặp), xóa ngay
       setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
     }
-  };
+  }, []);
+
+  const addToast = useCallback((message: ReactNode, type: Toast['type']) => {
+    const id = Date.now().toString();
+    const newToast: Toast = {
+      id,
+      message,
+      type,
+    };
+    
+    setToasts((prevToasts) => [...prevToasts, newToast]);
+
+    // Tự động xóa toast sau 3 giây
+    setTimeout(() => {
+      removeToast(id);
+    }, 3000);
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>

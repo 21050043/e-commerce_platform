@@ -12,6 +12,7 @@ import {
 } from '../../services/seller-order.service';
 import { formatCurrency, formatDate } from '../../utils/format';
 import { useToast } from '../../contexts/ToastContext';
+import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
@@ -245,6 +246,7 @@ const OrderDetailPanel = ({ order, onClose, onStatusChange }: OrderDetailPanelPr
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const SellerOrders = () => {
+    useSellerProfileCheck();
     const { showToast } = useToast();
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
