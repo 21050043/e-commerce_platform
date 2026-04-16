@@ -4,7 +4,7 @@ import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, User, Save, Loader, AlertTriangle, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getMyVendorProfile, updateVendorProfile, type VendorProfileResponse } from '../services/user.service';
+import { getMyVendorProfile, updateVendorProfile, applyShipper, type VendorProfileResponse } from '../services/user.service';
 
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
@@ -42,6 +42,13 @@ const Account = () => {
   const [vendorProfile, setVendorProfile] = useState<VendorProfileResponse | null>(null);
 
   const [activeVendorTab, setActiveVendorTab] = useState<'privacy' | 'terms'>('privacy');
+
+  // Shipper states
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [applyType, setApplyType] = useState<'vendor' | 'shipper'>('vendor');
+  const [applyAgreed, setApplyAgreed] = useState(false);
+  const [shipperDiaChiHoatDong, setShipperDiaChiHoatDong] = useState('');
+  const [shipperLoaiXe, setShipperLoaiXe] = useState('Xe máy');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -188,7 +195,7 @@ const Account = () => {
         addToast('Bạn phải đồng ý với điều khoản và chính sách hoạt động', 'warning');
         return;
       }
-      
+
       const response = await api.post('/vendor/apply', {
         agreed: vendorAgreed,
       });
@@ -202,6 +209,53 @@ const Account = () => {
       addToast('Đăng ký người bán thành công! Chào mừng bạn đến với Kênh Người Bán.', 'success');
       closeVendorModal();
       navigate('/seller/settings');
+    } catch (err: any) {
+      addToast(err?.response?.data?.message || 'Không thể gửi hồ sơ', 'error');
+    }
+  };
+
+  const openApplyModal = (type: 'vendor' | 'shipper') => {
+    setApplyType(type);
+    setShowApplyModal(true);
+    setApplyAgreed(false);
+  };
+
+  const closeApplyModal = () => {
+    setShowApplyModal(false);
+    setApplyAgreed(false);
+    setShipperDiaChiHoatDong('');
+    setShipperLoaiXe('Xe máy');
+  };
+
+  const submitApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (!applyAgreed) {
+        addToast('Bạn phải đồng ý với điều khoản và chính sách', 'warning');
+        return;
+      }
+
+      if (applyType === 'shipper') {
+        if (!shipperDiaChiHoatDong.trim()) {
+          addToast('Vui lòng nhập khu vực hoạt động', 'error');
+          return;
+        }
+
+        const response = await applyShipper({
+          agreed: true,
+          diaChiHoatDong: shipperDiaChiHoatDong,
+          loaiXe: shipperLoaiXe,
+        });
+
+        if (response.accessToken) {
+          localStorage.setItem('accessToken', response.accessToken);
+          await refreshUser();
+        }
+
+        addToast('Đăng ký Shipper thành công! Chào mừng bạn đến với Dịch vụ Giao hàng.', 'success');
+        closeApplyModal();
+        navigate('/shipper');
+      }
     } catch (err: any) {
       addToast(err?.response?.data?.message || 'Không thể gửi hồ sơ', 'error');
     }
@@ -312,26 +366,53 @@ const Account = () => {
                           <Link to="/seller" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Vào khu vực bán hàng</Link>
                         </div>
                       </div>
-                    ) : (
-                      <div className="mb-6 p-4 border rounded-lg bg-primary-50/50">
+                    ) : user?.MaVaiTro === 4 ? (
+                      <div className="mb-6 p-4 border rounded-lg bg-blue-50">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-gray-800">Bạn là người bán?</p>
-                            <p className="text-sm text-gray-600">{vendorStatus === 'PENDING' ? 'Hồ sơ của bạn đang chờ phê duyệt. Vui lòng đợi email/SMS thông báo.' : 'Đăng ký trở thành vendor để quản lý sản phẩm của bạn.'}
-                              {vendorStatus && (
-                                <span className="ml-2 px-2 py-0.5 rounded text-xs bg-primary-100 text-primary-700">
-                                  Trạng thái: {vendorStatus}
-                                </span>
-                              )}
-                            </p>
+                            <p className="font-medium text-gray-800">Tài khoản của bạn đủ điều kiện làm Shipper</p>
+                            <p className="text-sm text-gray-600">Quản lý các đơn giao hàng và theo dõi thu nhập tại khu vực Shipper.</p>
                           </div>
-                          <button
-                            onClick={openVendorModal}
-                            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-                            disabled={vendorStatus === 'PENDING'}
-                          >
-                            {vendorStatus === 'PENDING' ? 'Đang chờ duyệt' : 'Đăng ký bán hàng'}
-                          </button>
+                          <Link to="/shipper/dashboard" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Vào khu vực Shipper</Link>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 mb-6">
+                        <div className="p-4 border rounded-lg bg-primary-50/50">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-800">Bạn là người bán?</p>
+                              <p className="text-sm text-gray-600">{vendorStatus === 'PENDING' ? 'Hồ sơ của bạn đang chờ phê duyệt. Vui lòng đợi email/SMS thông báo.' : 'Đăng ký trở thành vendor để quản lý sản phẩm của bạn.'}
+                                {vendorStatus && (
+                                  <span className="ml-2 px-2 py-0.5 rounded text-xs bg-primary-100 text-primary-700">
+                                    Trạng thái: {vendorStatus}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                            <button
+                              onClick={openVendorModal}
+                              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                              disabled={vendorStatus === 'PENDING'}
+                            >
+                              {vendorStatus === 'PENDING' ? 'Đang chờ duyệt' : 'Đăng ký bán hàng'}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="p-4 border rounded-lg bg-blue-50/50">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-800">Bạn muốn làm Shipper?</p>
+                              <p className="text-sm text-gray-600">Đăng ký làm shipper để nhận các đơn giao hàng và kiếm thêm thu nhập.</p>
+                            </div>
+                            <button
+                              onClick={() => openApplyModal('shipper')}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 whitespace-nowrap"
+                            >
+                              Đăng ký Shipper
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -368,7 +449,7 @@ const Account = () => {
 
                         <div>
                           <label className="block text-gray-700 mb-2">
-                            Địa chỉ giao hàng
+                            Địa chỉ nhận hàng
                           </label>
                           <textarea
                             name="DiaChi"
@@ -502,13 +583,13 @@ const Account = () => {
       {showVendorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
-            <button 
-              onClick={closeVendorModal} 
+            <button
+              onClick={closeVendorModal}
               className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
             >
               ×
             </button>
-            
+
             <div className="flex flex-col h-[80vh] md:h-[600px]">
               <div className="p-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
                 <h3 className="text-2xl font-bold">Đăng ký trở thành Người bán</h3>
@@ -535,7 +616,7 @@ const Account = () => {
                   <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
                     <h4 className="text-gray-900 font-bold text-xl mb-4">Chính sách bảo mật thông tin người bán</h4>
                     <p>Chúng tôi cam kết bảo mật tuyệt đối các thông tin kinh doanh của bạn. Khi đăng ký, bạn đồng ý cung cấp các thông tin liên hệ và địa chỉ kinh doanh chính xác để hệ thống vận hành.</p>
-                    
+
                     <section>
                       <h5 className="font-bold text-gray-900 text-lg mb-2">1. Thu Thập Thông Tin</h5>
                       <p className="mb-2">Chúng tôi thu thập thông tin cá nhân của bạn khi bạn:</p>
@@ -604,7 +685,7 @@ const Account = () => {
                 ) : (
                   <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
                     <h4 className="text-gray-900 font-bold text-xl mb-4">Điều khoản vận hành và sử dụng dịch vụ</h4>
-                    
+
                     <section>
                       <h5 className="font-bold text-gray-900 text-lg mb-2">1. Chấp Nhận Điều Khoản</h5>
                       <p>Bằng việc truy cập và sử dụng website này, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản và điều kiện sử dụng. Nếu bạn không đồng ý với bất kỳ phần nào, bạn không nên sử dụng website.</p>
@@ -676,30 +757,258 @@ const Account = () => {
               <div className="p-6 border-t bg-white">
                 <form onSubmit={submitVendor} className="space-y-4">
                   <label className="flex items-start gap-3 cursor-pointer group p-2 rounded-xl hover:bg-primary-50 transition-colors">
-                    <input 
-                      type="checkbox" 
-                      className="mt-1 w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer" 
-                      checked={vendorAgreed} 
-                      onChange={(e) => setVendorAgreed(e.target.checked)} 
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                      checked={vendorAgreed}
+                      onChange={(e) => setVendorAgreed(e.target.checked)}
                     />
                     <span className="text-sm text-gray-700 leading-tight">Tôi đã đọc kỹ và hoàn toàn đồng ý với các <strong>chính sách bảo mật</strong> và <strong>điều khoản sử dụng</strong> nêu trên.</span>
                   </label>
 
-                  
+
                   <div className="flex gap-3 pt-2">
-                    <button 
-                      type="button" 
-                      onClick={closeVendorModal} 
+                    <button
+                      type="button"
+                      onClick={closeVendorModal}
                       className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-gray-200 transition-all"
                     >
                       Để sau
                     </button>
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       className={`flex-1 py-3 px-4 rounded-2xl font-bold text-white transition-all shadow-lg ${vendorAgreed ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30' : 'bg-gray-300 cursor-not-allowed shadow-none'}`}
                       disabled={!vendorAgreed}
                     >
                       Đăng ký
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showApplyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
+            <button
+              onClick={closeApplyModal}
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+            >
+              ×
+            </button>
+
+            <div className="flex flex-col h-[90vh] md:h-[750px]">
+              <div className="p-6 bg-gradient-to-r from-primary-600 to-primary-700 text-white shrink-0">
+                <h3 className="text-2xl font-bold">Đăng ký trở thành {applyType === 'vendor' ? 'Người bán' : 'Shipper'}</h3>
+                <p className="opacity-80 text-sm mt-1">Vui lòng đọc kỹ các điều khoản và chính sách trước khi tham gia</p>
+              </div>
+
+              <div className="flex border-b shrink-0 bg-white">
+                <button
+                  className={`flex-1 py-4 text-sm font-bold transition-all ${activeVendorTab === 'privacy' ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50/30' : 'text-gray-500 hover:bg-gray-50'}`}
+                  onClick={() => setActiveVendorTab('privacy')}
+                >
+                  1. Chính sách bảo mật
+                </button>
+                <button
+                  className={`flex-1 py-4 text-sm font-bold transition-all ${activeVendorTab === 'terms' ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50/30' : 'text-gray-500 hover:bg-gray-50'}`}
+                  onClick={() => setActiveVendorTab('terms')}
+                >
+                  2. Điều khoản sử dụng
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto bg-gray-50/50 custom-scrollbar">
+                <div className="p-6 prose prose-sm max-w-none text-gray-700 space-y-6">
+                  {activeVendorTab === 'privacy' ? (
+                    <div className="space-y-6">
+                      {applyType === 'shipper' ? (
+                        <>
+                          <h4 className="text-gray-900 font-bold text-xl mb-4">Chính sách bảo mật thông tin Shipper</h4>
+                          <p>Chúng tôi cam kết bảo mật thông tin cá nhân và hoạt động giao hàng của bạn. Khi đăng ký làm Shipper, bạn đồng ý cung cấp các thông tin cần thiết để quản lý đơn giao hàng hiệu quả.</p>
+
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">1. Thông Tin Thu Thập</h5>
+                            <p className="mb-2">Chúng tôi thu thập thông tin từ Shipper bao gồm:</p>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Họ tên, số điện thoại, địa chỉ hoạt động</li>
+                              <li>Loại phương tiện vận chuyển</li>
+                              <li>Thông tin về đơn hàng được giao</li>
+                              <li>Lịch sử giao hàng và đánh giá hiệu suất</li>
+                            </ul>
+                          </section>
+
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">2. Sử Dụng Thông Tin</h5>
+                            <p className="mb-2">Thông tin được sử dụng để:</p>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Gán và quản lý đơn giao hàng</li>
+                              <li>Tính toán hoa hồng và lương thưởng</li>
+                              <li>Liên lạc về tình trạng đơn hàng</li>
+                              <li>Đánh giá hiệu suất làm việc</li>
+                              <li>Xử lý tranh chấp và khiếu nại</li>
+                            </ul>
+                          </section>
+
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">3. Phân Công Giao Hàng Theo Vị Trí</h5>
+                            <p>Hệ thống tự động kết nối bạn với các đơn giao hàng dựa trên khu vực hoạt động chính mà bạn đã khai báo. Bạn sẽ nhận được những đơn hàng gần vị trí này. Việc này giúp tối ưu hóa hiệu suất, giảm thời gian giao hàng, và tăng chất lượng dịch vụ.</p>
+                          </section>
+
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">4. Bảo Mật Dữ Liệu</h5>
+                            <p className="mb-2">Chúng tôi bảo vệ thông tin bằng:</p>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Mã hóa dữ liệu nhạy cảm</li>
+                              <li>Kiểm soát quyền truy cập</li>
+                              <li>Giám sát hệ thống liên tục</li>
+                              <li>Cập nhật bảo mật định kỳ</li>
+                            </ul>
+                          </section>
+
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">5. Quyền Của Bạn</h5>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Truy cập và xem thông tin cá nhân</li>
+                              <li>Yêu cầu chỉnh sửa hoặc cập nhật thông tin</li>
+                              <li>Yêu cầu tạm dừng hoạt động từ tài khoản</li>
+                              <li>Khiếu nại về xử lý bất công</li>
+                            </ul>
+                          </section>
+                        </>
+                      ) : (
+                        <div className="space-y-4">
+                          <p>Vendor privacy policy content...</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {applyType === 'shipper' ? (
+                        <>
+                          <h4 className="text-gray-900 font-bold text-xl mb-4">Điều Khoản Và Điều Kiện Làm Shipper</h4>
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">1. Quyền và Trách Nhiệm</h5>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Bạn chịu trách nhiệm giao hàng đúng hạn và an toàn</li>
+                              <li>Tuân thủ tất cả luật pháp giao thông</li>
+                              <li>Duy trì phương tiện giao thông trong tình trạng tốt</li>
+                              <li>Cung cấp dịch vụ khách hàng chuyên nghiệp</li>
+                            </ul>
+                          </section>
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">2. Thanh Toán và Lương Thưởng</h5>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Hoa hồng được tính dựa trên số đơn giao thành công</li>
+                              <li>Thanh toán hàng tuần vào tài khoản ngân hàng</li>
+                              <li>Có thể bị khấu lương vì vi phạm hoặc khiếu nại khách</li>
+                            </ul>
+                          </section>
+                          <section>
+                            <h5 className="font-bold text-gray-900 text-lg mb-2">3. Hủy Và Chấm Dứt</h5>
+                            <ul className="space-y-1 list-disc list-inside ml-4">
+                              <li>Có thể hủy bất cứ lúc nào với thông báo trước</li>
+                              <li>Chúng tôi có quyền chấm dứt vì vi phạm hợp đồng</li>
+                              <li>Sẽ thanh toán đủ cho các đơn hàng đã hoàn thành</li>
+                            </ul>
+                          </section>
+                        </>
+                      ) : (
+                        <div className="space-y-4">
+                          <p>Vendor terms content...</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {applyType === 'shipper' && (
+                  <div className="p-8 bg-white border-y shadow-inner">
+                    <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                      <span className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mr-3 text-sm">3</span>
+                      Thông tin đăng ký hoạt động
+                    </h4>
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">
+                          Khu vực hoạt động chính <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={shipperDiaChiHoatDong}
+                          onChange={(e) => setShipperDiaChiHoatDong(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all bg-gray-50 focus:bg-white"
+                          rows={3}
+                          placeholder="VD: Quận 1, TPHCM hoặc Huyện Bình Chánh, TPHCM"
+                          required
+                        ></textarea>
+                        <p className="text-xs text-gray-500 mt-2 italic flex items-center">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Hệ thống sẽ tự động kết nối bạn với các đơn hàng gần khu vực này.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">
+                          Loại xe <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={shipperLoaiXe}
+                            onChange={(e) => setShipperLoaiXe(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-gray-50 focus:bg-white transition-all cursor-pointer"
+                            required
+                          >
+                            <option value="Xe máy">🛵 Xe máy</option>
+                            <option value="Ô tô">🚗 Ô tô</option>
+                            <option value="Xe tải">🚚 Xe tải</option>
+                            <option value="Xe khác">🚲 Xe khác</option>
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            ▼
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Chọn phương tiện chính bạn sẽ sử dụng để giao hàng.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 bg-white border-t shrink-0">
+                <form onSubmit={submitApplication} className="space-y-6">
+                  <label className="flex items-start gap-4 cursor-pointer group p-4 rounded-2xl hover:bg-primary-50 transition-all border border-transparent hover:border-primary-100">
+                    <div className="relative flex items-center mt-0.5">
+                      <input
+                        type="checkbox"
+                        className="w-6 h-6 rounded-lg border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer transition-all"
+                        checked={applyAgreed}
+                        onChange={(e) => setApplyAgreed(e.target.checked)}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-700 leading-relaxed">
+                      Tôi đã đọc kỹ, hiểu rõ và hoàn toàn đồng ý thỏa thuận với các
+                      <strong className="text-primary-700 mx-1 hover:underline">chính sách bảo mật</strong> và
+                      <strong className="text-primary-700 mx-1 hover:underline">điều khoản sử dụng</strong> dành cho Shipper.
+                    </span>
+                  </label>
+
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={closeApplyModal}
+                      className="flex-1 py-4 px-6 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-gray-200 transition-all active:scale-[0.98]"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button
+                      type="submit"
+                      className={`flex-1 py-4 px-6 rounded-2xl font-bold text-white transition-all shadow-lg active:scale-[0.98] ${applyAgreed ? 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/30 hover:shadow-primary-500/40' : 'bg-gray-300 cursor-not-allowed shadow-none opacity-50'}`}
+                      disabled={!applyAgreed}
+                    >
+                      Xác nhận đăng ký
                     </button>
                   </div>
                 </form>

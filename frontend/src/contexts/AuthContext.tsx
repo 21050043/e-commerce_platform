@@ -10,6 +10,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isStaff: boolean;
   isVendor: boolean;
+  isShipper: boolean;
   loading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
@@ -177,6 +178,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isAdmin = user?.MaVaiTro === 0;
   const isStaff = user?.MaVaiTro === 1;
   const isVendor = user?.MaVaiTro === 3;
+  const isShipper = user?.MaVaiTro === 4;
 
   const value = {
     user,
@@ -184,6 +186,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isAdmin,
     isStaff,
     isVendor,
+    isShipper,
     loading,
     login,
     register,

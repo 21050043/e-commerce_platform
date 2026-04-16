@@ -8,7 +8,7 @@ import { searchProducts } from '../services/product.service';
 import type { ProductResponse as Product } from '../services/product.service';
 
 const Navbar = () => {
-  const { isAuthenticated, isAdmin, isStaff, isVendor, user, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isStaff, isVendor, isShipper, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -125,6 +125,16 @@ const Navbar = () => {
           >
             <Package size={16} className="mr-3 text-primary-600" />
             <span>Khu vực người bán</span>
+          </Link>
+        )}
+        {isShipper && (
+          <Link
+            to="/shipper/orders"
+            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+            onClick={() => setIsDropdownOpen(false)}
+          >
+            <Package size={16} className="mr-3 text-primary-600" />
+            <span>Khu vực Shipper</span>
           </Link>
         )}
 

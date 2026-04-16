@@ -83,6 +83,12 @@ export const API_ENDPOINTS = {
       DELETE: (id: number) => `${API_BASE_URL}/vendor/products/${id}`
     },
   },
+  SHIPPER: {
+    APPLY: `${API_BASE_URL}/shipper/apply`,
+    ORDERS: `${API_BASE_URL}/shipper/orders`,
+    ORDER_BY_ID: (id: number) => `${API_BASE_URL}/shipper/orders/${id}`,
+    UPDATE_STATUS: (id: number) => `${API_BASE_URL}/shipper/orders/${id}/status`,
+  },
   SELLER_ORDER: {
     STATS: `${API_BASE_URL}/seller/orders/stats`,
     GET_ALL: (page = 1, limit = 10, trangThai?: string) =>

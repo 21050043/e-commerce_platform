@@ -11,6 +11,7 @@ import HoaDon from './HoaDon.model';
 import ChiTietHoaDon from './ChiTietHoaDon.model';
 import NguoiBan from './NguoiBan.model';
 import DonHangNguoiBan from './DonHangNguoiBan.model';
+import Shipper from './Shipper.model';
 import { DataTypes } from 'sequelize';
 
 // ─────────────────────────────────────────────
@@ -70,6 +71,12 @@ NguoiBan.hasMany(DonHangNguoiBan, { foreignKey: 'MaNguoiBan', as: 'DonHangNguoiB
 DonHangNguoiBan.belongsTo(NguoiBan, { foreignKey: 'MaNguoiBan', as: 'NguoiBan' });
 
 // ─────────────────────────────────────────────
+// Quan hệ: KhachHang ↔ Shipper (1-1 shipper profile)
+// ─────────────────────────────────────────────
+KhachHang.hasOne(Shipper, { foreignKey: 'MaKhachHang', as: 'Shipper' });
+Shipper.belongsTo(KhachHang, { foreignKey: 'MaKhachHang', as: 'KhachHang' });
+
+// ─────────────────────────────────────────────
 // Khởi tạo models
 // ─────────────────────────────────────────────
 const initializeModels = async () => {
@@ -122,5 +129,6 @@ export {
   ChiTietHoaDon,
   NguoiBan,
   DonHangNguoiBan,
+  Shipper,
   initializeModels,
 };

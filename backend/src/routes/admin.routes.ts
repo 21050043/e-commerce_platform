@@ -39,13 +39,13 @@ const userValidation = [
     .isLength({ min: 6 }).withMessage('Mật khẩu phải có ít nhất 6 ký tự'),
   body('MaVaiTro')
     .notEmpty().withMessage('Vai trò không được để trống')
-    .isIn([0, 1, 2, 3]).withMessage('Vai trò không hợp lệ')
+    .isIn([0, 1, 2, 3, 4]).withMessage('Vai trò không hợp lệ')
 ];
 
 const roleValidation = [
   body('newRole')
     .notEmpty().withMessage('Vai trò mới không được để trống')
-    .isIn([0, 1, 2, 3]).withMessage('Vai trò không hợp lệ')
+    .isIn([0, 1, 2, 3, 4]).withMessage('Vai trò không hợp lệ')
 ];
 
 const orderStatusValidation = [

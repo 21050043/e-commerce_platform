@@ -9,6 +9,21 @@ export default class AdminController {
   private productService = new ProductService();
   private orderService = new OrderService();
 
+  private mapRoleType(roleType: string | undefined): number {
+    switch (roleType) {
+      case 'staff':
+        return 1;
+      case 'customer':
+        return 2;
+      case 'vendor':
+        return 3;
+      case 'shipper':
+        return 4;
+      default:
+        return 2;
+    }
+  }
+
   /**
    * Lấy thông tin tổng quan cho dashboard
    */
@@ -80,8 +95,9 @@ export default class AdminController {
     try {
       const id = parseInt(req.params.id);
       const roleType = req.query.role as string;
+      const role = this.mapRoleType(roleType);
 
-      const user = await this.adminService.getUserById(id, roleType === 'staff' ? 1 : 2);
+      const user = await this.adminService.getUserById(id, role);
       return res.status(200).json(user);
     } catch (error: any) {
       return res.status(404).json({
@@ -121,8 +137,9 @@ export default class AdminController {
       const id = parseInt(req.params.id);
       const userData = req.body;
       const roleType = req.query.role as string;
+      const role = this.mapRoleType(roleType);
 
-      const updatedUser = await this.adminService.updateUser(id, roleType === 'staff' ? 1 : 2, userData);
+      const updatedUser = await this.adminService.updateUser(id, role, userData);
 
       return res.status(200).json({
         message: 'Cập nhật người dùng thành công',
@@ -139,8 +156,9 @@ export default class AdminController {
     try {
       const id = parseInt(req.params.id);
       const roleType = req.query.role as string;
+      const role = this.mapRoleType(roleType);
 
-      await this.adminService.deleteUser(id, roleType === 'staff' ? 1 : 2);
+      await this.adminService.deleteUser(id, role);
 
       return res.status(200).json({
         message: 'Xóa người dùng thành công'
@@ -162,8 +180,9 @@ export default class AdminController {
       const id = parseInt(req.params.id);
       const { newRole } = req.body;
       const roleType = req.query.role as string;
+      const role = this.mapRoleType(roleType);
 
-      await this.adminService.changeUserRole(id, roleType === 'staff' ? 1 : 2, newRole);
+      await this.adminService.changeUserRole(id, role, newRole);
 
       return res.status(200).json({
         message: 'Thay đổi vai trò người dùng thành công'

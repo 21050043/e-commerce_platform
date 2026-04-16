@@ -60,6 +60,12 @@ export interface VendorProfileUpdateRequest {
   SoDienThoaiLienHe?: string;
 }
 
+export interface ShipperApplicationRequest {
+  agreed: boolean;
+  diaChiHoatDong?: string;
+  loaiXe?: string;
+}
+
 export const getUserProfile = async (): Promise<UserResponse> => {
   const response = await api.get(API_ENDPOINTS.USER.GET_PROFILE);
   return response.data;
@@ -88,6 +94,11 @@ export const getMyVendorProfile = async (): Promise<VendorProfileResponse | null
 
 export const updateVendorProfile = async (data: VendorProfileUpdateRequest): Promise<{ message: string; profile: VendorProfileResponse }> => {
   const response = await api.put(API_ENDPOINTS.VENDOR.UPDATE, data);
+  return response.data;
+};
+
+export const applyShipper = async (data: ShipperApplicationRequest): Promise<{ message: string; accessToken: string; expiresIn: number; role: number }> => {
+  const response = await api.post(API_ENDPOINTS.SHIPPER.APPLY, data);
   return response.data;
 };
 

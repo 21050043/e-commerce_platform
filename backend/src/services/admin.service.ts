@@ -322,6 +322,13 @@ export default class AdminService {
     try {
       const { MaVaiTro, MatKhau, SoDienThoai, ...rest } = userData;
 
+      if (MaVaiTro === 4) {
+        const shipperRole = await VaiTro.findByPk(4, { transaction: t });
+        if (!shipperRole) {
+          await VaiTro.create({ MaVaiTro: 4, TenVaiTro: 'Shipper' } as any, { transaction: t });
+        }
+      }
+
       // Kiểm tra số điện thoại đã tồn tại chưa
       let existingUser;
       if (MaVaiTro === 2) {
@@ -473,6 +480,13 @@ export default class AdminService {
         }
 
         // Kiểm tra nếu là admin cuối cùng
+        if (newRole === 4) {
+          const shipperRole = await VaiTro.findByPk(4);
+          if (!shipperRole) {
+            await VaiTro.create({ MaVaiTro: 4, TenVaiTro: 'Shipper' } as any);
+          }
+        }
+
         if (user.MaVaiTro === 0 && newRole !== 0) {
           const adminCount = await NhanVien.count({
             where: { MaVaiTro: 0 }
