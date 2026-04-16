@@ -97,3 +97,16 @@ export interface IDonHangNguoiBan {
   GhiChu?: string | null;
   NgayCapNhat?: Date;
 }
+
+// Interface cho Shipper
+export interface IShipper {
+  MaShipper?: number;
+  MaKhachHang: number;
+  DiaChiHoatDong: string;
+  LoaiXe: string;
+  EmailLienHe?: string;
+  HangGPLX?: string;
+  HeDieuHanh?: string;
+  TrangThai: 'ACTIVE' | 'INACTIVE';
+  NgayDangKy?: Date;
+}

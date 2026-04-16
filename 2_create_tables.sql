@@ -111,4 +111,16 @@ CREATE TABLE IF NOT EXISTS DonHangNguoiBan (
     CONSTRAINT CHK_DHNB_TrangThai CHECK (TrangThai IN ('Đã đặt hàng', 'Đang xử lý', 'Đang giao hàng', 'Đã giao hàng', 'Đã hủy'))
 );
 
-
+-- Create table Shipper
+CREATE TABLE IF NOT EXISTS Shipper (
+    MaShipper INT AUTO_INCREMENT PRIMARY KEY,
+    MaKhachHang INT NOT NULL UNIQUE,
+    DiaChiHoatDong TEXT NOT NULL,
+    LoaiXe VARCHAR(50) NOT NULL,
+    EmailLienHe VARCHAR(150) NULL,
+    HangGPLX VARCHAR(20) NULL,
+    HeDieuHanh VARCHAR(20) NULL,
+    TrangThai ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+    NgayDangKy DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_Shipper_KhachHang FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang)
+);

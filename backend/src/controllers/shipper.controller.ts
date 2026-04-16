@@ -10,7 +10,7 @@ export default class ShipperController {
   public applyShipper = async (req: Request, res: Response): Promise<Response> => {
     try {
       const { id } = req.user!;
-      const { agreed, diaChiHoatDong, loaiXe } = req.body;
+      const { agreed, diaChiHoatDong, loaiXe, emailLienHe, hangGPLX, heDieuHanh } = req.body;
       
       if (!agreed) {
         return res.status(400).json({ message: 'Bạn phải đồng ý với điều khoản để đăng ký shipper' });
@@ -23,6 +23,9 @@ export default class ShipperController {
       await this.shipperService.applyShipper(id, {
         diaChiHoatDong,
         loaiXe,
+        emailLienHe,
+        hangGPLX,
+        heDieuHanh,
       });
 
       const tokens = this.authService.generateTokens({

@@ -6,6 +6,9 @@ interface IShipper {
   MaKhachHang: number;
   DiaChiHoatDong: string;
   LoaiXe: string;
+  EmailLienHe?: string;
+  HangGPLX?: string;
+  HeDieuHanh?: string;
   TrangThai: 'ACTIVE' | 'INACTIVE';
   NgayDangKy: Date;
 }
@@ -17,6 +20,9 @@ class Shipper extends Model<IShipper, ShipperCreationAttributes> implements IShi
   public MaKhachHang!: number;
   public DiaChiHoatDong!: string;
   public LoaiXe!: string;
+  public EmailLienHe?: string;
+  public HangGPLX?: string;
+  public HeDieuHanh?: string;
   public MaNguoiBan?: number;
   public TrangThai!: 'ACTIVE' | 'INACTIVE';
   public NgayDangKy!: Date;
@@ -46,6 +52,18 @@ Shipper.init(
       type: DataTypes.STRING,
       allowNull: false,
       comment: 'Loại xe: Xe máy, Ô tô, Xe tải, v.v.',
+    },
+    EmailLienHe: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    HangGPLX: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    HeDieuHanh: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     TrangThai: {
       type: DataTypes.ENUM('ACTIVE', 'INACTIVE'),

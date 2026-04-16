@@ -13,6 +13,9 @@ const VALID_STATUS = ['Đang giao hàng', 'Đã giao hàng'];
 export interface ShipperApplicationData {
   diaChiHoatDong: string;
   loaiXe: string;
+  emailLienHe?: string;
+  hangGPLX?: string;
+  heDieuHanh?: string;
 }
 
 export default class ShipperService {
@@ -69,6 +72,9 @@ export default class ShipperService {
       MaKhachHang: khachHangId,
       DiaChiHoatDong: data.diaChiHoatDong,
       LoaiXe: data.loaiXe,
+      EmailLienHe: data.emailLienHe,
+      HangGPLX: data.hangGPLX,
+      HeDieuHanh: data.heDieuHanh,
       TrangThai: 'ACTIVE',
     } as any);
 

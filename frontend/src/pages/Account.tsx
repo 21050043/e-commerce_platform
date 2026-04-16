@@ -49,6 +49,55 @@ const Account = () => {
   const [applyAgreed, setApplyAgreed] = useState(false);
   const [shipperDiaChiHoatDong, setShipperDiaChiHoatDong] = useState('');
   const [shipperLoaiXe, setShipperLoaiXe] = useState('Xe máy');
+  const [shipperHangGPLX, setShipperHangGPLX] = useState('A1');
+  const [shipperHeDieuHanh, setShipperHeDieuHanh] = useState('Android');
+  const [shipperEmailLienHe, setShipperEmailLienHe] = useState('');
+
+  // Location states for Shipper Application
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<any>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
+  const [selectedWard, setSelectedWard] = useState<any>(null);
+  const [searchProvince, setSearchProvince] = useState('');
+  const [searchDistrict, setSearchDistrict] = useState('');
+  const [searchWard, setSearchWard] = useState('');
+  const [focusProvince, setFocusProvince] = useState(false);
+  const [focusDistrict, setFocusDistrict] = useState(false);
+  const [focusWard, setFocusWard] = useState(false);
+
+  useEffect(() => {
+    fetch('https://provinces.open-api.vn/api/?depth=1')
+      .then(res => res.json())
+      .then(data => setProvinces(data))
+      .catch(err => console.error('Error fetching provinces:', err));
+  }, []);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      fetch(`https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`)
+        .then(res => res.json())
+        .then(data => setDistricts(data.districts || []))
+        .catch(err => console.error('Error fetching districts:', err));
+      setSelectedDistrict(null);
+      setWards([]);
+      setSelectedWard(null);
+      setSearchDistrict('');
+      setSearchWard('');
+    }
+  }, [selectedProvince]);
+
+  useEffect(() => {
+    if (selectedDistrict) {
+      fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`)
+        .then(res => res.json())
+        .then(data => setWards(data.wards || []))
+        .catch(err => console.error('Error fetching wards:', err));
+      setSelectedWard(null);
+      setSearchWard('');
+    }
+  }, [selectedDistrict]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -225,6 +274,16 @@ const Account = () => {
     setApplyAgreed(false);
     setShipperDiaChiHoatDong('');
     setShipperLoaiXe('Xe máy');
+    setShipperHangGPLX('A1');
+    setShipperHeDieuHanh('Android');
+    setShipperEmailLienHe('');
+    // Reset location states
+    setSelectedProvince(null);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    setSearchProvince('');
+    setSearchDistrict('');
+    setSearchWard('');
   };
 
   const submitApplication = async (e: React.FormEvent) => {
@@ -236,15 +295,20 @@ const Account = () => {
       }
 
       if (applyType === 'shipper') {
-        if (!shipperDiaChiHoatDong.trim()) {
-          addToast('Vui lòng nhập khu vực hoạt động', 'error');
+        if (!selectedProvince || !selectedDistrict || !selectedWard) {
+          addToast('Vui lòng chọn đầy đủ khu vực hoạt động', 'error');
           return;
         }
 
+        const fullLocation = `${selectedWard.name}, ${selectedDistrict.name}, ${selectedProvince.name}`;
+
         const response = await applyShipper({
           agreed: true,
-          diaChiHoatDong: shipperDiaChiHoatDong,
+          diaChiHoatDong: fullLocation,
           loaiXe: shipperLoaiXe,
+          hangGPLX: shipperHangGPLX,
+          heDieuHanh: shipperHeDieuHanh,
+          emailLienHe: shipperEmailLienHe,
         });
 
         if (response.accessToken) {
@@ -926,51 +990,240 @@ const Account = () => {
                 </div>
 
                 {applyType === 'shipper' && (
-                  <div className="p-8 bg-white border-y shadow-inner">
-                    <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
-                      <span className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mr-3 text-sm">3</span>
-                      Thông tin đăng ký hoạt động
-                    </h4>
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-gray-700 font-bold mb-2">
-                          Khu vực hoạt động chính <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          value={shipperDiaChiHoatDong}
-                          onChange={(e) => setShipperDiaChiHoatDong(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all bg-gray-50 focus:bg-white"
-                          rows={3}
-                          placeholder="VD: Quận 1, TPHCM hoặc Huyện Bình Chánh, TPHCM"
-                          required
-                        ></textarea>
-                        <p className="text-xs text-gray-500 mt-2 italic flex items-center">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                          Hệ thống sẽ tự động kết nối bạn với các đơn hàng gần khu vực này.
-                        </p>
-                      </div>
+                  <div className="p-8 bg-white border-y shadow-inner space-y-10">
+                    {/* Mục 1: Hồ sơ pháp lý và cá nhân */}
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                        <span className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mr-3 text-sm">3</span>
+                        1. Hồ sơ pháp lý và cá nhân
+                      </h4>
+                      
+                      <div className="space-y-6 ml-11">
+                        {/* CCCD (Simulation) */}
+                        <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                          <label className="block text-gray-700 font-bold mb-1">Căn cước công dân (CCCD)</label>
+                          <p className="text-sm text-primary-600 font-medium italic">"Đây là dự án mô phỏng, không cần cung cấp thông tin này"</p>
+                        </div>
 
-                      <div>
-                        <label className="block text-gray-700 font-bold mb-2">
-                          Loại xe <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={shipperLoaiXe}
-                            onChange={(e) => setShipperLoaiXe(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-gray-50 focus:bg-white transition-all cursor-pointer"
-                            required
-                          >
-                            <option value="Xe máy">🛵 Xe máy</option>
-                            <option value="Ô tô">🚗 Ô tô</option>
-                            <option value="Xe tải">🚚 Xe tải</option>
-                            <option value="Xe khác">🚲 Xe khác</option>
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                            ▼
+                        {/* Loại xe */}
+                        <div>
+                          <label className="block text-gray-700 font-bold mb-2">
+                            Loại xe <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={shipperLoaiXe}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setShipperLoaiXe(val);
+                                // Reset rank default based on vehicle
+                                if (val === 'Xe máy') setShipperHangGPLX('A1');
+                                else if (val === 'Ô tô' || val === 'Xe tải') setShipperHangGPLX('B1');
+                                else setShipperHangGPLX('');
+                              }}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none bg-gray-50 focus:bg-white transition-all cursor-pointer"
+                              required
+                            >
+                              <option value="Xe máy">🛵 Xe máy</option>
+                              <option value="Ô tô">🚗 Ô tô</option>
+                              <option value="Xe tải">🚚 Xe tải</option>
+                              <option value="Xe khác">🚲 Xe khác</option>
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                              ▼
+                            </div>
                           </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">Chọn phương tiện chính bạn sẽ sử dụng để giao hàng.</p>
+
+                        {/* GPLX */}
+                        {(shipperLoaiXe === 'Xe máy' || shipperLoaiXe === 'Ô tô' || shipperLoaiXe === 'Xe tải') && (
+                          <div>
+                            <label className="block text-gray-700 font-bold mb-3">
+                              Giấy phép lái xe (GPLX) <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex flex-wrap gap-4">
+                              {(shipperLoaiXe === 'Xe máy' 
+                                ? ['A1', 'A2'] 
+                                : ['B1', 'B2', 'C']
+                              ).map((rank) => (
+                                <label key={rank} className={`flex items-center px-4 py-2 border rounded-xl cursor-pointer transition-all ${shipperHangGPLX === rank ? 'bg-primary-50 border-primary-500 text-primary-700' : 'bg-white border-gray-200 text-gray-600 hover:border-primary-300'}`}>
+                                  <input
+                                    type="radio"
+                                    name="hangGPLX"
+                                    className="hidden"
+                                    value={rank}
+                                    checked={shipperHangGPLX === rank}
+                                    onChange={(e) => setShipperHangGPLX(e.target.value)}
+                                  />
+                                  <span className="font-bold">Hạng {rank}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Cà-vẹt (Simulation) */}
+                        <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                          <label className="block text-gray-700 font-bold mb-1">Giấy đăng ký xe (Cà-vẹt xe)</label>
+                          <p className="text-sm text-primary-600 font-medium italic">"Đây là dự án mô phỏng, không cần cung cấp thông tin này"</p>
+                        </div>
+
+                        {/* Lý lịch tư pháp (Simulation) */}
+                        <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                          <label className="block text-gray-700 font-bold mb-1">Lý lịch tư pháp (Bản gốc - Mẫu số 1)</label>
+                          <p className="text-sm text-gray-500 mb-1">Thời hạn cấp thường yêu cầu trong vòng 10-12 tháng gần nhất.</p>
+                          <p className="text-sm text-primary-600 font-medium italic">"Đây là dự án mô phỏng, không cần cung cấp thông tin này"</p>
+                        </div>
+
+                        {/* Khu vực hoạt động */}
+                        <div>
+                          <label className="block text-gray-700 font-bold mb-4">
+                            Khu vực hoạt động chính <span className="text-red-500">*</span>
+                          </label>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Province */}
+                            <div className="relative">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block ml-1">Tỉnh / Thành</label>
+                              <input
+                                type="text"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all outline-none"
+                                placeholder="Chọn..."
+                                value={searchProvince}
+                                onChange={e => setSearchProvince(e.target.value)}
+                                onFocus={() => setFocusProvince(true)}
+                                onBlur={() => setTimeout(() => setFocusProvince(false), 200)}
+                              />
+                              {focusProvince && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-1 custom-scrollbar">
+                                  {provinces.filter(p => p.name.toLowerCase().includes(searchProvince.toLowerCase())).map(p => (
+                                    <li
+                                      key={p.code}
+                                      onMouseDown={() => { setSelectedProvince(p); setSearchProvince(p.name); }}
+                                      className="px-4 py-2 rounded-lg hover:bg-primary-50 cursor-pointer font-bold text-gray-700 text-sm transition-colors"
+                                    >
+                                      {p.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+
+                            {/* District */}
+                            <div className="relative">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block ml-1">Quận / Huyện</label>
+                              <input
+                                type="text"
+                                disabled={!selectedProvince}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all outline-none disabled:opacity-40"
+                                placeholder="Chọn..."
+                                value={searchDistrict}
+                                onChange={e => setSearchDistrict(e.target.value)}
+                                onFocus={() => setFocusDistrict(true)}
+                                onBlur={() => setTimeout(() => setFocusDistrict(false), 200)}
+                              />
+                              {focusDistrict && selectedProvince && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-1 custom-scrollbar">
+                                  {districts.filter(d => d.name.toLowerCase().includes(searchDistrict.toLowerCase())).map(d => (
+                                    <li
+                                      key={d.code}
+                                      onMouseDown={() => { setSelectedDistrict(d); setSearchDistrict(d.name); }}
+                                      className="px-4 py-2 rounded-lg hover:bg-primary-50 cursor-pointer font-bold text-gray-700 text-sm transition-colors"
+                                    >
+                                      {d.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+
+                            {/* Ward */}
+                            <div className="relative">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block ml-1">Phường / Xã</label>
+                              <input
+                                type="text"
+                                disabled={!selectedDistrict}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all outline-none disabled:opacity-40"
+                                placeholder="Chọn..."
+                                value={searchWard}
+                                onChange={e => setSearchWard(e.target.value)}
+                                onFocus={() => setFocusWard(true)}
+                                onBlur={() => setTimeout(() => setFocusWard(false), 200)}
+                              />
+                              {focusWard && selectedDistrict && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-1 custom-scrollbar">
+                                  {wards.filter(w => w.name.toLowerCase().includes(searchWard.toLowerCase())).map(w => (
+                                    <li
+                                      key={w.code}
+                                      onMouseDown={() => { setSelectedWard(w); setSearchWard(w.name); }}
+                                      className="px-4 py-2 rounded-lg hover:bg-primary-50 cursor-pointer font-bold text-gray-700 text-sm transition-colors"
+                                    >
+                                      {w.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-gray-500 mt-3 italic flex items-center font-bold uppercase tracking-wider">
+                            <AlertTriangle className="w-3 h-3 mr-1 text-primary-500" />
+                            Hệ thống sẽ kết nối bạn với các đơn hàng gần khu vực này.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mục 2: Công cụ và Tài chính điện tử */}
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                        <span className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mr-3 text-sm">4</span>
+                        2. Công cụ và Tài chính điện tử
+                      </h4>
+                      
+                      <div className="space-y-6 ml-11">
+                        {/* Smartphone */}
+                        <div>
+                          <label className="block text-gray-700 font-bold mb-3">
+                            Điện thoại thông minh <span className="text-red-500">*</span>
+                          </label>
+                          <div className="flex gap-4">
+                            {['Android', 'iOS'].map((os) => (
+                              <label key={os} className={`flex-1 flex items-center justify-center px-4 py-3 border rounded-xl cursor-pointer transition-all ${shipperHeDieuHanh === os ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:border-primary-300'}`}>
+                                <input
+                                  type="radio"
+                                  name="heDieuHanh"
+                                  className="hidden"
+                                  value={os}
+                                  checked={shipperHeDieuHanh === os}
+                                  onChange={(e) => setShipperHeDieuHanh(e.target.value)}
+                                />
+                                <span className="font-bold">{os}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* ShopeePay (Simulation) */}
+                        <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                          <label className="block text-gray-700 font-bold mb-1">Ví điện tử ShopeePay</label>
+                          <p className="text-sm text-gray-500 mb-1">Xác thực và liên kết với tài khoản ngân hàng chính chủ để nhận thu nhập.</p>
+                          <p className="text-sm text-primary-600 font-medium italic">"Đây là dự án mô phỏng, không cần cung cấp thông tin này"</p>
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                          <label className="block text-gray-700 font-bold mb-2">
+                            Email cá nhân <span className="text-gray-400 font-normal ml-1">(Không bắt buộc)</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={shipperEmailLienHe}
+                            onChange={(e) => setShipperEmailLienHe(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all bg-gray-50 focus:bg-white"
+                            placeholder="Email nhận hợp đồng điện tử..."
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

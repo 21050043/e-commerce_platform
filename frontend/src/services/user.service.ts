@@ -62,8 +62,11 @@ export interface VendorProfileUpdateRequest {
 
 export interface ShipperApplicationRequest {
   agreed: boolean;
-  diaChiHoatDong?: string;
-  loaiXe?: string;
+  diaChiHoatDong: string;
+  loaiXe: string;
+  hangGPLX?: string;
+  heDieuHanh?: string;
+  emailLienHe?: string;
 }
 
 export const getUserProfile = async (): Promise<UserResponse> => {

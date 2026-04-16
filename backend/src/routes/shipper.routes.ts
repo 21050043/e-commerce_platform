@@ -20,6 +20,18 @@ router.post(
     .trim()
     .notEmpty().withMessage('Loại xe không được để trống')
     .isIn(['Xe máy', 'Ô tô', 'Xe tải', 'Xe khác']).withMessage('Loại xe không hợp lệ'),
+  body('emailLienHe')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isEmail().withMessage('Email không hợp lệ'),
+  body('hangGPLX')
+    .optional()
+    .trim()
+    .isIn(['A1', 'A2', 'B1', 'B2', 'C', '']).withMessage('Hạng GPLX không hợp lệ'),
+  body('heDieuHanh')
+    .trim()
+    .notEmpty().withMessage('Hệ điều hành điện thoại không được để trống')
+    .isIn(['Android', 'iOS']).withMessage('Hệ điều hành không hợp lệ'),
   shipperController.applyShipper
 );
 
