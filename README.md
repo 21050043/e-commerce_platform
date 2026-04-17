@@ -26,11 +26,11 @@
 
 | Thanh Toán          | Giỏ Hàng            | Hoá đơn            |
 |---------------------|---------------------|--------------------|
-| ![Checkout](demo/payment.png) | ![Cart](demo/cart.png) | ![Order](demo/order.png) |
+| ![Checkout](demo/payment_1.png) | ![Cart](demo/cart.png) | ![Order](demo/order.png) |
 
-| Admin Dashboard     | Quản lý sản phẩm    | Quản lý đơn hàng   |
+| Vendor Dashboard     | Quản lý sản phẩm    | Quản lý đơn hàng   |
 |---------------------|---------------------|--------------------|
-| ![Dashboard](demo/dashboard.png) | ![Product_management](demo/product_management.png) | ![Order_management](demo/order_management.png) |
+| ![Dashboard](demo/vendor_dashboard.png) | ![Product_management](demo/product_management.png) | ![Order_management](demo/order_management.png) |
 
 ## 🛠 Công Nghệ Sử Dụng
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
