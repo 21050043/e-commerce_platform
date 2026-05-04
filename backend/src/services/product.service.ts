@@ -17,7 +17,11 @@ export default class ProductService {
       
       const { count, rows } = await SanPham.findAndCountAll({
         where: whereClause,
-        include: [{ model: DanhMuc, as: 'DanhMuc' }, { model: NguoiBan, as: 'NguoiBan' }],
+        include: [
+          { model: DanhMuc, as: 'DanhMuc' },
+          // Vacation Mode: chỉ hiển thị sản phẩm của shop đang ACTIVE
+          { model: NguoiBan, as: 'NguoiBan', where: { TrangThaiHoatDong: 'ACTIVE' }, required: true }
+        ],
         limit,
         offset,
         order: [['NgayCapNhat', 'DESC']]
@@ -97,7 +101,10 @@ export default class ProductService {
       
       const { count, rows } = await SanPham.findAndCountAll({
         where: whereClause,
-        include: [{ model: DanhMuc, as: 'DanhMuc' }, { model: NguoiBan, as: 'NguoiBan' }],
+        include: [
+          { model: DanhMuc, as: 'DanhMuc' },
+          { model: NguoiBan, as: 'NguoiBan', where: { TrangThaiHoatDong: 'ACTIVE' }, required: true }
+        ],
         limit,
         offset,
         order: [['NgayCapNhat', 'DESC']]
@@ -131,7 +138,10 @@ export default class ProductService {
       
       const { count, rows } = await SanPham.findAndCountAll({
         where: whereClause,
-        include: [{ model: DanhMuc, as: 'DanhMuc' }, { model: NguoiBan, as: 'NguoiBan' }],
+        include: [
+          { model: DanhMuc, as: 'DanhMuc' },
+          { model: NguoiBan, as: 'NguoiBan', where: { TrangThaiHoatDong: 'ACTIVE' }, required: true }
+        ],
         limit,
         offset,
         order: [['NgayCapNhat', 'DESC']]
@@ -338,6 +348,7 @@ export default class ProductService {
           TenCuaHang: vendor.TenCuaHang,
           DiaChiKinhDoanh: vendor.DiaChiKinhDoanh,
           SoDienThoaiLienHe: vendor.SoDienThoaiLienHe,
+          TrangThaiHoatDong: (vendor as any).TrangThaiHoatDong ?? 'ACTIVE',
           KhachHang: (vendor as any).KhachHang ? {
             TenKhachHang: (vendor as any).KhachHang.TenKhachHang
           } : undefined

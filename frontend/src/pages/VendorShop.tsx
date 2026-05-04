@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { ChevronRight, Star, Loader, AlertTriangle, Store, Phone, MapPin } from 'lucide-react';
+import { ChevronRight, Star, Loader, AlertTriangle, Store, Phone, MapPin, Palmtree } from 'lucide-react';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 import { formatCurrency } from '../utils/format';
@@ -12,6 +12,7 @@ interface VendorShopData {
     TenCuaHang: string;
     DiaChiKinhDoanh: string;
     SoDienThoaiLienHe: string;
+    TrangThaiHoatDong?: 'ACTIVE' | 'VACATION';
     KhachHang?: {
       TenKhachHang: string;
     };
@@ -154,6 +155,21 @@ const VendorShop = () => {
           </div>
         </div>
       </section>
+
+      {/* Vacation Mode Banner */}
+      {shopData.vendor.TrangThaiHoatDong === 'VACATION' && (
+        <div className="bg-amber-50 border-y border-amber-200 py-4">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-3 text-amber-800">
+              <Palmtree size={22} className="text-amber-600 flex-shrink-0" />
+              <div>
+                <p className="font-bold">Cửa hàng đang tạm nghỉ (Vacation Mode)</p>
+                <p className="text-sm text-amber-700">Hiện tại cửa hàng không nhận đơn hàng mới. Bạn vẫn có thể xem sản phẩm nhưng chưa thể đặt mua lúc này.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Products Section */}
       <section className="py-12">
