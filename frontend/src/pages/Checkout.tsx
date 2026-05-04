@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '../layouts/MainLayout';
@@ -24,6 +24,7 @@ interface CheckoutForm {
 }
 
 const Checkout = () => {
+  const isFirstLoad = useRef(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formData, setFormData] = useState<CheckoutForm>({
@@ -48,7 +49,7 @@ const Checkout = () => {
   const [focusDistrict, setFocusDistrict] = useState(false);
   const [focusWard, setFocusWard] = useState(false);
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { cart: cartItems, clearAll } = useCart();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -64,11 +65,13 @@ const Checkout = () => {
       fetch(`https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`)
         .then(res => res.json())
         .then(data => setDistricts(data.districts || []));
-      setSelectedDistrict(null);
-      setWards([]);
-      setSelectedWard(null);
-      setSearchDistrict('');
-      setSearchWard('');
+      if (!isFirstLoad.current) {
+        setSelectedDistrict(null);
+        setWards([]);
+        setSelectedWard(null);
+        setSearchDistrict('');
+        setSearchWard('');
+      }
     }
   }, [selectedProvince]);
 
@@ -77,8 +80,10 @@ const Checkout = () => {
       fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`)
         .then(res => res.json())
         .then(data => setWards(data.wards || []));
-      setSelectedWard(null);
-      setSearchWard('');
+      if (!isFirstLoad.current) {
+        setSelectedWard(null);
+        setSearchWard('');
+      }
     }
   }, [selectedDistrict]);
 
@@ -93,6 +98,36 @@ const Checkout = () => {
       return;
     }
 
+    // Auto-fill address from user profile
+    if (user && user.DiaChi) {
+      try {
+        if (user.DiaChi.startsWith('{')) {
+          const parsedAddress = JSON.parse(user.DiaChi);
+          if (parsedAddress.province) {
+            setSelectedProvince(parsedAddress.province);
+            setSearchProvince(parsedAddress.province.name);
+          }
+          if (parsedAddress.district) {
+            setSelectedDistrict(parsedAddress.district);
+            setSearchDistrict(parsedAddress.district.name);
+          }
+          if (parsedAddress.ward) {
+            setSelectedWard(parsedAddress.ward);
+            setSearchWard(parsedAddress.ward.name);
+          }
+          if (parsedAddress.detail) {
+            setAddressDetail(parsedAddress.detail);
+          }
+        } else {
+          // Fallback if it's just a plain string
+          setAddressDetail(user.DiaChi);
+        }
+      } catch (e) {
+        console.error('Error parsing user address:', e);
+        setAddressDetail(user.DiaChi);
+      }
+    }
+
     const formattedCart = cartItems.map(item => ({
       productId: item.product.MaSanPham,
       name: item.product.TenSanPham,
@@ -102,7 +137,12 @@ const Checkout = () => {
     }));
 
     setCart(formattedCart);
-  }, [isAuthenticated, navigate, cartItems]);
+
+    // Mark initial load as complete after a short delay
+    setTimeout(() => {
+      isFirstLoad.current = false;
+    }, 1000);
+  }, [isAuthenticated, navigate, cartItems, user]);
 
   const calculateTotalPrice = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);

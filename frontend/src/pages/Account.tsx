@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, User, Save, Loader, AlertTriangle, LogOut } from 'lucide-react';
@@ -48,6 +48,7 @@ const Account = () => {
   const [applyType, setApplyType] = useState<'vendor' | 'shipper'>('vendor');
   const [applyAgreed, setApplyAgreed] = useState(false);
   const [shipperDiaChiHoatDong, setShipperDiaChiHoatDong] = useState('');
+  const isFirstLoad = useRef(true);
   const [shipperLoaiXe, setShipperLoaiXe] = useState('Xe máy');
   const [shipperHangGPLX, setShipperHangGPLX] = useState('A1');
   const [shipperHeDieuHanh, setShipperHeDieuHanh] = useState('Android');
@@ -80,11 +81,13 @@ const Account = () => {
         .then(res => res.json())
         .then(data => setDistricts(data.districts || []))
         .catch(err => console.error('Error fetching districts:', err));
-      setSelectedDistrict(null);
-      setWards([]);
-      setSelectedWard(null);
-      setSearchDistrict('');
-      setSearchWard('');
+      if (!isFirstLoad.current) {
+        setSelectedDistrict(null);
+        setWards([]);
+        setSelectedWard(null);
+        setSearchDistrict('');
+        setSearchWard('');
+      }
     }
   }, [selectedProvince]);
 
@@ -94,8 +97,10 @@ const Account = () => {
         .then(res => res.json())
         .then(data => setWards(data.wards || []))
         .catch(err => console.error('Error fetching wards:', err));
-      setSelectedWard(null);
-      setSearchWard('');
+      if (!isFirstLoad.current) {
+        setSelectedWard(null);
+        setSearchWard('');
+      }
     }
   }, [selectedDistrict]);
 
@@ -106,6 +111,16 @@ const Account = () => {
     }
 
     if (user) {
+      // Cố gắng parse địa chỉ nếu là JSON (địa chỉ có cấu trúc)
+      let parsedDiaChi = { detail: user.DiaChi || '', province: null, district: null, ward: null };
+      try {
+        if (user.DiaChi && user.DiaChi.startsWith('{')) {
+          parsedDiaChi = JSON.parse(user.DiaChi);
+        }
+      } catch (e) {
+        console.error('Error parsing address JSON:', e);
+      }
+
       setFormData({
         TenKhachHang: user.TenKhachHang || user.TenNhanVien || '',
         SoDienThoai: user.SoDienThoai || '',
@@ -114,7 +129,29 @@ const Account = () => {
         MatKhauMoi: '',
         XacNhanMatKhau: '',
       });
+
+      // Nếu có địa chỉ cấu trúc, cập nhật các state tương ứng
+      if (parsedDiaChi.province) {
+        setSelectedProvince(parsedDiaChi.province);
+        setSearchProvince(parsedDiaChi.province.name);
+      }
+      if (parsedDiaChi.district) {
+        setSelectedDistrict(parsedDiaChi.district);
+        setSearchDistrict(parsedDiaChi.district.name);
+      }
+      if (parsedDiaChi.ward) {
+        setSelectedWard(parsedDiaChi.ward);
+        setSearchWard(parsedDiaChi.ward.name);
+      }
+      if (parsedDiaChi.detail) {
+        setFormData(prev => ({ ...prev, DiaChi: parsedDiaChi.detail }));
+      }
+
       setLoading(false);
+      // Đánh dấu đã xong lần load đầu tiên sau một khoảng trễ ngắn để các useEffect địa chỉ chạy xong
+      setTimeout(() => {
+        isFirstLoad.current = false;
+      }, 1000);
     }
     (async () => {
       try {
@@ -151,9 +188,20 @@ const Account = () => {
       setSuccessMessage(null);
       setSubmitting(true);
 
+      // Chuẩn bị payload với địa chỉ dạng JSON nếu đã chọn đủ Tỉnh/Huyện/Xã
+      let finalDiaChi = formData.DiaChi;
+      if (selectedProvince && selectedDistrict && selectedWard) {
+        finalDiaChi = JSON.stringify({
+          detail: formData.DiaChi,
+          province: { code: selectedProvince.code, name: selectedProvince.name },
+          district: { code: selectedDistrict.code, name: selectedDistrict.name },
+          ward: { code: selectedWard.code, name: selectedWard.name }
+        });
+      }
+
       const payload: any = {
         SoDienThoai: formData.SoDienThoai,
-        DiaChi: formData.DiaChi,
+        DiaChi: finalDiaChi,
       };
       if (user?.MaVaiTro === 2 || user?.MaVaiTro === 3) {
         payload['TenKhachHang'] = formData.TenKhachHang;
@@ -161,6 +209,7 @@ const Account = () => {
         payload['TenNhanVien'] = formData.TenKhachHang;
       }
       await api.put(API_ENDPOINTS.USER.UPDATE_PROFILE, payload);
+      await refreshUser();
 
       if (user?.MaVaiTro === 3 && vendorProfile && vendorProfile.TrangThai === 'APPROVED' && formData.DiaChiKinhDoanh) {
         try {
@@ -511,18 +560,105 @@ const Account = () => {
                           />
                         </div>
 
-                        <div>
-                          <label className="block text-gray-700 mb-2">
-                            Địa chỉ nhận hàng
-                          </label>
-                          <textarea
-                            name="DiaChi"
-                            value={formData.DiaChi}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            rows={3}
-                            required
-                          ></textarea>
+                        <div className="pt-2">
+                          <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 ml-1">Địa chỉ nhận hàng</label>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            {/* Province */}
+                            <div className="relative">
+                              <label className="text-[10px] font-bold text-gray-500 mb-2 block ml-1 uppercase">Tỉnh / Thành</label>
+                              <input
+                                type="text"
+                                className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all text-sm"
+                                placeholder="Chọn..."
+                                value={searchProvince}
+                                onChange={e => setSearchProvince(e.target.value)}
+                                onFocus={() => setFocusProvince(true)}
+                                onBlur={() => setTimeout(() => setFocusProvince(false), 200)}
+                              />
+                              {focusProvince && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-2 scrollbar-thin">
+                                  {provinces.filter(p => p.name.toLowerCase().includes(searchProvince.toLowerCase())).map(p => (
+                                    <li
+                                      key={p.code}
+                                      onMouseDown={() => { setSelectedProvince(p); setSearchProvince(p.name); }}
+                                      className="px-4 py-2 rounded-xl hover:bg-primary-50 cursor-pointer font-bold text-gray-700 transition-colors text-sm"
+                                    >
+                                      {p.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+
+                            {/* District */}
+                            <div className="relative">
+                              <label className="text-[10px] font-bold text-gray-500 mb-2 block ml-1 uppercase">Quận / Huyện</label>
+                              <input
+                                type="text"
+                                disabled={!selectedProvince}
+                                className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all disabled:opacity-40 text-sm"
+                                placeholder="Chọn..."
+                                value={searchDistrict}
+                                onChange={e => setSearchDistrict(e.target.value)}
+                                onFocus={() => setFocusDistrict(true)}
+                                onBlur={() => setTimeout(() => setFocusDistrict(false), 200)}
+                              />
+                              {focusDistrict && selectedProvince && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-2 scrollbar-thin">
+                                  {districts.filter(d => d.name.toLowerCase().includes(searchDistrict.toLowerCase())).map(d => (
+                                    <li
+                                      key={d.code}
+                                      onMouseDown={() => { setSelectedDistrict(d); setSearchDistrict(d.name); }}
+                                      className="px-4 py-2 rounded-xl hover:bg-primary-50 cursor-pointer font-bold text-gray-700 transition-colors text-sm"
+                                    >
+                                      {d.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+
+                            {/* Ward */}
+                            <div className="relative">
+                              <label className="text-[10px] font-bold text-gray-500 mb-2 block ml-1 uppercase">Phường / Xã</label>
+                              <input
+                                type="text"
+                                disabled={!selectedDistrict}
+                                className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all disabled:opacity-40 text-sm"
+                                placeholder="Chọn..."
+                                value={searchWard}
+                                onChange={e => setSearchWard(e.target.value)}
+                                onFocus={() => setFocusWard(true)}
+                                onBlur={() => setTimeout(() => setFocusWard(false), 200)}
+                              />
+                              {focusWard && selectedDistrict && (
+                                <ul className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-48 overflow-y-auto p-2 scrollbar-thin">
+                                  {wards.filter(w => w.name.toLowerCase().includes(searchWard.toLowerCase())).map(w => (
+                                    <li
+                                      key={w.code}
+                                      onMouseDown={() => { setSelectedWard(w); setSearchWard(w.name); }}
+                                      className="px-4 py-2 rounded-xl hover:bg-primary-50 cursor-pointer font-bold text-gray-700 transition-colors text-sm"
+                                    >
+                                      {w.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="relative group">
+                            <label className="text-[10px] font-bold text-gray-500 mb-2 block ml-1 uppercase">Địa chỉ cụ thể</label>
+                            <textarea
+                              name="DiaChi"
+                              value={formData.DiaChi}
+                              onChange={handleInputChange}
+                              placeholder="Số nhà, tên đường..."
+                              className="w-full bg-gray-50 border-none rounded-2xl px-4 py-4 font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 transition-all outline-none text-sm min-h-[100px]"
+                              required
+                            ></textarea>
+                          </div>
                         </div>
 
                         {user?.MaVaiTro === 3 && vendorProfile && vendorProfile.TrangThai === 'APPROVED' && (

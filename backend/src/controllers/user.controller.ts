@@ -36,8 +36,10 @@ export default class UserController {
       // Lấy thông tin từ user đã xác thực
       const { id, role } = req.user!;
       
+      const isKhachHangTable = [2, 3, 4].includes(role);
+      
       const userData = {
-        ...(role === 2 ? { TenKhachHang: req.body.TenKhachHang } : { TenNhanVien: req.body.TenNhanVien }),
+        ...(isKhachHangTable ? { TenKhachHang: req.body.TenKhachHang } : { TenNhanVien: req.body.TenNhanVien }),
         SoDienThoai: req.body.SoDienThoai,
         DiaChi: req.body.DiaChi,
       };

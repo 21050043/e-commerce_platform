@@ -51,7 +51,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // Tự động refresh token khi khởi động ứng dụng
           try {
             await refreshToken();
-            setUser(storedUser);
+            // Lấy thông tin người dùng mới nhất từ server
+            const userData = await getUserProfile();
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
 
             // Thiết lập interval để refresh token tự động (mỗi 14 phút)
             // Token thường có thời hạn 15 phút, refresh trước 1 phút

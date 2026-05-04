@@ -10,13 +10,13 @@ export default class UserService {
     try {
       let user;
 
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng, Người bán, hoặc Shipper (Lưu trong bảng KhachHang)
         user = await KhachHang.findByPk(id, {
           attributes: { exclude: ['MatKhau'] }
         });
       } else {
-        // Nhân viên hoặc Admin
+        // Nhân viên hoặc Admin (Lưu trong bảng NhanVien)
         user = await NhanVien.findByPk(id, {
           attributes: { exclude: ['MatKhau'] }
         });
@@ -37,8 +37,8 @@ export default class UserService {
    */
   public async updateUser(id: number, role: number, userData: any) {
     try {
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng, Người bán, hoặc Shipper
         const user = await KhachHang.findByPk(id);
         
         if (!user) {
@@ -74,8 +74,8 @@ export default class UserService {
    */
   public async updatePassword(id: number, role: number, hashedPassword: string) {
     try {
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng, Người bán, hoặc Shipper
         const user = await KhachHang.findByPk(id);
         
         if (!user) {

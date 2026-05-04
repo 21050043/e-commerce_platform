@@ -289,14 +289,14 @@ export default class AdminService {
     try {
       let user;
 
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng, Người bán, hoặc Shipper (Lưu trong bảng KhachHang)
         user = await KhachHang.findByPk(id, {
           attributes: { exclude: ['MatKhau'] },
           include: [{ model: VaiTro, as: 'VaiTro' }]
         });
       } else {
-        // Nhân viên hoặc Admin
+        // Nhân viên hoặc Admin (Lưu trong bảng NhanVien)
         user = await NhanVien.findByPk(id, {
           attributes: { exclude: ['MatKhau'] },
           include: [{ model: VaiTro, as: 'VaiTro' }]
@@ -329,9 +329,11 @@ export default class AdminService {
         }
       }
 
+      const isKhachHangTable = [2, 3, 4].includes(MaVaiTro);
+      
       // Kiểm tra số điện thoại đã tồn tại chưa
       let existingUser;
-      if (MaVaiTro === 2) {
+      if (isKhachHangTable) {
         existingUser = await KhachHang.findOne({ where: { SoDienThoai } });
       } else {
         existingUser = await NhanVien.findOne({ where: { SoDienThoai } });
@@ -342,8 +344,8 @@ export default class AdminService {
 
       let newUser;
 
-      if (MaVaiTro === 2) {
-        // Tạo khách hàng
+      if (isKhachHangTable) {
+        // Tạo khách hàng/người bán/shipper
         newUser = await KhachHang.create({
           ...rest,
           MaVaiTro,
@@ -381,8 +383,8 @@ export default class AdminService {
       // Không cho phép cập nhật mật khẩu qua API này
       const { MatKhau, ...updateData } = userData;
 
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng/Người bán/Shipper
         const user = await KhachHang.findByPk(id);
 
         if (!user) {
@@ -420,8 +422,8 @@ export default class AdminService {
    */
   public async deleteUser(id: number, role: number) {
     try {
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng/Người bán/Shipper
         const user = await KhachHang.findByPk(id);
 
         if (!user) {
@@ -462,8 +464,8 @@ export default class AdminService {
    */
   public async changeUserRole(id: number, role: number, newRole: number) {
     try {
-      if (role === 2) {
-        // Khách hàng
+      if (role === 2 || role === 3 || role === 4) {
+        // Khách hàng/Người bán/Shipper
         const user = await KhachHang.findByPk(id);
 
         if (!user) {

@@ -62,8 +62,9 @@ export default class OrderController {
       const orderId = parseInt(req.params.id);
       const order = await this.orderService.getOrderById(orderId);
 
-      // Khách hàng chỉ xem đơn hàng của mình
-      if (req.user!.role === 2 && (order as any).MaKhachHang !== req.user!.id) {
+      // Khách hàng/Người bán/Shipper chỉ được xem đơn hàng của chính họ
+      const isCustomerRole = [2, 3, 4].includes(req.user!.role);
+      if (isCustomerRole && (order as any).MaKhachHang !== req.user!.id) {
         return res.status(403).json({ message: 'Bạn không có quyền xem đơn hàng này' });
       }
 
