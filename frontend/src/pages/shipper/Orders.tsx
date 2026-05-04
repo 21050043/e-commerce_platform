@@ -8,6 +8,7 @@ import {
   type ShipperOrderResponse,
 } from '../../services/shipper-order.service';
 import { formatCurrency, formatDate } from '../../utils/format';
+import { API_ROOT_URL } from '../../constants/api';
 import { useToast } from '../../contexts/ToastContext';
 
 const STATUS_OPTIONS = ['all', 'Chờ vận chuyển', 'Đã nhận hàng', 'Đang giao hàng', 'Đã giao hàng', 'Hoàn tất'];
@@ -218,7 +219,7 @@ const ShipperOrders = () => {
                       <div className="h-16 w-16 rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center">
                         {item.SanPham?.HinhAnh ? (
                           <img
-                            src={item.SanPham.HinhAnh.startsWith('/uploads') ? `http://localhost:5000${item.SanPham.HinhAnh}` : item.SanPham.HinhAnh}
+                            src={item.SanPham.HinhAnh.startsWith('/uploads') ? `${API_ROOT_URL}${item.SanPham.HinhAnh}` : item.SanPham.HinhAnh}
                             alt={item.SanPham.TenSanPham}
                             className="h-full w-full object-cover"
                           />

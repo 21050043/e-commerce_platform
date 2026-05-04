@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, Star, Loader, AlertTriangle, Store, Phone, MapPin, Palmtree } from 'lucide-react';
 import api from '../services/api';
-import { API_ENDPOINTS } from '../constants/api';
+import { API_ENDPOINTS, API_ROOT_URL } from '../constants/api';
 import { formatCurrency } from '../utils/format';
 
 interface VendorShopData {
@@ -194,7 +194,7 @@ const VendorShop = () => {
                 >
                   <div className="h-56 overflow-hidden">
                     <img
-                      src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `http://localhost:5000${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
+                      src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
                       alt={product.TenSanPham}
                       className="w-full h-full object-cover transform hover:scale-105 transition duration-300"
                     />

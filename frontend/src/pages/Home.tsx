@@ -13,6 +13,7 @@ import { useCart } from '../contexts/CartContext';
 import { formatCurrency } from '../utils/format';
 import { getCategoryImage } from '../utils/image';
 import { getRandomRating } from '../utils/random';
+import { API_ROOT_URL } from '../constants/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -313,9 +314,10 @@ const Home = () => {
                     <Link to={`/products/${product.MaSanPham}`} className="block">
                       <div className="relative h-64 overflow-hidden group">
                         <img
-                          src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `http://localhost:5000${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}
+                          src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}
                           alt={product.TenSanPham}
-                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                          crossOrigin="anonymous"
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>

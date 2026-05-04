@@ -6,6 +6,8 @@ import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import { searchProducts } from '../services/product.service';
 import type { ProductResponse as Product } from '../services/product.service';
+import { API_ROOT_URL } from '../constants/api';
+import { formatCurrency } from '../utils/format';
 
 const Navbar = () => {
   const { isAuthenticated, isAdmin, isStaff, isVendor, isShipper, user, logout } = useAuth();
@@ -213,9 +215,10 @@ const Navbar = () => {
                   >
                     {item.HinhAnh ? (
                       <img
-                        src={item.HinhAnh}
+                        src={item.HinhAnh ? (item.HinhAnh.startsWith('http') ? item.HinhAnh : `${API_ROOT_URL}${item.HinhAnh}`) : ''}
                         alt={item.TenSanPham}
                         className="w-12 h-12 object-cover rounded-xl border"
+                        crossOrigin="anonymous"
                         onError={e => (e.currentTarget.src = '/vite.svg')}
                       />
                     ) : (
@@ -226,7 +229,7 @@ const Navbar = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-800 truncate">{item.TenSanPham}</p>
                       <p className="text-xs text-primary-600 font-semibold">
-                        {item.GiaSanPham?.toLocaleString('vi-VN')}₫
+                        {formatCurrency(item.GiaSanPham)}
                       </p>
                     </div>
                   </button>
@@ -382,9 +385,10 @@ const Navbar = () => {
                     >
                       {item.HinhAnh ? (
                         <img
-                          src={item.HinhAnh}
+                          src={item.HinhAnh ? (item.HinhAnh.startsWith('http') ? item.HinhAnh : `${API_ROOT_URL}${item.HinhAnh}`) : ''}
                           alt={item.TenSanPham}
                           className="w-12 h-12 object-cover rounded-xl border"
+                          crossOrigin="anonymous"
                           onError={e => (e.currentTarget.src = '/vite.svg')}
                         />
                       ) : (
@@ -395,7 +399,7 @@ const Navbar = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-800 truncate">{item.TenSanPham}</p>
                         <p className="text-xs text-primary-600 font-semibold">
-                          {item.GiaSanPham?.toLocaleString('vi-VN')}₫
+                          {formatCurrency(item.GiaSanPham)}
                         </p>
                       </div>
                     </button>

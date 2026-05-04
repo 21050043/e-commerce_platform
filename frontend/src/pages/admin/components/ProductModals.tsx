@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, AlertCircle, Shield, Eye } from 'lucide-react';
 import { formatCurrency } from '../../../utils/format';
-import { API_BASE_URL } from '../../../constants/api';
+import { API_BASE_URL, API_ROOT_URL } from '../../../constants/api';
 import type { ProductResponse } from '../../../services/product.service';
 
 interface DetailModalProps {
@@ -21,7 +21,7 @@ export const ProductDetailModal: React.FC<DetailModalProps> = ({ product, onClos
                     <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-primary-100 shadow">
                         {product.HinhAnh ? (
                             <img
-                                src={product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_BASE_URL}${product.HinhAnh}`}
+                                src={product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`}
                                 alt={product.TenSanPham}
                                 className="w-full h-full object-cover"
                             />

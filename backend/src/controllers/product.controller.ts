@@ -109,7 +109,9 @@ export default class ProductController {
       // Xử lý tệp hình ảnh nếu có
       let imagePath = null;
       if (req.file) {
-        const fileName = `${Date.now()}-${req.file.originalname}`;
+        // Làm sạch tên tệp: thay khoảng trắng bằng gạch dưới và bỏ ký tự đặc biệt
+        const sanitizedOriginalName = req.file.originalname.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const fileName = `${Date.now()}-${sanitizedOriginalName}`;
         const uploadPath = path.join(__dirname, '../../public/uploads', fileName);
         
         // Đảm bảo thư mục tồn tại
@@ -188,7 +190,9 @@ export default class ProductController {
       // Xử lý tệp hình ảnh nếu có
       let imagePath = null;
       if (req.file) {
-        const fileName = `${Date.now()}-${req.file.originalname}`;
+        // Làm sạch tên tệp: thay khoảng trắng bằng gạch dưới và bỏ ký tự đặc biệt
+        const sanitizedOriginalName = req.file.originalname.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const fileName = `${Date.now()}-${sanitizedOriginalName}`;
         const uploadPath = path.join(__dirname, '../../public/uploads', fileName);
         
         // Đảm bảo thư mục tồn tại

@@ -5,7 +5,7 @@ import { ChevronRight, Star, ShoppingCart, Minus, Plus, AlertTriangle, User, Mai
 import Skeleton from '../components/ui/Skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
-import { API_ENDPOINTS } from '../constants/api';
+import { API_ENDPOINTS, API_ROOT_URL } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import type { ProductResponse } from '../services/product.service';
@@ -187,7 +187,7 @@ const ProductDetail = () => {
               <div className="sticky top-24">
                 <div className="border rounded-lg overflow-hidden bg-white p-4">
                   <img
-                    src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `http://localhost:5000${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
+                    src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
                     alt={product.TenSanPham}
                     className="w-full h-auto object-contain"
                     style={{ maxHeight: '500px' }}
@@ -427,7 +427,7 @@ const ProductDetail = () => {
                 >
                   <div className="h-56 overflow-hidden">
                     <img
-                      src={relatedProduct.HinhAnh ? (relatedProduct.HinhAnh.startsWith('http') ? relatedProduct.HinhAnh : `http://localhost:5000${relatedProduct.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
+                      src={relatedProduct.HinhAnh ? (relatedProduct.HinhAnh.startsWith('http') ? relatedProduct.HinhAnh : `${API_ROOT_URL}${relatedProduct.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}
                       alt={relatedProduct.TenSanPham}
                       className="w-full h-full object-cover transform hover:scale-105 transition duration-300"
                     />

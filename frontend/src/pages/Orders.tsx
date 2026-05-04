@@ -4,7 +4,7 @@ import MainLayout from '../layouts/MainLayout';
 import { ChevronRight, Loader, Package, Calendar, CreditCard, Clock, ChevronDown, AlertTriangle, Image, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { API_ENDPOINTS } from '../constants/api';
+import { API_ENDPOINTS, API_ROOT_URL } from '../constants/api';
 import { formatCurrency, formatDate } from '../utils/format';
 import { getStatusColor } from '../utils/order';
 import { confirmDelivery } from '../services/order.service';
@@ -210,7 +210,7 @@ const Orders = () => {
                               {item.SanPham.HinhAnh ? (
                                 <img
                                   src={item.SanPham.HinhAnh.startsWith('/uploads')
-                                    ? `http://localhost:5000${item.SanPham.HinhAnh}`
+                                    ? `${API_ROOT_URL}${item.SanPham.HinhAnh}`
                                     : item.SanPham.HinhAnh}
                                   alt={item.SanPham.TenSanPham}
                                   className="w-full h-full object-cover"

@@ -4,6 +4,7 @@ import ShipperLayout from '../../layouts/ShipperLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import api from '../../services/api';
+import { formatCurrency } from '../../utils/format';
 
 interface ShipperStats {
   totalOrders: number;
@@ -134,7 +135,7 @@ const ShipperDashboard = () => {
                 </div>
                 <div className="rounded-2xl bg-violet-50 p-5">
                   <p className="text-sm text-violet-700">Tổng Thu Nhập</p>
-                  <p className="mt-3 text-3xl font-bold text-violet-800">{stats.totalEarnings.toLocaleString('vi-VN')}₫</p>
+                  <p className="mt-3 text-3xl font-bold text-violet-800">{formatCurrency(stats.totalEarnings)}</p>
                 </div>
               </div>
             </div>
@@ -250,14 +251,14 @@ const ShipperDashboard = () => {
                   <tr className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 font-medium text-gray-900">Tổng Thu Nhập</td>
                     <td className="px-4 py-3 text-green-700 font-semibold">
-                      {stats.totalEarnings.toLocaleString('vi-VN')}₫
+                      {formatCurrency(stats.totalEarnings)}
                     </td>
                     <td className="px-4 py-3 text-gray-600">Tổng hoa hồng nhận được</td>
                   </tr>
                   <tr className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 font-medium text-gray-900">Thu Nhập Trung Bình</td>
                     <td className="px-4 py-3 text-green-600 font-semibold">
-                      {averageEarnings.toLocaleString('vi-VN')}₫
+                      {formatCurrency(averageEarnings)}
                     </td>
                     <td className="px-4 py-3 text-gray-600">Trung bình mỗi đơn hàng</td>
                   </tr>

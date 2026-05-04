@@ -9,7 +9,7 @@ import { getProductById } from '../../services/product.service';
 import { getAllCategories } from '../../services/category.service';
 // import type { ProductResponse } from '../../services/product.service';
 import type { CategoryResponse } from '../../services/category.service';
-import { API_ENDPOINTS, API_BASE_URL } from '../../constants/api';
+import { API_ENDPOINTS, API_BASE_URL, API_ROOT_URL } from '../../constants/api';
 // import api from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -88,7 +88,7 @@ const ProductForm = () => {
           });
 
           if (product.HinhAnh) {
-            setImagePreview(product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_BASE_URL}${product.HinhAnh}`);
+            setImagePreview(product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`);
           }
         }
 

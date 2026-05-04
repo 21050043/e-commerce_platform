@@ -6,7 +6,7 @@ import { CreditCard, Truck, MapPin, ShieldCheck, CheckCircle2, Wallet, Banknote,
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import api from '../services/api';
-import { API_ENDPOINTS } from '../constants/api';
+import { API_ENDPOINTS, API_ROOT_URL } from '../constants/api';
 import { useToast } from '../contexts/ToastContext';
 import { formatCurrency } from '../utils/format';
 
@@ -454,7 +454,7 @@ const Checkout = () => {
                       {cart.map((item) => (
                         <div key={item.productId} className="flex gap-4 items-center group">
                           <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100">
-                            <img src={item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=100&q=80'} alt="" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform" />
+                            <img src={item.image ? (item.image.startsWith('http') ? item.image : `${API_ROOT_URL}${item.image}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=100&q=80'} alt="" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4 className="font-bold text-gray-900 text-sm line-clamp-1 group-hover:text-primary-600 transition-colors uppercase tracking-tight">{item.name}</h4>

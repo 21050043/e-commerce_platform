@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import { formatCurrency } from '../utils/format';
+import { API_ROOT_URL } from '../constants/api';
 import Skeleton from '../components/ui/Skeleton';
 
 const Cart = () => {
@@ -115,10 +116,11 @@ const Cart = () => {
                           <img
                             src={item.product.HinhAnh ? (item.product.HinhAnh.startsWith('http')
                               ? item.product.HinhAnh
-                              : `http://localhost:5000${item.product.HinhAnh}`)
+                              : `${API_ROOT_URL}${item.product.HinhAnh}`)
                               : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}
                             alt={item.product.TenSanPham}
                             className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                            crossOrigin="anonymous"
                           />
                         </div>
 

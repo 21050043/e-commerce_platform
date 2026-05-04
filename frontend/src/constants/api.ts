@@ -1,5 +1,6 @@
 // API base URL
-export const API_BASE_URL = 'http://localhost:5000/api';
+export const API_ROOT_URL = 'http://localhost:5000';
+export const API_BASE_URL = `${API_ROOT_URL}/api`;
 
 // API endpoints
 export const API_ENDPOINTS = {

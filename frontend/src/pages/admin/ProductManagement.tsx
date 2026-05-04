@@ -8,7 +8,7 @@ import { getAllProducts, searchProducts, getVendorProducts, suspendProduct, unsu
 import type { ProductResponse, ProductListResponse } from '../../services/product.service';
 import { getAllCategories } from '../../services/category.service';
 import type { CategoryResponse } from '../../services/category.service';
-import { API_ENDPOINTS, API_BASE_URL } from '../../constants/api';
+import { API_ENDPOINTS, API_BASE_URL, API_ROOT_URL } from '../../constants/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency } from '../../utils/format';
@@ -333,7 +333,7 @@ const ProductManagement = () => {
                             <div className="w-16 h-16 rounded-md overflow-hidden">
                               {product.HinhAnh ? (
                                 <img
-                                  src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_BASE_URL}${product.HinhAnh}`) : ''}
+                                  src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`) : ''}
                                   alt={product.TenSanPham}
                                   className="w-full h-full object-cover"
                                 />

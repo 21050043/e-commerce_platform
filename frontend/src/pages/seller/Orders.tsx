@@ -11,6 +11,7 @@ import {
     type SellerOrderResponse,
 } from '../../services/seller-order.service';
 import { formatCurrency, formatDate } from '../../utils/format';
+import { API_ROOT_URL } from '../../constants/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 
@@ -205,7 +206,7 @@ const OrderDetailPanel = ({ order, onClose, onStatusChange }: OrderDetailPanelPr
                                         {item.SanPham?.HinhAnh ? (
                                             <img
                                                 src={item.SanPham.HinhAnh.startsWith('/uploads')
-                                                    ? `http://localhost:5000${item.SanPham.HinhAnh}`
+                                                    ? `${API_ROOT_URL}${item.SanPham.HinhAnh}`
                                                     : item.SanPham.HinhAnh}
                                                 alt={item.SanPham.TenSanPham}
                                                 className="w-full h-full object-cover"

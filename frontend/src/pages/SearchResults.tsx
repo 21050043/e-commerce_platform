@@ -5,6 +5,7 @@ import { Loader, Search } from 'lucide-react';
 import { searchProducts } from '../services/product.service';
 import { useQuery } from '../hooks/useQuery';
 import { formatCurrency } from '../utils/format';
+import { API_ROOT_URL } from '../constants/api';
 
 const SearchResults = () => {
   const query = useQuery().get('q') || '';
@@ -68,7 +69,7 @@ const SearchResults = () => {
                 >
                   <div className="h-48 overflow-hidden flex items-center justify-center bg-gray-50">
                     <img
-                      src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `http://localhost:5000${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'}
+                      src={product.HinhAnh ? (product.HinhAnh.startsWith('http') ? product.HinhAnh : `${API_ROOT_URL}${product.HinhAnh}`) : 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'}
                       alt={product.TenSanPham}
                       className="w-full h-full object-contain"
                     />
