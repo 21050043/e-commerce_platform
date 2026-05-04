@@ -71,4 +71,22 @@ export default class OrderController {
       return res.status(404).json({ message: error.message });
     }
   };
+
+  public confirmDelivery = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const orderId = parseInt(req.params.id);
+      if (isNaN(orderId)) {
+        return res.status(400).json({ message: 'Mã đơn hàng không hợp lệ' });
+      }
+
+      const { shipperRating, shipperComment } = req.body;
+      const order = await this.orderService.confirmDelivery(orderId, req.user!.id, shipperRating, shipperComment);
+      return res.status(200).json({
+        message: 'Xác nhận giao hàng thành công',
+        order,
+      });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message || 'Không thể xác nhận giao hàng' });
+    }
+  };
 }

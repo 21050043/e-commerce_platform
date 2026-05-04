@@ -13,7 +13,8 @@ class DonHangNguoiBan extends Model<IDonHangNguoiBan, DonHangNguoiBanCreationAtt
   public MaDonHangNB!: number;
   public MaHoaDon!: number;
   public MaNguoiBan!: number;
-  public TrangThai!: 'Đã đặt hàng' | 'Đang xử lý' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy';
+  public MaShipper?: number | null;
+  public TrangThai!: 'Đã đặt hàng' | 'Đang xử lý' | 'Chờ vận chuyển' | 'Đã nhận hàng' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy' | 'Hoàn tất';
   public TongTienNB!: number;
   public GhiChu?: string | null;
   public NgayCapNhat?: Date;
@@ -35,6 +36,11 @@ DonHangNguoiBan.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: 'NguoiBan', key: 'MaNguoiBan' },
+    },
+    MaShipper: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: 'Shipper', key: 'MaShipper' },
     },
     TrangThai: {
       type: DataTypes.STRING(50),

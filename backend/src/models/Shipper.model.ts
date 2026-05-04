@@ -11,9 +11,11 @@ interface IShipper {
   HeDieuHanh?: string;
   TrangThai: 'ACTIVE' | 'INACTIVE';
   NgayDangKy: Date;
+  TongDiemDanhGia?: number;
+  SoLuongDanhGia?: number;
 }
 
-interface ShipperCreationAttributes extends Optional<IShipper, 'MaShipper' | 'NgayDangKy'> {}
+interface ShipperCreationAttributes extends Optional<IShipper, 'MaShipper' | 'NgayDangKy' | 'TongDiemDanhGia' | 'SoLuongDanhGia'> {}
 
 class Shipper extends Model<IShipper, ShipperCreationAttributes> implements IShipper {
   public MaShipper!: number;
@@ -26,6 +28,8 @@ class Shipper extends Model<IShipper, ShipperCreationAttributes> implements IShi
   public MaNguoiBan?: number;
   public TrangThai!: 'ACTIVE' | 'INACTIVE';
   public NgayDangKy!: Date;
+  public TongDiemDanhGia!: number;
+  public SoLuongDanhGia!: number;
 }
 
 Shipper.init(
@@ -74,6 +78,16 @@ Shipper.init(
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+    },
+    TongDiemDanhGia: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    SoLuongDanhGia: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   {

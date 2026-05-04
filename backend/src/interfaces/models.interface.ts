@@ -92,7 +92,8 @@ export interface IDonHangNguoiBan {
   MaDonHangNB?: number;
   MaHoaDon: number;
   MaNguoiBan: number;
-  TrangThai: 'Đã đặt hàng' | 'Đang xử lý' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy';
+  MaShipper?: number | null; // Thêm trường để gán shipper
+  TrangThai: 'Đã đặt hàng' | 'Đang xử lý' | 'Chờ vận chuyển' | 'Đã nhận hàng' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy' | 'Hoàn tất';
   TongTienNB: number;
   GhiChu?: string | null;
   NgayCapNhat?: Date;

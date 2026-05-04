@@ -10,11 +10,14 @@ import {
 import { formatCurrency, formatDate } from '../../utils/format';
 import { useToast } from '../../contexts/ToastContext';
 
-const STATUS_OPTIONS = ['all', 'Đang giao hàng', 'Đã giao hàng'];
+const STATUS_OPTIONS = ['all', 'Chờ vận chuyển', 'Đã nhận hàng', 'Đang giao hàng', 'Đã giao hàng', 'Hoàn tất'];
 
 const STATUS_BADGES: Record<string, string> = {
+  'Chờ vận chuyển': 'bg-sky-100 text-sky-700',
+  'Đã nhận hàng': 'bg-amber-100 text-amber-700',
   'Đang giao hàng': 'bg-orange-100 text-orange-700',
   'Đã giao hàng': 'bg-green-100 text-green-700',
+  'Hoàn tất': 'bg-emerald-100 text-emerald-700',
 };
 
 const ShipperOrders = () => {
@@ -23,7 +26,7 @@ const ShipperOrders = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState('Đang giao hàng');
+  const [selectedStatus, setSelectedStatus] = useState('Chờ vận chuyển');
   const [selectedOrder, setSelectedOrder] = useState<ShipperOrderResponse | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -56,11 +59,11 @@ const ShipperOrders = () => {
 
   const closeOrder = () => setSelectedOrder(null);
 
-  const markDelivered = async (orderId: number) => {
-    if (!window.confirm('Xác nhận đơn hàng đã giao thành công?')) return;
+  const progressOrder = async (orderId: number, nextStatus: string, confirmationMessage: string) => {
+    if (!window.confirm(confirmationMessage)) return;
     setActionLoading(true);
     try {
-      await updateShipperOrderStatus(orderId, 'Đã giao hàng');
+      await updateShipperOrderStatus(orderId, nextStatus);
       addToast('Cập nhật trạng thái thành công', 'success');
       setSelectedOrder(null);
       setRefreshKey((prev) => prev + 1);
@@ -238,21 +241,39 @@ const ShipperOrders = () => {
                   <p className="font-semibold text-gray-900">Ghi chú</p>
                   <p>{selectedOrder.GhiChu || 'Không có ghi chú thêm'}</p>
                 </div>
-                {selectedOrder.TrangThai === 'Đang giao hàng' ? (
-                  <button
-                    onClick={() => markDelivered(selectedOrder.MaDonHangNB)}
-                    disabled={actionLoading}
-                    className="inline-flex items-center gap-2 rounded-full bg-secondary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-secondary-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <CheckCircle size={18} />
-                    {actionLoading ? 'Đang cập nhật...' : 'Đã giao hàng'}
-                  </button>
-                ) : (
-                  <div className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-3 text-sm font-semibold text-green-700">
-                    <Truck size={18} />
-                    Đơn hàng đã hoàn thành
-                  </div>
-                )}
+                {selectedOrder.TrangThai === 'Chờ vận chuyển' ? (
+                <button
+                  onClick={() => progressOrder(selectedOrder.MaDonHangNB, 'Đã nhận hàng', 'Bạn muốn nhận đơn này?')}
+                  disabled={actionLoading}
+                  className="inline-flex items-center gap-2 rounded-full bg-secondary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-secondary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <CheckCircle size={18} />
+                  {actionLoading ? 'Đang cập nhật...' : 'Nhận đơn'}
+                </button>
+              ) : selectedOrder.TrangThai === 'Đã nhận hàng' ? (
+                <button
+                  onClick={() => progressOrder(selectedOrder.MaDonHangNB, 'Đang giao hàng', 'Bắt đầu giao đơn này?')}
+                  disabled={actionLoading}
+                  className="inline-flex items-center gap-2 rounded-full bg-secondary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-secondary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Truck size={18} />
+                  {actionLoading ? 'Đang cập nhật...' : 'Bắt đầu giao'}
+                </button>
+              ) : selectedOrder.TrangThai === 'Đang giao hàng' ? (
+                <button
+                  onClick={() => progressOrder(selectedOrder.MaDonHangNB, 'Đã giao hàng', 'Xác nhận đơn hàng đã giao thành công?')}
+                  disabled={actionLoading}
+                  className="inline-flex items-center gap-2 rounded-full bg-secondary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-secondary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <CheckCircle size={18} />
+                  {actionLoading ? 'Đang cập nhật...' : 'Đã giao hàng'}
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-3 text-sm font-semibold text-green-700">
+                  <Truck size={18} />
+                  Đơn hàng đã hoàn thành
+                </div>
+              )}
               </div>
             </div>
           </div>

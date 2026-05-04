@@ -37,4 +37,20 @@ router.get('/my-orders', authMiddleware, orderController.getOrdersByCustomerId);
 // ─── Xem chi tiết 1 hoá đơn (khách hàng + người bán) ──────────────
 router.get('/:id', authMiddleware, orderController.getOrderById);
 
+// ─── Khách hàng xác nhận đã nhận hàng ────────────────────────────
+router.put(
+  '/:id/confirm-delivery',
+  authMiddleware,
+  body('shipperRating')
+    .optional()
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Đánh giá shipper phải là một số từ 1 đến 5'),
+  body('shipperComment')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Bình luận tối đa 255 ký tự'),
+  orderController.confirmDelivery
+);
+
 export default router;

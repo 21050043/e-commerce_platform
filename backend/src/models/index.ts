@@ -81,8 +81,46 @@ Shipper.belongsTo(KhachHang, { foreignKey: 'MaKhachHang', as: 'KhachHang' });
 // ─────────────────────────────────────────────
 const initializeModels = async () => {
   try {
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ alter: true });
     logger.db.synchronized();
+
+    // Nếu bảng DonHangNguoiBan đã tồn tại nhưng chưa có cột MaShipper, thêm cột này.
+    try {
+      await sequelize.query('ALTER TABLE DonHangNguoiBan ADD COLUMN IF NOT EXISTS MaShipper INT NULL');
+    } catch (e) {
+      // Nếu cột đã tồn tại hoặc thao tác thất bại vì cột đã tồn tại, bỏ qua.
+    }
+
+    // Nếu bảng Shipper chưa có các cột đánh giá, thêm các cột này.
+    try {
+      await sequelize.query('ALTER TABLE Shipper ADD COLUMN IF NOT EXISTS TongDiemDanhGia INT NOT NULL DEFAULT 0');
+      await sequelize.query('ALTER TABLE Shipper ADD COLUMN IF NOT EXISTS SoLuongDanhGia INT NOT NULL DEFAULT 0');
+    } catch (e) {
+      // Bỏ qua nếu cột đã tồn tại hoặc MySQL không hỗ trợ cú pháp IF NOT EXISTS.
+    }
+
+    // Nếu check constraint cũ giới hạn giá trị TrangThai, cập nhật lại để bao gồm tất cả trạng thái
+    const dropCheckStatements = [
+      'ALTER TABLE DonHangNguoiBan DROP CHECK CHK_DHNB_TrangThai',
+      'ALTER TABLE DonHangNguoiBan DROP CONSTRAINT CHK_DHNB_TrangThai',
+    ];
+
+    for (const sql of dropCheckStatements) {
+      try {
+        await sequelize.query(sql);
+        break;
+      } catch (e) {
+        // Bỏ qua nếu câu lệnh không hợp lệ hoặc constraint không tồn tại.
+      }
+    }
+
+    try {
+      await sequelize.query(
+        "ALTER TABLE DonHangNguoiBan ADD CONSTRAINT CHK_DHNB_TrangThai CHECK (TrangThai IN ('Đã đặt hàng', 'Đang xử lý', 'Chờ vận chuyển', 'Đã nhận hàng', 'Đang giao hàng', 'Đã giao hàng', 'Đã hủy', 'Hoàn tất'))"
+      );
+    } catch (e) {
+      // Nếu constraint đã tồn tại hoặc MySQL không hỗ trợ, bỏ qua.
+    }
 
     // Dọn dẹp database: Xóa cột MaDanhMucChinh và bảng NguoiBanDanhMuc theo yêu cầu
     try {

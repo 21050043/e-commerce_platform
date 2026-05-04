@@ -100,6 +100,14 @@ export const updateOrderStatus = async (id: number, status: string): Promise<Ord
   return response.data;
 };
 
+export const confirmDelivery = async (id: number, shipperRating?: number, shipperComment?: string): Promise<OrderResponse> => {
+  const response = await api.put(API_ENDPOINTS.ORDER.CONFIRM_DELIVERY(id), {
+    shipperRating,
+    shipperComment,
+  });
+  return response.data;
+};
+
 export const getOrdersByCustomerId = async (customerId: number): Promise<OrderResponse[]> => {
   const response = await api.get(`${API_ENDPOINTS.ADMIN.ORDERS.GET_ALL}/by-customer/${customerId}`);
   return response.data;

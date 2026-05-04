@@ -106,6 +106,19 @@ export default class ShipperController {
     }
   };
 
+  public getDeliveredOrders = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id: khachHangId } = req.user!;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const result = await this.shipperService.getDeliveredOrders(khachHangId, page, limit);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message || 'Lỗi khi lấy danh sách đơn hàng đã giao' });
+    }
+  };
+
   public getStats = async (req: Request, res: Response): Promise<Response> => {
     try {
       const { id: khachHangId } = req.user!;

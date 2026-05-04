@@ -6,6 +6,7 @@ import SanPham from '../models/SanPham.model';
 import KhachHang from '../models/KhachHang.model';
 import NguoiBan from '../models/NguoiBan.model';
 import DonHangNguoiBan from '../models/DonHangNguoiBan.model';
+import Shipper from '../models/Shipper.model';
 import { IHoaDon } from '../interfaces/models.interface';
 
 interface OrderItem {
@@ -173,6 +174,53 @@ export default class OrderService {
 
     if (!order) {
       throw new Error('Đơn hàng không tồn tại');
+    }
+
+    return order;
+  }
+
+  public async confirmDelivery(orderId: number, customerId: number, shipperRating?: number, shipperComment?: string) {
+    const order = await HoaDon.findByPk(orderId, {
+      include: [{ model: DonHangNguoiBan, as: 'DonHangNguoiBans' }],
+    }) as HoaDon & { DonHangNguoiBans?: DonHangNguoiBan[] };
+
+    if (!order) {
+      throw new Error('Đơn hàng không tồn tại');
+    }
+
+    if (order.MaKhachHang !== customerId) {
+      throw new Error('Bạn không có quyền xác nhận đơn hàng này');
+    }
+
+    const subOrders = order.DonHangNguoiBans || [];
+    if (subOrders.length === 0) {
+      throw new Error('Không tìm thấy thông tin đơn hàng con để xác nhận');
+    }
+
+    const allDelivered = subOrders.every((subOrder: DonHangNguoiBan) => subOrder.TrangThai === 'Đã giao hàng');
+    if (!allDelivered) {
+      throw new Error('Chỉ đơn hàng đã được giao bởi shipper mới có thể xác nhận');
+    }
+
+    await Promise.all(subOrders.map((subOrder: DonHangNguoiBan) => subOrder.update({ TrangThai: 'Hoàn tất' })));
+    await order.update({ TrangThai: 'Hoàn tất' });
+
+    if (shipperRating && shipperRating >= 1 && shipperRating <= 5) {
+      const shipperIds = Array.from(
+        new Set(subOrders.map((subOrder: DonHangNguoiBan) => subOrder.MaShipper).filter((id): id is number => typeof id === 'number'))
+      );
+
+      for (const shipperId of shipperIds) {
+        const shipper = await Shipper.findByPk(shipperId);
+        if (!shipper) continue;
+
+        const totalRating = (shipper.TongDiemDanhGia || 0) + shipperRating;
+        const ratingCount = (shipper.SoLuongDanhGia || 0) + 1;
+        await shipper.update({
+          TongDiemDanhGia: totalRating,
+          SoLuongDanhGia: ratingCount,
+        });
+      }
     }
 
     return order;

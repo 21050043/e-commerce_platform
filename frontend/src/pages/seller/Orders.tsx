@@ -19,6 +19,8 @@ import { useSellerProfileCheck } from '../../hooks/useSellerProfileCheck';
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
     'Đã đặt hàng': { label: 'Đã đặt hàng', color: 'bg-blue-100 text-blue-700', icon: Clock },
     'Đang xử lý': { label: 'Đang xử lý', color: 'bg-yellow-100 text-yellow-700', icon: Package },
+    'Chờ vận chuyển': { label: 'Chờ vận chuyển', color: 'bg-sky-100 text-sky-700', icon: Truck },
+    'Đã nhận hàng': { label: 'Đã nhận hàng', color: 'bg-amber-100 text-amber-700', icon: Truck },
     'Đang giao hàng': { label: 'Đang giao hàng', color: 'bg-orange-100 text-orange-700', icon: Truck },
     'Đã giao hàng': { label: 'Đã giao hàng', color: 'bg-green-100 text-green-700', icon: CheckCircle },
     'Đã hủy': { label: 'Đã hủy', color: 'bg-red-100 text-red-700', icon: XCircle },
@@ -26,7 +28,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 
 const NEXT_STATUS: Record<string, string[]> = {
     'Đã đặt hàng': ['Đang xử lý', 'Đã hủy'],
-    'Đang xử lý': ['Đang giao hàng', 'Đã hủy'],
+    'Đang xử lý': ['Chờ vận chuyển', 'Đã hủy'],
+    'Chờ vận chuyển': [],
+    'Đã nhận hàng': ['Đang giao hàng'],
     'Đang giao hàng': ['Đã giao hàng'],
     'Đã giao hàng': [],
     'Đã hủy': [],
@@ -42,15 +46,15 @@ const ACTION_CONFIG: Record<string, { label: string; description: string; color:
         color: 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100',
         icon: Package
     },
-    'Đang giao hàng': {
+    'Chờ vận chuyển': {
         label: 'Giao cho đơn vị vận chuyển',
-        description: 'Đơn hàng đã sẵn sàng và được gởi cho nhân viên giao hàng',
-        color: 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-100',
+        description: 'Đơn hàng đã sẵn sàng và được gởi cho shipper nhận',
+        color: 'bg-sky-600 text-white hover:bg-sky-700 shadow-sky-100',
         icon: Truck
     },
-    'Đã giao hàng': {
+    'Đang giao hàng': {
         label: 'Xác nhận đã giao thành công',
-        description: 'Đánh dấu đơn hàng đã đến tay khách hàng an toàn',
+        description: 'Đánh dấu đơn hàng đã được shipper giao đến khách',
         color: 'bg-green-600 text-white hover:bg-green-700 shadow-green-100',
         icon: CheckCircle
     },

@@ -20,7 +20,7 @@ export interface ShipperOrderResponse {
   MaDonHangNB: number;
   MaHoaDon: number;
   MaNguoiBan: number;
-  TrangThai: 'Đang giao hàng' | 'Đã giao hàng';
+  TrangThai: 'Chờ vận chuyển' | 'Đã nhận hàng' | 'Đang giao hàng' | 'Đã giao hàng' | 'Hoàn tất';
   TongTienNB: number;
   GhiChu?: string;
   NgayCapNhat?: string;

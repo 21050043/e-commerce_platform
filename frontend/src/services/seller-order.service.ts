@@ -22,7 +22,7 @@ export interface SellerOrderResponse {
     MaDonHangNB: number;
     MaHoaDon: number;
     MaNguoiBan: number;
-    TrangThai: 'Đã đặt hàng' | 'Đang xử lý' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy';
+    TrangThai: 'Đã đặt hàng' | 'Đang xử lý' | 'Chờ vận chuyển' | 'Đã nhận hàng' | 'Đang giao hàng' | 'Đã giao hàng' | 'Đã hủy';
     TongTienNB: number;
     GhiChu?: string;
     NgayCapNhat?: string;

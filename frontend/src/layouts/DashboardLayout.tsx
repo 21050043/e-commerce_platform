@@ -97,7 +97,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 <div className="text-right hidden sm:block">
                                     <div className="text-sm font-semibold">{user?.TenKhachHang || user?.TenNhanVien}</div>
                                     <div className="text-[10px] opacity-70 uppercase tracking-widest font-bold">
-                                        {user?.MaVaiTro === 0 ? 'Admin' : user?.MaVaiTro === 1 ? 'Staff' : 'Seller'}
+                                        {user?.MaVaiTro === 0 ? 'Admin' : user?.MaVaiTro === 1 ? 'Staff' : user?.MaVaiTro === 4 ? 'Shipper' : 'Seller'}
                                     </div>
                                 </div>
                                 <div className={`h-10 w-10 ${themeClasses.avatar} border-2 border-white border-opacity-30 rounded-full flex items-center justify-center font-bold text-lg shadow-inner group-hover:scale-105 transition`}>

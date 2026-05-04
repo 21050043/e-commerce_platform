@@ -71,6 +71,7 @@ export default class SellerOrderController {
                 order: updated,
             });
         } catch (error: any) {
+            console.error('Seller order status update failed:', error);
             return res.status(400).json({ message: error.message });
         }
     };

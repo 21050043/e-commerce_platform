@@ -36,6 +36,7 @@ router.post(
 );
 
 router.get('/orders', authMiddleware, roleMiddleware([4]), shipperController.getMyOrders);
+router.get('/delivered-orders', authMiddleware, roleMiddleware([4]), shipperController.getDeliveredOrders);
 router.get('/stats', authMiddleware, roleMiddleware([4]), shipperController.getStats);
 router.get('/orders/:id', authMiddleware, roleMiddleware([4]), shipperController.getOrderDetail);
 router.put(
@@ -44,7 +45,7 @@ router.put(
   roleMiddleware([4]),
   body('trangThai')
     .notEmpty().withMessage('Trạng thái không được để trống')
-    .isIn(['Đã giao hàng']).withMessage('Shipper chỉ có thể cập nhật trạng thái sang Đã giao hàng'),
+    .isIn(['Đã nhận hàng', 'Đang giao hàng', 'Đã giao hàng']).withMessage('Trạng thái shipper không hợp lệ'),
   shipperController.updateStatus
 );
 

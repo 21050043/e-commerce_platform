@@ -76,6 +76,9 @@ const ShipperDashboard = () => {
     );
   }
 
+  const displayName = stats?.shipperInfo?.name || user?.TenKhachHang || 'Shipper';
+  const averageEarnings = stats?.totalOrders ? Math.round(stats.totalEarnings / stats.totalOrders) : 0;
+
   return (
     <ShipperLayout>
       <div className="py-8">
@@ -83,7 +86,58 @@ const ShipperDashboard = () => {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Bảng Điều Khiển Shipper</h1>
-            <p className="text-gray-600">Chào mừng, {user?.TenKhachHang} 👋</p>
+            <p className="text-gray-600">Chào mừng, {displayName} 👋</p>
+          </div>
+
+          {/* Shipper Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+              <p className="text-sm uppercase tracking-[0.3em] text-gray-500 mb-4">Thông tin Shipper</p>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div>
+                  <p className="font-semibold text-gray-900">Tên</p>
+                  <p>{stats.shipperInfo?.name || 'Chưa có'}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Số điện thoại</p>
+                  <p>{stats.shipperInfo?.phone || 'Chưa có'}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Khu vực hoạt động</p>
+                  <p>{stats.shipperInfo?.area || 'Chưa có'}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Loại phương tiện</p>
+                  <p>{stats.shipperInfo?.vehicle || 'Chưa có'}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Trạng thái</p>
+                  <p>{stats.shipperInfo?.status || 'Không xác định'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+              <p className="text-sm uppercase tracking-[0.3em] text-gray-500 mb-4">Tóm tắt hiệu suất</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-sky-50 p-5">
+                  <p className="text-sm text-sky-700">Tổng Đơn Hàng</p>
+                  <p className="mt-3 text-3xl font-bold text-sky-800">{stats.totalOrders}</p>
+                </div>
+                <div className="rounded-2xl bg-emerald-50 p-5">
+                  <p className="text-sm text-emerald-700">Đơn Giao Thành Công</p>
+                  <p className="mt-3 text-3xl font-bold text-emerald-800">{stats.completedOrders}</p>
+                </div>
+                <div className="rounded-2xl bg-orange-50 p-5">
+                  <p className="text-sm text-orange-700">Đang Giao</p>
+                  <p className="mt-3 text-3xl font-bold text-orange-800">{stats.pendingOrders}</p>
+                </div>
+                <div className="rounded-2xl bg-violet-50 p-5">
+                  <p className="text-sm text-violet-700">Tổng Thu Nhập</p>
+                  <p className="mt-3 text-3xl font-bold text-violet-800">{stats.totalEarnings.toLocaleString('vi-VN')}₫</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Stats Grid */}
@@ -203,7 +257,7 @@ const ShipperDashboard = () => {
                   <tr className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 font-medium text-gray-900">Thu Nhập Trung Bình</td>
                     <td className="px-4 py-3 text-green-600 font-semibold">
-                      {Math.round(stats.totalEarnings / stats.totalOrders).toLocaleString('vi-VN')}₫
+                      {averageEarnings.toLocaleString('vi-VN')}₫
                     </td>
                     <td className="px-4 py-3 text-gray-600">Trung bình mỗi đơn hàng</td>
                   </tr>

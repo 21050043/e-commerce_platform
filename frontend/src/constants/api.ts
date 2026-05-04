@@ -32,7 +32,8 @@ export const API_ENDPOINTS = {
     GET_MY_ORDERS: `${API_BASE_URL}/orders/my-orders`,
     GET_BY_ID: (id: number) => `${API_BASE_URL}/orders/${id}`,
     GET_ALL: `${API_BASE_URL}/orders`,
-    UPDATE_STATUS: (id: number) => `${API_BASE_URL}/orders/${id}/status`
+    UPDATE_STATUS: (id: number) => `${API_BASE_URL}/orders/${id}/status`,
+    CONFIRM_DELIVERY: (id: number) => `${API_BASE_URL}/orders/${id}/confirm-delivery`
   },
   CART: {
     ADD: '/cart',

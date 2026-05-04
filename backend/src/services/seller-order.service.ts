@@ -7,11 +7,11 @@ import KhachHang from '../models/KhachHang.model';
 import NguoiBan from '../models/NguoiBan.model';
 
 // Luồng chuyển trạng thái hợp lệ theo mô hình platform.
-// Người bán chịu trách nhiệm từ "Đang xử lý" → "Đang giao hàng" → "Đã giao hàng".
+// Người bán chịu trách nhiệm từ "Đang xử lý" → "Chờ vận chuyển" → shipper nhận đơn.
 const VALID_TRANSITIONS: Record<string, string[]> = {
     'Đã đặt hàng': ['Đang xử lý', 'Đã hủy'],
-    'Đang xử lý': ['Đang giao hàng', 'Đã hủy'],
-    'Đang giao hàng': ['Đã giao hàng'],
+    'Đang xử lý': ['Chờ vận chuyển', 'Đã hủy'],
+    'Chờ vận chuyển': [],
     'Đã giao hàng': [],
     'Đã hủy': [],
 };
@@ -108,6 +108,9 @@ export default class SellerOrderService {
         const currentStatus = subOrder.TrangThai;
         const allowedNext = VALID_TRANSITIONS[currentStatus] ?? [];
 
+        console.log(`Attempting to update order ${donHangNBId} from "${currentStatus}" to "${newStatus}"`);
+        console.log(`Allowed next statuses: ${allowedNext}`);
+
         if (!allowedNext.includes(newStatus)) {
             throw new Error(
                 `Không thể chuyển trạng thái từ "${currentStatus}" sang "${newStatus}"`
@@ -115,7 +118,7 @@ export default class SellerOrderService {
         }
 
         await subOrder.update({ TrangThai: newStatus as any });
-        return subOrder;
+        return subOrder.toJSON ? subOrder.toJSON() : subOrder;
     }
 
     /**

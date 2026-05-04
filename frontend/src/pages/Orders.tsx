@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { ChevronRight, Loader, Package, Calendar, CreditCard, Clock, ChevronDown, AlertTriangle, Image } from 'lucide-react';
+import { ChevronRight, Loader, Package, Calendar, CreditCard, Clock, ChevronDown, AlertTriangle, Image, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
 import { formatCurrency, formatDate } from '../utils/format';
 import { getStatusColor } from '../utils/order';
+import { confirmDelivery } from '../services/order.service';
 
 interface OrderDetail {
   MaSanPham: number;
@@ -35,6 +36,9 @@ const Orders = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+  const [confirmingOrder, setConfirmingOrder] = useState<number | null>(null);
+  const [shipperRating, setShipperRating] = useState<number>(5);
+  const [shipperComment, setShipperComment] = useState<string>('');
 
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -86,6 +90,25 @@ const Orders = () => {
       setExpandedOrder(null);
     } else {
       setExpandedOrder(orderId);
+    }
+  };
+
+  const handleConfirmDelivery = async (orderId: number) => {
+    try {
+      setConfirmingOrder(orderId);
+      await confirmDelivery(orderId, shipperRating, shipperComment);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.MaHoaDon === orderId ? { ...order, TrangThai: 'Hoàn tất' } : order
+        )
+      );
+      setShipperRating(5);
+      setShipperComment('');
+    } catch (err: any) {
+      console.error('Lỗi khi xác nhận giao hàng:', err);
+      setError(err.response?.data?.message || 'Không thể xác nhận giao hàng. Vui lòng thử lại.');
+    } finally {
+      setConfirmingOrder(null);
     }
   };
 
@@ -254,6 +277,47 @@ const Orders = () => {
                                 : 'Dự kiến giao trong 2-3 ngày làm việc'}
                           </span>
                         </div>
+                        {(order.TrangThai === 'Chờ xác nhận' || order.TrangThai === 'Đã giao hàng') && (
+                          <>
+                            <div className="mt-4 rounded-3xl border border-gray-200 bg-white p-4">
+                              <p className="text-sm font-semibold text-gray-900 mb-2">Đánh giá Shipper</p>
+                              <div className="flex items-center gap-1 mb-3">
+                                {[1, 2, 3, 4, 5].map((value) => (
+                                  <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setShipperRating(value)}
+                                    className="rounded-full p-2 transition"
+                                  >
+                                    <Star
+                                      size={18}
+                                      className={value <= shipperRating ? 'text-yellow-400' : 'text-gray-300'}
+                                    />
+                                  </button>
+                                ))}
+                              </div>
+                              <textarea
+                                value={shipperComment}
+                                onChange={(e) => setShipperComment(e.target.value)}
+                                placeholder="Gửi nhận xét cho shipper (tùy chọn)"
+                                className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none focus:border-primary-500"
+                                rows={3}
+                                maxLength={255}
+                              />
+                              <p className="mt-2 text-xs text-gray-500">Bạn có thể gửi đánh giá ngay khi xác nhận nhận hàng.</p>
+                            </div>
+                            <div className="mt-4">
+                              <button
+                                type="button"
+                                className="inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                onClick={() => handleConfirmDelivery(order.MaHoaDon)}
+                                disabled={confirmingOrder === order.MaHoaDon}
+                              >
+                                {confirmingOrder === order.MaHoaDon ? 'Đang xác nhận...' : 'Xác nhận đã nhận hàng'}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
