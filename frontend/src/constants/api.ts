@@ -77,6 +77,7 @@ export const API_ENDPOINTS = {
     APPLY: `${API_BASE_URL}/vendor/apply`,
     ME: `${API_BASE_URL}/vendor/me`,
     UPDATE: `${API_BASE_URL}/vendor/me`,
+    VACATION_MODE: `${API_BASE_URL}/vendor/me/vacation-mode`,
     PRODUCTS: {
       LIST: `${API_BASE_URL}/vendor/products`,
       CREATE: `${API_BASE_URL}/vendor/products`,
@@ -89,6 +90,8 @@ export const API_ENDPOINTS = {
     ORDERS: `${API_BASE_URL}/shipper/orders`,
     ORDER_BY_ID: (id: number) => `${API_BASE_URL}/shipper/orders/${id}`,
     UPDATE_STATUS: (id: number) => `${API_BASE_URL}/shipper/orders/${id}/status`,
+    PROFILE: `${API_BASE_URL}/shipper/profile`,
+    VACATION_MODE: `${API_BASE_URL}/shipper/vacation-mode`,
   },
   SELLER_ORDER: {
     STATS: `${API_BASE_URL}/seller/orders/stats`,

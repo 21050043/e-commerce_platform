@@ -38,6 +38,7 @@ router.post(
 router.get('/orders', authMiddleware, roleMiddleware([4]), shipperController.getMyOrders);
 router.get('/delivered-orders', authMiddleware, roleMiddleware([4]), shipperController.getDeliveredOrders);
 router.get('/stats', authMiddleware, roleMiddleware([4]), shipperController.getStats);
+router.get('/profile', authMiddleware, roleMiddleware([4]), shipperController.getProfile);
 router.get('/orders/:id', authMiddleware, roleMiddleware([4]), shipperController.getOrderDetail);
 router.put(
   '/orders/:id/status',
@@ -47,6 +48,15 @@ router.put(
     .notEmpty().withMessage('Trạng thái không được để trống')
     .isIn(['Đã nhận hàng', 'Đang giao hàng', 'Đã giao hàng']).withMessage('Trạng thái shipper không hợp lệ'),
   shipperController.updateStatus
+);
+router.put(
+  '/vacation-mode',
+  authMiddleware,
+  roleMiddleware([4]),
+  body('trangThaiHoatDong')
+    .isIn(['ACTIVE', 'VACATION'])
+    .withMessage('Trạng thái hoạt động phải là ACTIVE hoặc VACATION'),
+  shipperController.updateVacationMode
 );
 
 export default router;

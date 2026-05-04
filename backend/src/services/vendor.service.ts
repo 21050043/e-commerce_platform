@@ -85,4 +85,14 @@ export default class VendorService {
     await vendor.update(updateData);
     return vendor;
   }
+
+  public async updateVacationMode(khachHangId: number, trangThaiHoatDong: 'ACTIVE' | 'VACATION') {
+    const vendor = await NguoiBan.findOne({ where: { MaKhachHang: khachHangId } });
+    if (!vendor) throw new Error('Không tìm thấy hồ sơ người bán');
+    if (vendor.TrangThai !== 'APPROVED') {
+      throw new Error('Chỉ người bán đã được phê duyệt mới có thể điều chỉnh chế độ hoạt động');
+    }
+    await vendor.update({ TrangThaiHoatDong: trangThaiHoatDong });
+    return vendor;
+  }
 }

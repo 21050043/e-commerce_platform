@@ -66,9 +66,19 @@ export default class OrderService {
           throw new Error(`Sản phẩm "${product.TenSanPham}" chưa có người bán hợp lệ`);
         }
 
-        // CHỈNH SỬA BẢO MẬT: Kiểm tra trạng thái shop
+        // BẢO MẬT: Ngăn vendor mua hàng của chính mình (chống buff đơn, đánh giá ảo)
+        if (product.NguoiBan.MaKhachHang === orderData.MaKhachHang) {
+          throw new Error(`Bạn không thể mua sản phẩm "${product.TenSanPham}" từ cửa hàng của chính mình`);
+        }
+
+        // BẢO MẬT: Kiểm tra trạng thái shop và vacation mode
         if (product.NguoiBan.TrangThai !== 'APPROVED') {
           throw new Error(`Cửa hàng "${product.NguoiBan.TenCuaHang}" hiện không tiếp nhận đơn hàng mới`);
+        }
+
+        // BẢO MẬT: Kiểm tra Vacation Mode của shop
+        if ((product.NguoiBan as any).TrangThaiHoatDong === 'VACATION') {
+          throw new Error(`Cửa hàng "${product.NguoiBan.TenCuaHang}" đang tạm nghỉ và không nhận đơn hàng`);
         }
 
         // CHỈNH SỬA BẢO MẬT: Lấy giá từ DB để tính toán, không tin client

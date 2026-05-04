@@ -71,7 +71,6 @@ export interface IChiTietHoaDon {
   ThanhTien: number;
 }
 
-// Interface cho NguoiBan (Vendor)
 export interface INguoiBan {
   MaNguoiBan?: number;
   MaKhachHang: number;
@@ -80,8 +79,10 @@ export interface INguoiBan {
   DiaChiKinhDoanh?: string | null;
   EmailLienHe?: string | null;
   SoDienThoaiLienHe?: string | null;
-
+  // TrangThai: trạng thái phê duyệt của platform
   TrangThai?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  // TrangThaiHoatDong: chế độ hoạt động — vendor tự bật/tắt
+  TrangThaiHoatDong?: 'ACTIVE' | 'VACATION';
   LyDoTuChoi?: string | null;
   NgayDuyet?: Date | null;
 }

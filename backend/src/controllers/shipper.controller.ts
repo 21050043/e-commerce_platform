@@ -128,4 +128,34 @@ export default class ShipperController {
       return res.status(400).json({ message: error.message || 'Lỗi khi lấy thống kê shipper' });
     }
   };
+
+  public getProfile = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id: khachHangId } = req.user!;
+      const profile = await this.shipperService.getShipperProfile(khachHangId);
+      return res.status(200).json(profile);
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message || 'Lỗi khi lấy thông tin shipper' });
+    }
+  };
+
+  public updateVacationMode = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id: khachHangId } = req.user!;
+      const { trangThaiHoatDong } = req.body;
+
+      if (!['ACTIVE', 'VACATION'].includes(trangThaiHoatDong)) {
+        return res.status(400).json({ message: 'Trạng thái hoạt động không hợp lệ' });
+      }
+
+      const profile = await this.shipperService.updateVacationMode(khachHangId, trangThaiHoatDong);
+      const message = trangThaiHoatDong === 'VACATION'
+        ? 'Bạn đã bật chế độ tạm nghỉ, hệ thống sẽ không phân công đơn mới'
+        : 'Bạn đã hoạt động trở lại, sẵn sàng nhận đơn mới';
+
+      return res.status(200).json({ message, profile });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message || 'Không thể cập nhật chế độ hoạt động' });
+    }
+  };
 }

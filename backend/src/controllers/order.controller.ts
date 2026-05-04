@@ -40,10 +40,11 @@ export default class OrderController {
         return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng' });
       }
 
-      // Chỉ khách hàng (role 2) và người bán (role 3) xem đơn hàng của mình
-      if (role !== 2 && role !== 3) {
+      // Khách hàng (role 2), người bán (role 3), shipper (role 4) đều có thể
+      // xem đơn hàng của chính mình (đơn đã đặt với tư cách người mua)
+      if (role !== 2 && role !== 3 && role !== 4) {
         return res.status(403).json({
-          message: 'Chỉ khách hàng và người bán mới có thể xem đơn hàng của họ',
+          message: 'Bạn không có quyền xem đơn hàng',
         });
       }
 

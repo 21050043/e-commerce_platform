@@ -9,13 +9,16 @@ interface IShipper {
   EmailLienHe?: string;
   HangGPLX?: string;
   HeDieuHanh?: string;
+  // TrangThai: trạng thái tài khoản (quản trị viên kiểm soát)
   TrangThai: 'ACTIVE' | 'INACTIVE';
+  // TrangThaiHoatDong: chế độ hoạt động (shipper tự bật/tắt)
+  TrangThaiHoatDong: 'ACTIVE' | 'VACATION';
   NgayDangKy: Date;
   TongDiemDanhGia?: number;
   SoLuongDanhGia?: number;
 }
 
-interface ShipperCreationAttributes extends Optional<IShipper, 'MaShipper' | 'NgayDangKy' | 'TongDiemDanhGia' | 'SoLuongDanhGia'> {}
+interface ShipperCreationAttributes extends Optional<IShipper, 'MaShipper' | 'NgayDangKy' | 'TrangThaiHoatDong' | 'TongDiemDanhGia' | 'SoLuongDanhGia'> {}
 
 class Shipper extends Model<IShipper, ShipperCreationAttributes> implements IShipper {
   public MaShipper!: number;
@@ -27,6 +30,7 @@ class Shipper extends Model<IShipper, ShipperCreationAttributes> implements IShi
   public HeDieuHanh?: string;
   public MaNguoiBan?: number;
   public TrangThai!: 'ACTIVE' | 'INACTIVE';
+  public TrangThaiHoatDong!: 'ACTIVE' | 'VACATION';
   public NgayDangKy!: Date;
   public TongDiemDanhGia!: number;
   public SoLuongDanhGia!: number;
@@ -73,6 +77,12 @@ Shipper.init(
       type: DataTypes.ENUM('ACTIVE', 'INACTIVE'),
       allowNull: false,
       defaultValue: 'ACTIVE',
+    },
+    TrangThaiHoatDong: {
+      type: DataTypes.ENUM('ACTIVE', 'VACATION'),
+      allowNull: false,
+      defaultValue: 'ACTIVE',
+      comment: 'Chế độ hoạt động: ACTIVE = đang nhận đơn, VACATION = tạm nghỉ',
     },
     NgayDangKy: {
       type: DataTypes.DATE,

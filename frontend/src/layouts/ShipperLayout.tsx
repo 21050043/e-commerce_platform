@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, Home, LayoutDashboard } from 'lucide-react';
+import { Truck, LayoutDashboard, Settings } from 'lucide-react';
 import DashboardLayout from './DashboardLayout';
 
 interface ShipperLayoutProps {
@@ -10,7 +10,7 @@ const ShipperLayout: React.FC<ShipperLayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/shipper/dashboard', label: 'Bảng Điều Khiển', icon: LayoutDashboard },
     { path: '/shipper/orders', label: 'Đơn giao hàng', icon: Truck },
-    { path: '/', label: 'Cửa hàng', icon: Home },
+    { path: '/shipper/settings', label: 'Cài đặt Shipper', icon: Settings },
   ];
 
   return (

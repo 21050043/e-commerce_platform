@@ -25,6 +25,7 @@ import SellerDashboard from './pages/seller/Dashboard';
 import SellerOrders from './pages/seller/Orders';
 import ShipperDashboard from './pages/shipper/Dashboard';
 import ShipperOrders from './pages/shipper/Orders';
+import ShipperSettings from './pages/shipper/Settings';
 import SellerSettings from './pages/seller/Settings';
 import SearchResults from './pages/SearchResults';
 import BusinessLicense from './pages/BusinessLicense';
@@ -108,6 +109,11 @@ function App() {
               <Route path="/shipper/orders" element={
                 <ProtectedRoute requiredRoles={[4]}>
                   <ShipperOrders />
+                </ProtectedRoute>
+              } />
+              <Route path="/shipper/settings" element={
+                <ProtectedRoute requiredRoles={[4]}>
+                  <ShipperSettings />
                 </ProtectedRoute>
               } />
 

@@ -2,7 +2,7 @@ import { Model, DataTypes, Optional } from 'sequelize';
 import { INguoiBan } from '../interfaces/models.interface';
 import { sequelize } from '../config/db.config';
 
-interface NguoiBanCreationAttributes extends Optional<INguoiBan, 'MaNguoiBan' | 'TenCuaHang' | 'EmailLienHe' | 'TrangThai' | 'LyDoTuChoi' | 'NgayDuyet'> {}
+interface NguoiBanCreationAttributes extends Optional<INguoiBan, 'MaNguoiBan' | 'TenCuaHang' | 'EmailLienHe' | 'TrangThai' | 'TrangThaiHoatDong' | 'LyDoTuChoi' | 'NgayDuyet'> {}
 
 class NguoiBan extends Model<INguoiBan, NguoiBanCreationAttributes> implements INguoiBan {
   public MaNguoiBan!: number;
@@ -13,6 +13,7 @@ class NguoiBan extends Model<INguoiBan, NguoiBanCreationAttributes> implements I
   public EmailLienHe?: string;
   public SoDienThoaiLienHe?: string;
   public TrangThai?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  public TrangThaiHoatDong?: 'ACTIVE' | 'VACATION';
   public LyDoTuChoi?: string;
   public NgayDuyet?: Date | null;
 }
@@ -56,6 +57,12 @@ NguoiBan.init(
       type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED'),
       allowNull: true,
       defaultValue: 'PENDING',
+    },
+    TrangThaiHoatDong: {
+      type: DataTypes.ENUM('ACTIVE', 'VACATION'),
+      allowNull: false,
+      defaultValue: 'ACTIVE',
+      comment: 'Chế độ hoạt động: ACTIVE = đang bán, VACATION = tạm nghỉ',
     },
     LyDoTuChoi: {
       type: DataTypes.STRING(255),

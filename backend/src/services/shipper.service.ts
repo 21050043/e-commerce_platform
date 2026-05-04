@@ -327,7 +327,41 @@ export default class ShipperService {
         area: shipper.DiaChiHoatDong,
         vehicle: shipper.LoaiXe,
         status: shipper.TrangThai,
+        trangThaiHoatDong: shipper.TrangThaiHoatDong,
       }
     };
+  }
+
+  public async getShipperProfile(khachHangId: number) {
+    const shipper = await Shipper.findOne({
+      where: { MaKhachHang: khachHangId },
+      include: [{ model: KhachHang, as: 'KhachHang' }],
+    });
+
+    if (!shipper) throw new Error('Không tìm thấy thông tin shipper');
+
+    return {
+      MaShipper: shipper.MaShipper,
+      DiaChiHoatDong: shipper.DiaChiHoatDong,
+      LoaiXe: shipper.LoaiXe,
+      EmailLienHe: shipper.EmailLienHe,
+      HangGPLX: shipper.HangGPLX,
+      HeDieuHanh: shipper.HeDieuHanh,
+      TrangThai: shipper.TrangThai,
+      TrangThaiHoatDong: shipper.TrangThaiHoatDong,
+      NgayDangKy: shipper.NgayDangKy,
+      TenKhachHang: (shipper as any).KhachHang?.TenKhachHang,
+      SoDienThoai: (shipper as any).KhachHang?.SoDienThoai,
+    };
+  }
+
+  public async updateVacationMode(khachHangId: number, trangThaiHoatDong: 'ACTIVE' | 'VACATION') {
+    const shipper = await Shipper.findOne({ where: { MaKhachHang: khachHangId } });
+    if (!shipper) throw new Error('Không tìm thấy thông tin shipper');
+    if (shipper.TrangThai !== 'ACTIVE') {
+      throw new Error('Tài khoản shipper không được phép thay đổi trạng thái');
+    }
+    await shipper.update({ TrangThaiHoatDong: trangThaiHoatDong });
+    return shipper;
   }
 }

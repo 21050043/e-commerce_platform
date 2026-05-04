@@ -151,6 +151,16 @@ const initializeModels = async () => {
     } catch (e) {}
 
 
+    // Thêm cột TrangThaiHoatDong cho NguoiBan (Vacation Mode cho vendor)
+    try {
+      await sequelize.query("ALTER TABLE NguoiBan ADD COLUMN IF NOT EXISTS TrangThaiHoatDong ENUM('ACTIVE', 'VACATION') NOT NULL DEFAULT 'ACTIVE' COMMENT 'Ch\u1ebf \u0111\u1ed9 ho\u1ea1t \u0111\u1ed9ng: ACTIVE = \u0111ang b\u00e1n, VACATION = t\u1ea1m ngh\u1ec9'");
+    } catch (e) {}
+
+    // Thêm cột TrangThaiHoatDong cho Shipper (Vacation Mode cho shipper)
+    try {
+      await sequelize.query("ALTER TABLE Shipper ADD COLUMN IF NOT EXISTS TrangThaiHoatDong ENUM('ACTIVE', 'VACATION') NOT NULL DEFAULT 'ACTIVE' COMMENT 'Ch\u1ebf \u0111\u1ed9 ho\u1ea1t \u0111\u1ed9ng: ACTIVE = \u0111ang nh\u1eadn \u0111\u01a1n, VACATION = t\u1ea1m ngh\u1ec9'");
+    } catch (e) {}
+
   } catch (error) {
     logger.error('Không thể đồng bộ hóa các model:', error);
   }

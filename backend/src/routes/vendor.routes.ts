@@ -31,6 +31,17 @@ router.put(
   vendorController.updateVendorProfile
 );
 
+// Vendor bật/tắt Vacation Mode (role 3)
+router.put(
+  '/me/vacation-mode',
+  authMiddleware,
+  roleMiddleware([3]),
+  body('trangThaiHoatDong')
+    .isIn(['ACTIVE', 'VACATION'])
+    .withMessage('Trạng thái hoạt động phải là ACTIVE hoặc VACATION'),
+  vendorController.updateVacationMode
+);
+
 // Vendor product management (role 3)
 router.get('/products', authMiddleware, roleMiddleware([3]), productController.getVendorProducts);
 router.post('/products', authMiddleware, roleMiddleware([3]), upload.single('image'), productController.createProduct);

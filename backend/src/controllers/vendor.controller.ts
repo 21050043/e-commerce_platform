@@ -71,6 +71,26 @@ export default class VendorController {
     }
   };
 
+  public updateVacationMode = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = req.user!;
+      const { trangThaiHoatDong } = req.body;
+
+      if (!['ACTIVE', 'VACATION'].includes(trangThaiHoatDong)) {
+        return res.status(400).json({ message: 'Trạng thái hoạt động không hợp lệ' });
+      }
+
+      const profile = await this.vendorService.updateVacationMode(id, trangThaiHoatDong);
+      const message = trangThaiHoatDong === 'VACATION'
+        ? 'Cửa hàng đã được bật chế độ tạm nghỉ (Vacation Mode)'
+        : 'Cửa hàng đã hoạt động trở lại';
+
+      return res.status(200).json({ message, profile });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message || 'Không thể cập nhật chế độ hoạt động' });
+    }
+  };
+
   // Admin methods (listApplications, approve, reject) removed as registration is now auto-approved.
 }
 
